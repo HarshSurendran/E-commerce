@@ -4,13 +4,11 @@ const User = require("../models/user.models.js")
 const uploadOnCloudinary = require("../utils/cloudinary.js");
 const ApiResponse = require("../utils/ApiResponse.js");
 
-const registerUser = asyncHandler(async(req,res)=>{
-   // user email unique validation - done
-   // take file from user -done
-   // upload image to cloudinary -done
-   // upload data to database
+const registerUser = asyncHandler(async(req,res)=>{   
    const {fullname,phone,email,password} = req.body;
     console.log(fullname);
+
+    //validation
     if(fullname.trim() === ""){
         throw new ApiError(400, "fullname is required")
     }else if(email.trim() === ""){
@@ -19,7 +17,7 @@ const registerUser = asyncHandler(async(req,res)=>{
         throw new ApiError(400, "password is required")
     }
     let nameRegex = /^[A-Z]/
-    if(!fname.match(nameRegex)){
+    if(!fullname.match(nameRegex)){
         throw new ApiError(400, "First name has to start with a capital letter")     
     }
     let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/       
@@ -27,14 +25,22 @@ const registerUser = asyncHandler(async(req,res)=>{
         throw new ApiError(400, "Email is not valid")
     }
 
-
     const emailExist = await User.findOne({email})
-    console.log("Details of existing email id", emailExist);
+    
     if(emailExist){
+        console.log("Details of existing email id", emailExist);
         throw new ApiError(409,"Email already exists");
     }
+    
+    //file handling
+    console.log(req.file);
 
-    const imageLocalPath = req.files?.image?.path;
+    if(!req.file){
+        throw new ApiError(500,"Image path is null");
+    }
+
+    const imageLocalPath = req.file?.path;
+    
 
     const imageUploaded = await uploadOnCloudinary(imageLocalPath);
 
@@ -48,7 +54,7 @@ const registerUser = asyncHandler(async(req,res)=>{
         image: imageUploaded?.url || ""
     });
 
-    const createdUser = await User.findbyId(user._id).select("-password -refreshtoken");
+    const createdUser = await User.findOne({_id: user._id}).select("-password -refreshtoken");
 
     if(!createdUser){
         throw new ApiError(500,"Error while registering a user");
@@ -62,3 +68,5 @@ const registerUser = asyncHandler(async(req,res)=>{
 module.exports = {
     registerUser
 }
+
+

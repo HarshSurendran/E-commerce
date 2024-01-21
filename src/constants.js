@@ -1,1 +1,1 @@
-module.exports = DB_NAME = 'E Commerce'
+module.exports = DB_NAME = 'ECommerce'
