@@ -77,8 +77,13 @@ const registerUser = asyncHandler(async(req,res)=>{
         throw new ApiError(500,"Error while registering a user");
     }
 
-    return res.status(201).json(
-        new ApiResponse(200, createdUser, "User registered Successfully")
+    return res
+    .status(201)
+    .json(new ApiResponse(
+        200,
+        createdUser,
+        "User registered Successfully"
+        )
     )
 })
 
@@ -155,7 +160,8 @@ const logoutUser = asyncHandler( async (req,res)=>{
         secure: true
     }
 
-    res.status(200)
+    return res
+    .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("RefreshToken", options)
     .json(new ApiResponse(200,{},"User successfully logged out"));
@@ -185,7 +191,7 @@ const refreshAccessToken = asyncHandler( async (req,res)=>{
         secure: true
     }
 
-    res
+    return res
     .status(200)
     .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",newRefreshToken,options)
@@ -199,9 +205,65 @@ const refreshAccessToken = asyncHandler( async (req,res)=>{
         ));
 })
 
+const changeCurrentPassword = asyncHandler( async(req,res)=>{
+    const {oldPassword, newPassword, confirmPassword} = req.body;
+
+    if(!(newPassword === confirmPassword)){
+        throw new ApiError(400,"Passwords is not matching");
+    }
+
+    const user = await User.findOne({_id: req.user?._id});
+
+    const passwordCorrect = await user.isPasswordCorrect(oldPassword);
+
+    if(!passwordCorrect){
+        throw new ApiError(400,"Incorrect old password");
+    }
+
+    user.password = newPassword;
+    await user.save({validateBeforeSave:false});
+
+    return res
+    .status(200)
+    .json( new ApiResponse(200,{},"Password updated successfully"))   
+    
+})
+
+const getCurrentUser = asyncHandler( async(req,res)=>{    
+    return res
+    .status(200)
+    .json( new ApiResponse(200,req.user,"User data retrival successfull"))
+})
+
+const updateUserDetails = asyncHandler( async(req,res)=>{
+
+    const {fullname, gender, phone, dateofbirth} = req.body;
+
+    const user = await User.updateOne(
+        {_id:req.user._id},
+        {
+            $set : {fullname, gender, phone, dateofbirth}
+        },
+        {
+            new: true
+        }
+    ).select("-password");
+    
+    return res
+    .status(200)
+    .json( new ApiResponse(
+        200,
+        user,
+        "User data updated successfully"
+    ));
+}) 
+
 module.exports = {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateUserDetails
 }
