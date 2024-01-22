@@ -1,18 +1,65 @@
 const ApiError = require("../utils/ApiError");
+const ApiResponse = require("../utils/ApiResponse");
 const asyncHandler = require("../utils/asynchandler");
 const uploadOnCloudinary = require("../utils/cloudinary");
 const ProductVarient = require("../models/productvarient.models");
-const ApiResponse = require("../utils/ApiResponse");
+const Product = require("../models/product.models.js");
+const Color = require("../models/color.model.js");
+const Size = require("../models/size.models.js");
+const Category = require("../models/category.models.js");
 
+
+const addProduct = asyncHandler( async (req,res)=>{
+    //get the product details -Done
+    //check wether the same product already exist -Done
+    //add the product to the database -Done
+
+    const {name,about,category,islisted} = req.body;
+
+    const productExist = await Product.findOne({name});
+
+    if(productExist){
+        throw new ApiError(400,"Product already exist");
+    }
+
+    const categoryId = await Category.findOne({category})
+
+    const product = await Product.create({
+        name,
+        about,
+        category: categoryId._id,
+        islisted
+    });
+
+    if(!product){
+        throw new ApiError(500,"Something went wrong Product is not added in db");
+    }
+    
+    return res
+    .status(200)
+    .json( new ApiResponse(200,
+        product,
+        "Product successfully added to db"
+        )
+    )
+})
 
 const addProductVarient = asyncHandler(async (req,res)=>{
     //get product details
-    const {productName, color, size, stock,price,cost} = req.body //add remaining parameters to add into product collection
+    const {productname, color, size, stock, price, cost} = req.body //add remaining parameters to add into product collection
+    console.log(productname);
 
     //collecting the _id from product,color and size 
-    const productId = await Product.findOne({name:productName}).select("-name -about -category -islisted -createdAt -updatedAt");
+    const productId = await Product.findOne({name:productname}).select("-name -about -category -islisted -createdAt -updatedAt");
+    console.log("   ",productId);
     const colorId = await Color.findOne({color:color}).select("-color -hex -createdAt -updatedAt");
-    const sizeId = await size.findOne({size:size}).select("-size -createdAt -updatedAt");
+    console.log("   ",colorId);
+    const sizeId = await Size.findOne({size:size}).select("-size -createdAt -updatedAt");
+    console.log("   ",sizeId);
+
+    if(!(productId&&colorId&&sizeId)){
+        throw new ApiError(400,"The product size or color given is invalid")
+    }
 
     //File Handling
     if(!req.files){
@@ -51,15 +98,21 @@ const addProductVarient = asyncHandler(async (req,res)=>{
     .json( new ApiResponse(
         200,
         productVarient,
-        "product uploaded successfully"
+        "productvarient uploaded successfully"
         )
     )
 });
+
+const editProductVarient = asyncHandler(async (req,res)=>{
+    //get datas name, about, category, islisted, color ,size, image
+      
+})
 
 
 
 
 
 module.exports = {
-    addProductVarient
+    addProductVarient,
+    addProduct
 }
