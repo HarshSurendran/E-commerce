@@ -17,10 +17,12 @@ const verifyUserJWT = async(req,_,next)=>{
 
         const user = await User.findOne({_id: decodedtoken._id}).select("-password -refreshToken");
 
+        
         if(!user){
             throw new ApiError(401,"Invalid access token");
         }
-
+        
+        console.log(user);
         // giving the user_id to the request property
         req.user = user._id;
         next();       

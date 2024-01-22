@@ -2,7 +2,7 @@ const ApiError = require("../utils/ApiError.js");
 const ApiResponse = require("../utils/ApiResponse.js");
 const asyncHandler = require("../utils/asynchandler.js");
 const Category = require("../models/category.models.js");
-const { addProduct } = require("./product.controler.js");
+
 
 const addCategory = asyncHandler( async(req,res)=>{
     const {category} = req.body;

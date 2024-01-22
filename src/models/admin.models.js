@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const adminSchema = mongoose.Schema({
     name:{
@@ -40,7 +42,6 @@ adminSchema.methods.generateAccessToken = function(){
         {
             _id: this._id,
             email: this.email,
-            name: this.name
         },
         process.env.ACCESS_TOKEN_SECRET,
         {

@@ -11,7 +11,6 @@ router.post("/login", userController.loginUser);
 //secured route
 router.post("/logout", auth.verifyUserJWT, userController.logoutUser);
 router.post("/refresh-token", userController.refreshAccessToken);
-
-
+router.patch("/userdetails", auth.verifyUserJWT, userController.updateUserDetails);
 
 module.exports = router

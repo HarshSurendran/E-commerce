@@ -47,15 +47,11 @@ const addProduct = asyncHandler( async (req,res)=>{
 const addProductVarient = asyncHandler(async (req,res)=>{
     //get product details
     const {productname, color, size, stock, price, cost} = req.body //add remaining parameters to add into product collection
-    console.log(productname);
-
+    
     //collecting the _id from product,color and size 
-    const productId = await Product.findOne({name:productname}).select("-name -about -category -islisted -createdAt -updatedAt");
-    console.log("   ",productId);
-    const colorId = await Color.findOne({color:color}).select("-color -hex -createdAt -updatedAt");
-    console.log("   ",colorId);
-    const sizeId = await Size.findOne({size:size}).select("-size -createdAt -updatedAt");
-    console.log("   ",sizeId);
+    const productId = await Product.findOne({name:productname}).select("-name -about -category -islisted -createdAt -updatedAt");    
+    const colorId = await Color.findOne({color:color}).select("-color -hex -createdAt -updatedAt");    
+    const sizeId = await Size.findOne({size:size}).select("-size -createdAt -updatedAt");    
 
     if(!(productId&&colorId&&sizeId)){
         throw new ApiError(400,"The product size or color given is invalid")
@@ -90,7 +86,7 @@ const addProductVarient = asyncHandler(async (req,res)=>{
     })
 
     if(!productVarient){
-        throw new ApiError(500,"Something went wrong while uploading productvarient to database")
+        throw new ApiError(500, "Something went wrong while uploading productvarient to database")
     }
 
     return res

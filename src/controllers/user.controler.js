@@ -97,10 +97,12 @@ const loginUser = asyncHandler( async (req,res)=>{
     
     const {value, password} = req.body;
 
+    console.log(value,"and",password);
+
     //validation of value and password
-    if(!value){
-        throw new ApiError(400,"Email or password is compulsory");
-    }else if(!password){
+    if(value.trim()==""){
+        throw new ApiError(400,"Email or Phone Number is compulsory");
+    }else if(password.trim()==""){
         throw new ApiError(400,"password is compulsory")
     }
     
@@ -129,6 +131,8 @@ const loginUser = asyncHandler( async (req,res)=>{
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
+    console.log(accessToken);
+
     const userLoggedIn =  await User.findOne({_id: user._id}).select("-password -refreshToken");
 
     const options ={
@@ -138,9 +142,9 @@ const loginUser = asyncHandler( async (req,res)=>{
 
     // sending the tokens to browser through cookie
 
-    res.status(200)
+    return res.status(200)
     .cookie("accessToken", accessToken, options)
-    .cookie("RefreshToken", refreshToken, options)
+    .cookie("refreshToken", refreshToken, options)
     .json( new ApiResponse(
         200,
         {
@@ -185,6 +189,7 @@ const refreshAccessToken = asyncHandler( async (req,res)=>{
     }
 
     const {accessToken,newRefreshToken} = generateAccessAndRefreshToken(user._id);
+    console.log("AccessToken is ", accessToken);
 
     const options={
         httpOnly: true,
@@ -238,16 +243,21 @@ const getCurrentUser = asyncHandler( async(req,res)=>{
 const updateUserDetails = asyncHandler( async(req,res)=>{
 
     const {fullname, gender, phone, dateofbirth} = req.body;
+    console.log(fullname," ",gender," ",phone, " ", dateofbirth);
+
+    console.log(req.user);
 
     const user = await User.updateOne(
-        {_id:req.user._id},
+        {_id:req.user},
         {
-            $set : {fullname, gender, phone, dateofbirth}
+            $set : {fullname:fullname, gender: gender, phone: phone, dateofbirth: dateofbirth}
         },
         {
             new: true
         }
     ).select("-password");
+
+    console.log(user);
     
     return res
     .status(200)
