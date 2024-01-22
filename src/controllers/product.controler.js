@@ -5,9 +5,14 @@ const ProductVarient = require("../models/productvarient.models");
 const ApiResponse = require("../utils/ApiResponse");
 
 
-const addProduct = asyncHandler(async (req,res)=>{
+const addProductVarient = asyncHandler(async (req,res)=>{
     //get product details
-    const {stock,price,cost} = req.body //add remaining parameters to add into product collection
+    const {productName, color, size, stock,price,cost} = req.body //add remaining parameters to add into product collection
+
+    //collecting the _id from product,color and size 
+    const productId = await Product.findOne({name:productName}).select("-name -about -category -islisted -createdAt -updatedAt");
+    const colorId = await Color.findOne({color:color}).select("-color -hex -createdAt -updatedAt");
+    const sizeId = await size.findOne({size:size}).select("-size -createdAt -updatedAt");
 
     //File Handling
     if(!req.files){
@@ -25,12 +30,12 @@ const addProduct = asyncHandler(async (req,res)=>{
 
         urls.push(uploadedToCloudinary.url);
     }
-    
+
     //add it to the database
     const productVarient = ProductVarient.create({
-        product_id:123,
-        size_id:12,
-        color_id:123,        
+        product_id:productId._id,
+        size_id:sizeId._id,
+        color_id:colorId._id,        
         stock,
         price,
         cost,
@@ -49,8 +54,12 @@ const addProduct = asyncHandler(async (req,res)=>{
         "product uploaded successfully"
         )
     )
-})
+});
+
+
+
+
 
 module.exports = {
-    addProduct
+    addProductVarient
 }
