@@ -8,18 +8,19 @@ const sizeController = require("../controllers/size.controler.js");
 const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 
+
 router.post("/login", adminController.adminlogin);
 
-
 // Secured routes
-router.post("/products", productController.addProduct);
-router.post("/products-varient", upload.array("images",4), productController.addProductVarient);
+router.post("/products", auth.verifyAdminJWT, productController.addProduct);
+router.post("/products-varient", auth.verifyAdminJWT, upload.array("images",4), productController.addProductVarient);
+router.post("/logout", auth.verifyAdminJWT, adminController.adminlogout);
 
 //category
-router.post("/category", categoryController.addCategory);
+router.post("/category", auth.verifyAdminJWT, categoryController.addCategory);
 //Color
-router.post("/color", colorController.addColor);
+router.post("/color", auth.verifyAdminJWT, colorController.addColor);
 //Size
-router.post("/size", sizeController.addSize);
+router.post("/size", auth.verifyAdminJWT, sizeController.addSize);
 
 module.exports = router;

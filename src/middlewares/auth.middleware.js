@@ -1,7 +1,7 @@
 const ApiError = require("../utils/ApiError");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.models");
-const admin = require("../models/admin.models.js");
+const Admin = require("../models/admin.models.js");
 
 const verifyUserJWT = async(req,_,next)=>{
     try {
@@ -32,18 +32,21 @@ const verifyUserJWT = async(req,_,next)=>{
     }
 }
 
-
 const verifyAdminJWT = async(req,_,next)=>{
     try {
         //getting token from request
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
+        console.log("This is token from verify admin token",token);
+
         if(!token){
-            throw new ApiError(401,"Unauthorised request");
+            throw new ApiError(401, "Unauthorised request");
         }
 
         // decoding the token and verifying it with user
         const decodedtoken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+        console.log("thisis the decoded token", decodedtoken);
 
         const admin = await Admin.findOne({_id: decodedtoken._id}).select("-password -refreshToken");
 
@@ -51,15 +54,14 @@ const verifyAdminJWT = async(req,_,next)=>{
             throw new ApiError(401,"Invalid access token");
         }
 
-        // giving the user_id to the request property
-        req.admin = admin._id;
+        // giving the admin details to the request property
+        req.admin = admin;
         next();       
         
     } catch (error) {
         throw new ApiError(401,"Verification of JWT unsuccessful.")
     }
 }
-
 
 module.exports = {
     verifyUserJWT,

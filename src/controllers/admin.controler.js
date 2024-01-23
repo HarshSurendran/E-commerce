@@ -62,6 +62,37 @@ const adminlogin = asyncHandler( async(req,res)=>{
     ));
 });
 
+const adminlogout = asyncHandler( async(req,res)=>{
+    
+    const admin = await Admin.updateOne(
+        {
+            _id: req.admin._id
+        },
+        {
+            $unset: {refreshToken:1},
+        },
+        {
+            new: true
+        }
+    );
+
+    if(!admin){
+        throw new ApiError(500, "Something went wrong while updating the refresh token")
+    }
+
+    const options ={
+        httpOnly: true,
+        secure: true
+    }
+    
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json( new ApiResponse(200,{},"admin logged out successfully"));
+})
+
 module.exports = {
-    adminlogin
+    adminlogin,
+    adminlogout
 }
