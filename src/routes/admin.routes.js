@@ -12,7 +12,7 @@ router.post("/login", adminController.adminlogin);
 
 
 // Secured routes
-router.post("/products", auth.verifyAdminJWT ,productController.addProduct);
+router.post("/products", productController.addProduct);
 router.post("/products-varient", upload.array("images",4), productController.addProductVarient);
 
 //category

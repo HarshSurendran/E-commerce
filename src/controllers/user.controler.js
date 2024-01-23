@@ -22,6 +22,7 @@ const generateAccessAndRefreshToken = async (userid)=>{
 }
 
 const registerUser = asyncHandler(async(req,res)=>{   
+    console.log(req.body);
    const {fullname,phone,email,password} = req.body;
     console.log(fullname);
 
@@ -157,7 +158,11 @@ const loginUser = asyncHandler( async (req,res)=>{
 const logoutUser = asyncHandler( async (req,res)=>{
     // get data about the user
     // delete the refreshtoken 
-    User.updateOne({_id:req.user._id},{$unset: {refreshToken: 1}},{new: true});
+    const user = await User.updateOne({_id:req.user._id},{$unset: {refreshToken: 1}},{new: true});
+
+    if(!user){
+        throw new ApiError(500, "Something went wrong while deleting refresh token");
+    }
 
     const options ={
         httpOnly:true,
@@ -245,10 +250,10 @@ const updateUserDetails = asyncHandler( async(req,res)=>{
     const {fullname, gender, phone, dateofbirth} = req.body;
     console.log(fullname," ",gender," ",phone, " ", dateofbirth);
 
-    console.log(req.user);
+    console.log(req.user._id);
 
     const user = await User.updateOne(
-        {_id:req.user},
+        {_id:req.user._id},
         {
             $set : {fullname:fullname, gender: gender, phone: phone, dateofbirth: dateofbirth}
         },

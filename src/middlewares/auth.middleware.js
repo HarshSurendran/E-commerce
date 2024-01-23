@@ -24,7 +24,7 @@ const verifyUserJWT = async(req,_,next)=>{
         
         console.log(user);
         // giving the user_id to the request property
-        req.user = user._id;
+        req.user = user;
         next();       
         
     } catch (error) {
