@@ -44,7 +44,7 @@ const addProduct = asyncHandler( async (req,res)=>{
     )
 })
 
-const addProductVarient = asyncHandler(async (req,res)=>{
+const addProductVarient = asyncHandler( async (req,res)=>{
     //get product details
     const {productname, color, size, stock, price, cost} = req.body //add remaining parameters to add into product collection
     
@@ -99,9 +99,10 @@ const addProductVarient = asyncHandler(async (req,res)=>{
     )
 });
 
-const editProductVarient = asyncHandler(async (req,res)=>{
-    //get datas name, about, category, islisted, color ,size, image
-      
+const editProductVarient = asyncHandler( async (req,res)=>{
+    //get datas name, about, category, islisted, 
+    //check whether every pic is edited
+    
 })
 
 

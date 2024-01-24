@@ -2,12 +2,20 @@ const ApiError = require("../utils/ApiError.js");
 const User = require("../models/user.models.js");
 const asyncHandler = require("../utils/asynchandler.js")
 const uploadOnCloudinary = require("../utils/cloudinary.js");
+const fs = require("fs");
 
 
 const insertUser = asyncHandler(async(req, _,next)=>{   
     console.log(req.body);
     const {fullname,phone,email,password} = req.body;
     console.log(fullname);
+    console.log(req.file);
+
+    if(!req.file){
+        throw new ApiError(500,"Image path is null");
+    }
+
+    const imageLocalPath = req.file?.path; 
 
     //validation
     if(fullname.trim() === ""){
@@ -29,22 +37,17 @@ const insertUser = asyncHandler(async(req, _,next)=>{
     const emailExist = await User.findOne({email})
     
     if(emailExist){
+        fs.unlinkSync(imageLocalPath);
         console.log("Details of existing email id", emailExist);
         throw new ApiError(409,"Email already exists");
     }
     
     //file handling
-    console.log(req.file);
-
-    if(!req.file){
-        throw new ApiError(500,"Image path is null");
-    }
-
-    const imageLocalPath = req.file?.path;    
+       
 
     const imageUploaded = await uploadOnCloudinary(imageLocalPath);
 
-    console.log("\n the response after image uploaded", imageUploaded);
+    console.log("\n the url after image uploaded", imageUploaded.url);
 
     const user = await User.create({
         fullname,
@@ -59,6 +62,14 @@ const insertUser = asyncHandler(async(req, _,next)=>{
     if(!createdUser){
         throw new ApiError(500,"Error while registering a user");
     }
+    console.log(createdUser);
+
+    // setTimeout(async (email)=>{
+    //     const user123 = await User.findOne({email});
+    //     if(user123.isVerified == false){
+    //         await User.deleteOne({_id:user123._id})
+    //     }
+    // });
 
     req.user = createdUser;
     next();

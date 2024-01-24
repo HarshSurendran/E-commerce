@@ -113,7 +113,13 @@ const verifiedUserLogin = asyncHandler( async (req,res)=>{
 
     console.log(accessToken);
 
-    const userLoggedIn =  await User.findOne({_id: req.user}).select("-password -refreshToken");
+    const userLoggedIn =  await User.updateOne(
+        {
+           _id: req.user
+        },
+        {
+            isVerified: true
+        }).select("-password -refreshToken");
 
     const options ={
         httpOnly : true,

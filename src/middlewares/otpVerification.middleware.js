@@ -1,6 +1,7 @@
-const ApiError = require("../utils/ApiError");
-const asyncHandler = require("../utils/asynchandler");
-const Otp = require("../models/otp.models");
+const ApiError = require("../utils/ApiError.js");
+const asyncHandler = require("../utils/asynchandler.js");
+const Otp = require("../models/otp.models.js");
+const User = require("../models/user.models.js")
 
 const verifyOtp = asyncHandler( async(req,_,next)=>{
     console.log(req.body);
@@ -19,6 +20,10 @@ const verifyOtp = asyncHandler( async(req,_,next)=>{
         throw new ApiError(400, "Otp entered is not correct");
     }
 
+    const updateUser = await User.updateOne({_id:userId},{$set: {isVerified: true}})
+    if(!updateUser){
+        throw new ApiError(500,"Updating userdetails failed")
+    }
     req.user = userId
     next();
 });
