@@ -30,7 +30,24 @@ const addSize = asyncHandler( async(req,res)=>{
 
 })
 
+const deleteSize = asyncHandler( async(req,res)=>{
+
+    console.log(req.params.id);
+    const sizeId = req.params.id;
+
+    const isSuccess = await Size.deleteOne({_id:sizeId});
+
+    if(!isSuccess){
+        throw new ApiError(500, "Something went wrong while deleting size")
+    }
+
+    return res
+    .status(200)
+    .json( new ApiResponse(200,{},"Size deleted successfully"));
+})
+
 
 module.exports = {
-    addSize
+    addSize,
+    deleteSize
 }

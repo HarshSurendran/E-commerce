@@ -27,6 +27,22 @@ const addColor = asyncHandler( async(req,res)=>{
     .json( new ApiResponse(200,col,"Color added successfully"));
 })
 
+const deleteColor = asyncHandler( async(req,res)=>{
+    console.log(req.params.id);
+    const colorid = req.params.id;
+
+    const isSuccess = await Color.deleteOne({_id:colorid});
+
+    if(!isSuccess){
+        throw new ApiError(500, "Something went wrong while deleting Color")
+    }
+
+    return res
+    .status(200)
+    .json( new ApiResponse(200,{},"Color deleted successfully"));
+})
+
 module.exports = {
-    addColor
+    addColor,
+    deleteColor
 }

@@ -37,16 +37,12 @@ const verifyAdminJWT = async(req,_,next)=>{
         //getting token from request
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
-        console.log("This is token from verify admin token",token);
-
         if(!token){
             throw new ApiError(401, "Unauthorised request");
         }
 
         // decoding the token and verifying it with user
         const decodedtoken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-        console.log("thisis the decoded token", decodedtoken);
 
         const admin = await Admin.findOne({_id: decodedtoken._id}).select("-password -refreshToken");
 

@@ -1,10 +1,17 @@
 const asyncHandler = require("../utils/asynchandler.js")
 const ApiError = require("../utils/ApiError.js");
-const User = require("../models/user.models.js")
-const uploadOnCloudinary = require("../utils/cloudinary.js");
 const ApiResponse = require("../utils/ApiResponse.js");
-const jwt = require('jsonwebtoken');
 
+//models
+const User = require("../models/user.models.js");
+
+
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+
+
+
+//Functions for use inside this file
 const generateAccessAndRefreshToken = async (userid)=>{
     try{
     const user = await User.findOne({_id:userid});
@@ -21,71 +28,110 @@ const generateAccessAndRefreshToken = async (userid)=>{
     }
 }
 
-const registerUser = asyncHandler(async(req,res)=>{   
-    console.log(req.body);
-   const {fullname,phone,email,password} = req.body;
-    console.log(fullname);
+//declaration of nodemailer
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GOOGLEEMAIL,
+      pass: process.env.GOOGLEPASSWORD,
+    },
+});
 
-    //validation
-    if(fullname.trim() === ""){
-        throw new ApiError(400, "fullname is required")
-    }else if(email.trim() === ""){
-        throw new ApiError(400, "email is required")
-    }else if(password.trim() === ""){
-        throw new ApiError(400, "password is required")
-    }
-    let nameRegex = /^[A-Z]/
-    if(!fullname.match(nameRegex)){
-        throw new ApiError(400, "First name has to start with a capital letter")     
-    }
-    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/       
-    if(!email.match(emailRegex)){
-        throw new ApiError(400, "Email is not valid")
-    }
 
-    const emailExist = await User.findOne({email})
+// const registerUser = asyncHandler(async(req,res)=>{   
+//     console.log(req.body);
+//     const {fullname,phone,email,password} = req.body;
+//     console.log(fullname);
+
+//     //validation
+//     if(fullname.trim() === ""){
+//         throw new ApiError(400, "fullname is required")
+//     }else if(email.trim() === ""){
+//         throw new ApiError(400, "email is required")
+//     }else if(password.trim() === ""){
+//         throw new ApiError(400, "password is required")
+//     }
+//     let nameRegex = /^[A-Z]/
+//     if(!fullname.match(nameRegex)){
+//         throw new ApiError(400, "First name has to start with a capital letter")     
+//     }
+//     let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/       
+//     if(!email.match(emailRegex)){
+//         throw new ApiError(400, "Email is not valid")
+//     }
+
+//     const emailExist = await User.findOne({email})
     
-    if(emailExist){
-        console.log("Details of existing email id", emailExist);
-        throw new ApiError(409,"Email already exists");
-    }
+//     if(emailExist){
+//         console.log("Details of existing email id", emailExist);
+//         throw new ApiError(409,"Email already exists");
+//     }
     
-    //file handling
-    console.log(req.file);
+//     //file handling
+//     console.log(req.file);
 
-    if(!req.file){
-        throw new ApiError(500,"Image path is null");
-    }
+//     if(!req.file){
+//         throw new ApiError(500,"Image path is null");
+//     }
 
-    const imageLocalPath = req.file?.path;
+//     const imageLocalPath = req.file?.path;
     
 
-    const imageUploaded = await uploadOnCloudinary(imageLocalPath);
+//     const imageUploaded = await uploadOnCloudinary(imageLocalPath);
 
-    console.log("\n the response after image uploaded", imageUploaded);
+//     console.log("\n the response after image uploaded", imageUploaded);
 
-    const user = await User.create({
-        fullname,
-        phone,
-        email,
-        password,
-        image: imageUploaded?.url || ""
-    });
+//     const user = await User.create({
+//         fullname,
+//         phone,
+//         email,
+//         password,
+//         image: imageUploaded?.url || ""
+//     });
 
-    const createdUser = await User.findOne({_id: user._id}).select("-password -refreshtoken");
+//     const createdUser = await User.findOne({_id: user._id}).select("-password -refreshtoken");
 
-    if(!createdUser){
-        throw new ApiError(500,"Error while registering a user");
+//     if(!createdUser){
+//         throw new ApiError(500,"Error while registering a user");
+//     }
+
+//     return res
+//     .status(201)
+//     .json(new ApiResponse(
+//         200,
+//         createdUser,
+//         "User registered Successfully"
+//         )
+//     )
+// })
+
+const verifiedUserLogin = asyncHandler( async (req,res)=>{
+
+    console.log(req.user);
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(req.user);
+
+    console.log(accessToken);
+
+    const userLoggedIn =  await User.findOne({_id: req.user}).select("-password -refreshToken");
+
+    const options ={
+        httpOnly : true,
+        secure: true 
     }
 
-    return res
-    .status(201)
-    .json(new ApiResponse(
+    // sending the tokens to browser through cookie
+
+    return res.status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json( new ApiResponse(
         200,
-        createdUser,
-        "User registered Successfully"
-        )
-    )
+        {
+        user: userLoggedIn,accessToken,refreshToken
+        },
+        "User succesfully logged in"
+    ));
 })
 
 const loginUser = asyncHandler( async (req,res)=>{
@@ -271,14 +317,45 @@ const updateUserDetails = asyncHandler( async(req,res)=>{
         user,
         "User data updated successfully"
     ));
-}) 
+})
 
-module.exports = {
-    registerUser,
+const otpPageLoader = asyncHandler( async(req,res)=>{
+    
+    const generatedOtp = req.otp.otp;
+    //sending otp to senders mail
+    const mailOptions = {
+        from: "harshsurendran@gmail.com",
+        to: req.user.email,
+        subject: "OTP Verification",
+        text: `Your OTP for verification is: ${generatedOtp}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          throw new ApiError(500, "Something went wrong with sending email", error.message);   
+        }
+    });
+
+    //while rendoring it to the otp verification page should send user email or id which should be given in hidden input form so that we will get to know who is the sender while verifying the code. 
+    return res.
+    status(200)
+    .json( new ApiResponse(
+        200,
+        {},
+        "Otp sent to email"
+    ))
+})
+
+
+
+
+module.exports = {    
     loginUser,
     logoutUser,
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
-    updateUserDetails
+    updateUserDetails,
+    otpPageLoader,
+    verifiedUserLogin
 }

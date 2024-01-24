@@ -92,6 +92,8 @@ const adminlogout = asyncHandler( async(req,res)=>{
     .json( new ApiResponse(200,{},"admin logged out successfully"));
 })
 
+// const listuser = asyncHandler
+
 module.exports = {
     adminlogin,
     adminlogout
