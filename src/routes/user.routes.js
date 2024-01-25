@@ -7,8 +7,18 @@ const insertUser = require("../middlewares/insertUser.middleware.js");
 const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 
+router.get("/login", (req,res)=>{
+    res.render("user/userlogin",{user:true});
+});
+router.get("/otp", (req,res)=>{
+    res.render("user/otpvalidation");
+});
+router.get("/register", (req,res)=>{
+    res.render("user/userregister",{user:true});
+})
+
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
-router.post("/verifyOtp", verifyOtp, userController.verifiedUserLogin);
+router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
 router.post("/login", userController.loginUser);
 
 //secured route

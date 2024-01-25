@@ -1,0 +1,90 @@
+<link rel='stylesheet' href='/stylesheets/userlogin.css' />
+
+<section class="pt-5 ">
+  <div class="container d-flex justify-content-center ">
+    <div class="w-50 ">
+      <div class="d-flex justify-content-center ">
+        <h3>Login</h3>
+      </div>
+
+      <form action="/user/login" method="post">        
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+          <div id="emailHelp" class="form-text">We'll never share your email with anyone else.            
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        
+        {{!-- <div class="mb-3">
+          <a href="#">Forgot your password?</a>
+        </div> --}}
+        {{!-- <div id="emailHelp" class="form-text mb-3 ">Forgot your password?  <a href="#">Click me</a>           
+        </div> --}}
+
+        <a href="" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Forgot your password?</a>
+                
+        <!-- Button trigger modal -->
+
+  
+        <!-- Modal one-->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h5 class="text-dark "> Forgot Password? Enter your credentials</h5>
+                        <div class="mb-3">
+                            <label for="emailInput" class="form-label text-dark"></label>
+                            <input type="email" class="form-control" id="emailInput" placeholder="Enter the email ID">
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"><button type="button" class="btn btn-primary " data-bs-target="#staticBackdrop2">Continue</button></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+           
+            <div class="modal-body">
+                <h5 class="text-dark "> Enter OTP</h5>
+                <div class="mb-3 row">
+                   
+                    <div class="col-sm-12">
+                        
+                        <div class="d-flex flex-wrap justify-content-center ">
+                            <input type="number" class="form-control mb-2 mx-2" id="otpInput1" maxlength="1" style="width: 4em; height: 4em;">
+                            <input type="number" class="form-control mb-2 mx-2" id="otpInput2" maxlength="1" style="width: 4em; height: 4em;">
+                            <input type="number" class="form-control mb-2 mx-2" id="otpInput3" maxlength="1" style="width: 4em; height: 4em;">
+                            <input type="number" class="form-control mb-2 mx-2" id="otpInput4" maxlength="1" style="width: 4em; height: 4em;">
+                          
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="/verifyotp" data-bs-toggle="modal" data-bs-target="#staticBackdrop3"><button type="button" class="btn btn-primary " data-bs-target="#staticBackdrop2">Continue</button></a>
+            </div>
+           
+        </div>
+    </div>
+</div>
+        <button type="submit" class="btn w-100 submit_button hover-shadow mb-3 mt-3  ">Submit</button>
+        <div class="mb-3 d-flex justify-content-center ">
+          <a href="register">Join our family. Create a account</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

@@ -193,7 +193,7 @@ const loginUser = asyncHandler( async (req,res)=>{
         secure: true 
     }
 
-    // sending the tokens to browser through cookie
+    //sending the tokens to browser through cookie
 
     return res.status(200)
     .cookie("accessToken", accessToken, options)
@@ -205,6 +205,7 @@ const loginUser = asyncHandler( async (req,res)=>{
         },
         "User succesfully logged in"
     ));
+    
 })
 
 const logoutUser = asyncHandler( async (req,res)=>{
@@ -343,13 +344,16 @@ const otpPageLoader = asyncHandler( async(req,res)=>{
     });
 
     //while rendoring it to the otp verification page should send user email or id which should be given in hidden input form so that we will get to know who is the sender while verifying the code. 
-    return res.
-    status(200)
-    .json( new ApiResponse(
-        200,
-        {},
-        "Otp sent to email"
-    ))
+    console.log("This is the userid i am sending with the render",req.otp.userid);
+    res.render("user/otpvalidation", {userId : req.otp.userid});
+
+    // return res.
+    // status(200)
+    // .json( new ApiResponse(
+    //     200,
+    //     {},
+    //     "Otp sent to email"
+    // ))
 })
 
 

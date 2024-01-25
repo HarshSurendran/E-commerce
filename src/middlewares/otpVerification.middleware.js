@@ -5,8 +5,10 @@ const User = require("../models/user.models.js")
 
 const verifyOtp = asyncHandler( async(req,_,next)=>{
     console.log(req.body);
-    const { userId, otp } = req.body
+    const { userId, otp1,otp2,otp3,otp4,otp5,otp6 } = req.body
     console.log(userId);
+    const otp = otp1+otp2+otp3+otp4+otp5+otp6;
+    console.log(otp);
 
     const userOtp = await Otp.findOne({userid:userId});
 
