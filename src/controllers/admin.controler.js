@@ -164,7 +164,7 @@ const createUser = asyncHandler( async(req,res)=>{
     
         return res
         .status(201)
-        .redirect("test");
+        .redirect("users");
 })
 
 const blockUnblockUser = asyncHandler( async(req,res)=>{
