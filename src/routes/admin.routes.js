@@ -9,12 +9,34 @@ const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 
 
-router.post("/login", adminController.adminlogin);
+router.get("/" ,(req,res)=>{
+    res.render("admin/adminlogin")
+});
+
+router.get("/test",(req,res)=>{
+    res.render("admin/test",{admin:true , title:"Urbane Wardrobe"})
+});
+
+router.post("/", adminController.adminlogin);
+router.get("/dashboard", auth.verifyAdminJWT, adminController.renderDashboard);
+
+router.get("/addproduct", auth.verifyAdminJWT, productController.addProductPage);
+router.post("/addproduct", auth.verifyAdminJWT, productController.addProduct);
+
+// product handling 
+router.get("/Products", auth.verifyAdminJWT, productController.onlyProductsList);
+router.get("/edit-product/:id", auth.verifyAdminJWT, productController.editProductPage);
+router.post("/editProduct", auth.verifyAdminJWT, productController.editProduct);
+router.get("/delete-product/:id", auth.verifyAdminJWT, productController.deleteProduct);
+
+
 
 // Secured routes
-router.post("/products", auth.verifyAdminJWT, productController.addProduct);
+router.get("/logout", auth.verifyAdminJWT, adminController.logout)
+router.get("/productlist", auth.verifyAdminJWT, productController.listProducts)
+//router.post("/products", auth.verifyAdminJWT, productController.addProduct);
 router.post("/products-varient", auth.verifyAdminJWT, upload.array("images",4), productController.addProductVarient);
-router.post("/logout", auth.verifyAdminJWT, adminController.adminlogout);
+
 
 //category
 router.post("/category", auth.verifyAdminJWT, categoryController.addCategory);

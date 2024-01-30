@@ -13,7 +13,7 @@ const verifyOtp = asyncHandler( async(req,_,next)=>{
     const userOtp = await Otp.findOne({userid:userId});
 
     if(!userOtp){
-        throw new ApiError(400,"there is no user with this Id")
+        throw new ApiError(400,"Invalid");
     }
 
     console.log("This is the otp model of the user", userOtp);

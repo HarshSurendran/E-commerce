@@ -3,11 +3,13 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const path = require("path");
 const hbs = require("hbs");
+//const errorHandlingMiddleware = require("./middlewares/errorHandling.middleware.js")
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
-app.use(cookieParser())
+app.use(cookieParser());
+//app.use(errorHandlingMiddleware());
 
 //setup view-engine
 console.log(__dirname);

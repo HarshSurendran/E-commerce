@@ -1,0 +1,259 @@
+<main class="main-wrap">            
+            <section class="content-main">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="content-header">
+                            <h2 class="content-title">Add New Product</h2>
+                            {{!-- <div>
+                                <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                                <button class="btn btn-md rounded font-sm hover-up">Publish</button>
+                            </div> --}}
+                        </div>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Basic</h4>
+                            </div>
+                            <div class="card-body">
+                                {{!-- <form> --}}
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Product title</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="productName" name="product_name"/>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Full description</label>
+                                        <textarea id="about" placeholder="Type here" class="form-control" rows="4"></textarea name="description">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6 mb-3">
+                                            <label class="form-label">Category</label>
+                                            <select id="category" class="form-select ">
+                                                {{#each category}}
+                                                <option>{{this.category}}</option>
+                                                {{/each}}                                                
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <label class="form-label">Listed</label>
+                                            <select id="islisted" class="form-select">
+                                                <option value="true">True</option>
+                                                <option value="false">False</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex  justify-content-center">
+                                        <button type="button" id="productButton" class="btn btn-md rounded font-sm hover-up">Add product</button>
+                                    </div>
+                                    <h3 id="alert" class="text-success text-center mt-2"></h3>
+                                {{!-- </form> --}}
+                            </div>
+                        </div>
+                        <!-- card end// -->
+                    </div>                    
+                </div>
+            </section>
+            <button id="addForm" class="btn btn-md rounded font-sm hover-up">Add</button>
+            <!-- content-main end// -->
+            <section id="productVarientForm" class="content-main" >
+                <div class="row">
+                    <div class="col-9">
+                        <div class="content-header">
+                            <h2 class="content-title">Add Product varient</h2>                            
+                        </div>
+                    </div>
+                    <div id="target" class="col-lg-9">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Basic</h4>
+                            </div>
+                            <div class="card-body">                                
+                                    <div class="row">
+                                        <div class="col-sm-6 mb-3">
+                                            <label class="form-label">Color</label>
+                                            <select id="color" class="form-select">
+                                                {{#each color}}
+                                                <option>{{this.color}}</option>
+                                                {{/each}}                                                
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <label class="form-label">Size</label>
+                                            <select id="size" class="form-select">
+                                                {{#each size}}
+                                                <option>{{this.size}}</option>
+                                                {{/each}}                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-4 mb-3">
+                                            <label for="price" class="form-label">Price</label>
+                                            <input type="number" placeholder="Type here" class="form-control" id="price" name="price"/>
+                                        </div>
+                                        <div class="col-sm-4 mb-3">
+                                            <label for="cost" class="form-label">Cost</label>
+                                            <input type="number" placeholder="Type here" class="form-control" id="cost" name="cost"/>
+                                        </div>
+                                        <div class="col-sm-4 mb-3">
+                                            <label for="stock" class="form-label">Stock</label>
+                                            <input type="number" placeholder="Type here" class="form-control" id="stock" name="stock"/>
+                                        </div>                                        
+                                    </div>
+                                    {{!-- Upload image with preview --}}
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h4>Media</h4>
+                                        </div>
+                                        <div class="row">
+                                            <div class="card-body col-sm-3">
+                                                <div class="input-upload">
+                                                    <img id="image-preview" src="assets/imgs/theme/upload.svg" alt="" />
+                                                    <input class="form-control" type="file" id="image-input-1" accept="image/*" onchange="previewImage(event)" required />
+                                                </div>
+                                            </div>
+                                            <div class="card-body col-sm-3">
+                                                <div class="input-upload">
+                                                    <img id="image-preview" src="assets/imgs/theme/upload.svg" alt="" />
+                                                    <input class="form-control" type="file" id="image-input-2" accept="image/*" onchange="previewImage(event)" required />
+                                                </div>
+                                            </div>
+                                            <div class="card-body col-sm-3">
+                                                <div class="input-upload">
+                                                    <img id="image-preview" src="assets/imgs/theme/upload.svg" alt="" />
+                                                    <input class="form-control" type="file" id="image-input-3" accept="image/*" onchange="previewImage(event)" required />
+                                                </div>
+                                            </div>
+                                            <div class="card-body col-sm-3">
+                                                <div class="input-upload">
+                                                    <img id="image-preview" src="assets/imgs/theme/upload.svg" alt="" />
+                                                    <input class="form-control" type="file" id="image-input-4" accept="image/*" onchange="previewImage(event)" required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex  justify-content-center">
+                                        <button type="button" id="productVarientButton" class="btn btn-md rounded font-sm hover-up">Add product-Varient</button>
+                                    </div>
+                                    <h3 id="varientAlert" class="text-center text-success " ></h3>                             
+                                
+                            </div>
+                        </div>
+                        <!-- card end// -->
+                    </div>                    
+                </div>
+                
+            </section>
+            
+            {{!-- <section id="parentSection" class="content-main" >
+
+            </section>             --}}
+        </main>
+
+<script>
+    
+    const alert = document.getElementById("alert");
+    const target = document.getElementById("target");
+    const productButton = document.getElementById("productButton");
+    productButton.addEventListener("click",addProdduct);
+
+    function addProdduct() {        
+        const productName= document.getElementById("productName").value;
+        const about= document.getElementById("about").value;
+        const category= document.getElementById("category").value;
+        const islisted = document.getElementById("islisted").value;
+
+        console.log("This is addproduct fetch")       
+        fetch("/api/v1/admin/addproduct",{
+            method: "post",
+            headers: {
+                "content-type" : "application/json"
+            },
+            body: JSON.stringify({
+                name: productName,
+                about,
+                category,
+                islisted
+            })
+        }).then((res)=>{
+
+            if(!res.ok){
+                alert.innerText = "Product is not added. Please try again";
+            }
+            console.log("fetch is succesfgull");
+            productButton.disabled = true;
+            alert.innerText = "Product is added, now add the varients.";
+            target.scrollIntoView({ behavior:"smooth"});
+        })
+    }
+
+   
+    const addForm = document.getElementById("addForm");
+    console.log(addForm);    
+    const parentSection = document.getElementById("parentSection");
+
+    let repeatCount = 0;     
+    function repeatForm() {
+        console.log("This is repeatform event listener");
+        repeatCount++;
+        const productVarientForm = document.getElementById("productVarientForm");
+        {{!-- const form = document.getElementById("form"); --}}
+        const cloneForm = target.cloneNode(true);
+        cloneForm.id = `productVarientForm${repeatCount}`;
+        cloneForm.reset();
+        parentSection.appendChild(productVarientForm);
+    }
+    
+    addForm.addEventListener("click", repeatForm);
+
+    const varientAlert = document.getElementById("varientAlert")
+    function addProductVarient() {
+        const color = document.getElementById("color").value;
+        const size = document.getElementById("size").value;
+        const price = document.getElementById("price").value;
+        const cost = document.getElementById("cost").value;
+        const stock = document.getElementById("stock").value;
+        const productName= document.getElementById("productName").value;
+
+        fetch("/api/v1/admin/products-varient",{
+            method: "post",
+            headers : {
+                content-type : "application/json"
+            },
+            body: JSON.stringify({
+                productname : productName,
+                color,
+                size,
+                stock,
+                price,
+                cost
+            })
+        }).then((res)=>{
+            if(!res.ok){
+                varientAlert.innerText = "Product varient is not added."
+            }
+            
+            price.innerText = 0;
+            cost.innerText = 0;
+            stock.innerText = 0;            
+        })
+
+    }
+
+    function previewImage(event) {
+        const input = event.target;
+        console.log(input)
+        const preview = document.getElementById('image-preview');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+</script>

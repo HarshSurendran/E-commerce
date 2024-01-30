@@ -4,6 +4,7 @@ const ApiResponse = require("../utils/ApiResponse.js");
 
 //models
 const User = require("../models/user.models.js");
+const ProductVarient = require("../models/productvarient.models.js");
 
 
 const jwt = require("jsonwebtoken");
@@ -113,13 +114,18 @@ const verifiedUserLogin = asyncHandler( async (req,res)=>{
 
     console.log(accessToken);
 
-    const userLoggedIn =  await User.updateOne(
+    const userUpdated =  await User.updateOne(
         {
            _id: req.user
         },
         {
             isVerified: true
-        }).select("-password -refreshToken");
+        }
+    );
+    
+    const userLoggedIn = await User.findOne({_id:req.user}).select("-password -refreshToken");
+
+    console.log(userLoggedIn);    
 
     const options ={
         httpOnly : true,
@@ -131,13 +137,14 @@ const verifiedUserLogin = asyncHandler( async (req,res)=>{
     return res.status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
-    .json( new ApiResponse(
-        200,
-        {
-        user: userLoggedIn,accessToken,refreshToken
-        },
-        "User succesfully logged in"
-    ));
+    // .json( new ApiResponse(
+    //     200,
+    //     {
+    //     user: userLoggedIn,accessToken,refreshToken
+    //     },
+    //     "User succesfully logged in"
+    // ));
+    .render("users/userhome",{user:userLoggedIn});
 })
 
 const loginUser = asyncHandler( async (req,res)=>{
@@ -198,13 +205,14 @@ const loginUser = asyncHandler( async (req,res)=>{
     return res.status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
-    .json( new ApiResponse(
-        200,
-        {
-        user: userLoggedIn,accessToken,refreshToken
-        },
-        "User succesfully logged in"
-    ));
+    // .json( new ApiResponse(
+    //     200,
+    //     {
+    //     user: userLoggedIn,accessToken,refreshToken
+    //     },
+    //     "User succesfully logged in"
+    // ));
+    .render("users/userhome", {user:true})
     
 })
 
@@ -345,7 +353,7 @@ const otpPageLoader = asyncHandler( async(req,res)=>{
 
     //while rendoring it to the otp verification page should send user email or id which should be given in hidden input form so that we will get to know who is the sender while verifying the code. 
     console.log("This is the userid i am sending with the render",req.otp.userid);
-    res.render("user/otpvalidation", {userId : req.otp.userid});
+    res.render("users/otpvalidation", {userId : req.otp.userid});
 
     // return res.
     // status(200)
@@ -354,6 +362,26 @@ const otpPageLoader = asyncHandler( async(req,res)=>{
     //     {},
     //     "Otp sent to email"
     // ))
+})
+
+const allproductlist = asyncHandler( async(req,res)=>{
+    const allProducts = await ProductVarient.aggregate({
+        $lookup : {
+            from: "products",
+            foriegnfield: _id,
+            localfield: product,
+            as:pr
+            
+        }
+    })
+
+    if(!allProducts){
+        throw new ApiError(500,"Something went wrong while fetching product list from databases")
+    }
+
+    res.render("users/allproductlist", {product: allProducts})
+
+
 })
 
 
@@ -367,5 +395,6 @@ module.exports = {
     getCurrentUser,
     updateUserDetails,
     otpPageLoader,
-    verifiedUserLogin
+    verifiedUserLogin,
+    allproductlist
 }

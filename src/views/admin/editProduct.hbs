@@ -1,0 +1,152 @@
+<main class="main-wrap">            
+            <section class="content-main">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="content-header">
+                            <h2 class="content-title">Edit Product</h2>
+                            {{!-- <div>
+                                <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                                <button class="btn btn-md rounded font-sm hover-up">Publish</button>
+                            </div> --}}
+                        </div>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Basic</h4>
+                            </div>
+                            <div class="card-body">
+                                
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Product title</label>
+                                        <input type="text" value="{{prodDetails.name}}" class="form-control" id="productName" name="product_name"/>
+                                        <p id="nameAlert" class="text-danger "></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Full description</label>
+                                        <textarea id="about" placeholder="" class="form-control" rows="4">{{prodDetails.about}}</textarea name="description">
+                                        <p id="aboutAlert" class="text-danger "></p>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6 mb-3">
+                                            <label class="form-label">Category</label>
+                                            <select id="category" class="form-select ">
+                                                <option>{{prodDetails.category.category}}</option>
+                                                {{#each cat}}
+                                                <option>{{this.category}}</option>
+                                                {{/each}}                                                
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <label class="form-label">Listed</label>
+                                            <select id="islisted" class="form-select">
+                                                <option value="true">True</option>
+                                                <option value="false">False</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex  justify-content-center">
+                                        <button type="button" id="editButton" class="btn btn-md rounded font-sm hover-up" data-id="{{prodDetails._id}}">Edit</button>
+                                    </div>
+                                    <h3 id="alert" class="text-success text-center mt-2"></h3>
+                                
+                            </div>
+                        </div>
+                        <!-- card end// -->
+                    </div>                    
+                </div>
+
+                <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5 text-success" id="exampleModalLabel">Success</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center ">
+                            The product was successfully edited.
+                        </div>
+                        <div class="modal-footer justify-content-center ">
+                            {{!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button> --}}
+                            <a href="/api/v1/admin/products"><button type="button" class="btn btn-primary">Back to products</button></a>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", ()=>{
+    const alert = document.getElementById("alert");    
+    const editButton = document.getElementById("editButton");
+        
+    async function showDataModal() {
+            try {
+                // Fetch data
+                await editProduct();
+
+                // Trigger the modal display
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+    function editProduct() {
+        const nameAlert = document.getElementById("nameAlert");
+        const aboutAlert = document.getElementById("aboutAlert");
+        nameAlert.innerText="";
+        aboutAlert.innerText="";  
+        const id = editButton.getAttribute("data-id");
+        console.log(id)    
+        const name= document.getElementById("productName").value;
+        const about= document.getElementById("about").value;
+        const category= document.getElementById("category").value;
+        const islisted = document.getElementById("islisted").value;        
+        
+        if(name.trim()==""){
+            nameAlert.innerText = "Name of the product can't be empty.";
+            throw new error(400, "Validation failed")    
+            //return;                    
+        }
+        if(about.trim()==""){
+            aboutAlert.innerText = "Description of the product can't be empty.";
+            throw new error(400, "Validation failed")    
+            //return;                    
+        }
+
+        console.log("This is addproduct fetch", id);   
+
+        fetch("/api/v1/admin/editProduct",{
+            method: "post",
+            headers: {
+                "content-type" : "application/json"
+            },
+            body: JSON.stringify({
+                id, 
+                name,
+                about,
+                category,
+                islisted
+            })
+        }).then((res)=>{
+
+            if(!res.ok){
+                alert.innerText = "Product is not edited. Please try again";
+            }                        
+           // alert.innerText = "Product is edited successfully.";            
+        }).catch((error)=>{
+            console.error("Error occured duting patch request", error);
+            alert.classList.remove("text-success");
+            alert.classList.add("text-danger");
+            alert.innerText = "Error occured"
+        })
+        
+    }
+
+    editButton.addEventListener("click",showDataModal);
+})
+    
+</script>
