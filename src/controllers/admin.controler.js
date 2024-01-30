@@ -111,16 +111,80 @@ const userList = asyncHandler( async(req, res)=>{
 
     res
     .status(200)
-    .render("admin/userlist",{admin:true, title:"urbane Wardrobw", user: userList});
+    .render("admin/userlist",{ admin:true, title:"Urbane Wardrobw", userDetails: userList});
+});
+
+// const unblockUser = asyncHandler( async(req,res)=>{
+//     const {id} = req.body;
+//     const user = await User.updateOne({_id:id},{
+//         $set: { isBlocked: false }
+//     });
+
+//     if(!user){
+//         throw new ApiError (500 , "something went wrong while unblocking user")
+//     }
+
+//     res
+//     .status(200)
+//     .json({
+//         statuscode: 200,
+//         success: true,
+//     })
+
+// })
+
+const blockUnblockUser = asyncHandler( async(req,res)=>{
+    const id = req.params.userId;
+    console.log(id);
+    const user = await User.findOne({_id:id}).select("-password -isVerified -refreshToken");
+
+    if(!user){
+        throw new ApiError(500, "cannot find user")
+    }
+
+    if(user.isBlocked == true){
+        console.log("Entered isblocked true");
+        const userUpdated = await User.updateOne({_id:id},{
+            $set: { isBlocked: false }
+        });
+    }else{
+        console.log("Entered isblocked false");
+        const userUpdated = await User.updateOne({_id:id},{
+            $set: { isBlocked: true }
+        });    
+    }
+
+    res
+    .status(200)
+    .json( new ApiResponse(200, {}, "task success"))
 })
 
+// const blockUser = asyncHandler( async( req,res)=>{
+//     const {id} = req.body;
+//     const user = await User.updateOne({_id:id},{
+//         $set: { isBlocked: true }
+//     });
+
+//     if(!user){
+//         throw new ApiError (500 , "something went wrong while blocking user")
+//     }
+
+//     res
+//     .status(200)
+//     .json({
+//         statuscode: 200,
+//         success: true,
+//     })
+// })
 
 
-// const listuser = asyncHandler
+
+
 
 module.exports = {
     adminlogin,
     logout,
     renderDashboard,
-    userList
+    userList,
+    blockUnblockUser    
 }

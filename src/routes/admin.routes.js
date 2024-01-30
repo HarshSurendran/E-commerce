@@ -13,9 +13,11 @@ router.get("/" ,(req,res)=>{
     res.render("admin/adminlogin")
 });
 
-router.get("/test",(req,res)=>{
-    res.render("admin/test",{admin:true , title:"Urbane Wardrobe"})
-});
+// usermanagement
+//router.patch("/usermanagement-unblock", adminController.unblockUser)
+router.patch("/blockunblock/:userId", adminController.blockUnblockUser)
+
+router.get("/test", adminController.userList);
 
 router.post("/", adminController.adminlogin);
 router.get("/dashboard", auth.verifyAdminJWT, adminController.renderDashboard);

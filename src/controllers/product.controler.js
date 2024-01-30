@@ -196,12 +196,14 @@ const deleteProduct = asyncHandler( async(req,res)=>{
 
     const id = req.params.id;
 
-    const deleted = await Product.deleteOne({_id:id});
-    console.log("This is the response after deletion",deleted);
-
-    if(!deleted){
-        throw new ApiError(500, "Deletion failed");
+    try{
+        const deleteProductVarient = await ProductVarient.deleteMany({product_id:id});
+        const deleted = await Product.deleteOne({_id:id});
+    }catch (error) {
+        console.log("some error while deleting the product", error);
     }
+
+    console.log("This is the response after deletion");    
     
     res
     .status(200)

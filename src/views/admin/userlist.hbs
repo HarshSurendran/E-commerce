@@ -1,0 +1,173 @@
+<main class="main-wrap">            
+            <section class="content-main">
+                <div class="content-header">
+                    <h2 class="content-title">User list</h2>
+                    <div>
+                        <a href="#" class="btn btn-primary"><i class="material-icons md-plus"></i> Create new</a>
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <header class="card-header">
+                        <div class="row gx-3">
+                            <div class="col-lg-4 col-md-6 me-auto">
+                                <input type="text" placeholder="Search..." class="form-control" />
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-6">
+                                <select class="form-select">
+                                    <option>Status</option>
+                                    <option>Active</option>
+                                    <option>Disabled</option>
+                                    <option>Show all</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-6">
+                                <select class="form-select">
+                                    <option>Show 20</option>
+                                    <option>Show 30</option>
+                                    <option>Show 40</option>
+                                </select>
+                            </div>
+                        </div>
+                    </header>
+                    <!-- card-header end// -->
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="userList" class="table table-hover">
+                                <thead class="text-center ">
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                        <th>Registered</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each userDetails}}
+                                        <tr class="text-center ">
+                                            <td class="text-start ">
+                                                <a href="#" class="itemside">
+                                                    <div class="left">
+                                                        {{!-- <img src="assets/imgs/people/avatar-1.png" class="img-sm img-avatar" alt="Userpic" /> --}}
+                                                    </div>
+                                                    <div class="info pl-3">
+                                                        <h6 class="mb-0 title">{{this.fullname}}</h6>
+                                                        <small class="text-muted">{{this.phone}}</small>
+                                                    </div>
+                                                </a>
+                                            </td>
+                                            <td>{{this.email}}</td>
+                                            <td>                                           
+                                            {{#if this.isBlocked}}
+                                                <button data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-brand unblockButton"> Unblock </button>
+                                            {{else}}
+                                                <button data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-danger blockButton"> Block </button>
+                                            {{/if}}
+                                            </td>                                            
+                                            <td>08.07.2020</td>
+                                            <td class="text-end">
+                                                <a href="#" class="btn btn-sm font-sm rounded btn-brand">View details</a>
+                                                <a href="#" class="btn btn-sm btn-brand rounded font-sm ">Delete</a>
+                                            </td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                            <!-- table-responsive.// -->
+                        </div>
+                    </div>
+                    <!-- card-body end// -->
+                </div>
+                <!-- card end// -->
+                <div class="pagination-area mt-15 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                            <li class="page-item"><a class="page-link" href="#">02</a></li>
+                            <li class="page-item"><a class="page-link" href="#">03</a></li>
+                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                            <li class="page-item"><a class="page-link" href="#">16</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+            <!-- content-main end// -->
+            
+        </main>
+        
+<script> 
+document.addEventListener('DOMContentLoaded', function () {
+    // Attach click event listener to the parent element of the user list
+    document.getElementById('userList').addEventListener('click', function (event) {
+        const target = event.target;
+
+        console.log("This is the taget :", target)
+        // Check if the clicked element is a button with class 'blockButton' or 'unblockButton'
+        if (target.tagName === 'BUTTON' && (target.classList.contains('blockButton') || target.classList.contains('unblockButton'))) {
+            // Get the user ID associated with the clicked button
+            const userId = target.dataset.id;
+
+            console.log("This is userId", userId)
+
+            // Perform the block/unblock action
+            blockUnblockUser(userId, target);
+        }
+    });
+});
+
+// Function to block/unblock a user
+function blockUnblockUser(userId, buttonElement) {
+    console.log("You have entered blovkfunctuion")
+    // Make a Fetch request to your server to handle the block/unblock action
+    fetch(`/api/v1/admin/blockunblock/${userId}`, {
+        method: 'PATCH', // or 'POST' depending on your API design
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            // Include any additional data you need to send to the server
+        }),
+    })
+    .then((res) => {
+        if (!res.ok) {
+            throw new Error('Error in block/unblock action');
+        }
+        return res.json();
+    })
+    .then((data) => {
+        // Update the button text and style based on the server response
+        if (buttonElement.classList.contains('blockButton')) {
+            console.log("THis is  ")
+            buttonElement.innerText = 'Unblock';
+            buttonElement.classList.remove('blockButton');
+            buttonElement.classList.add('unblockButton');
+            buttonElement.classList.remove('btn-danger');
+            buttonElement.classList.add('btn-brand');
+        } else if (buttonElement.classList.contains('unblockButton')) {
+            buttonElement.innerText = 'Block';
+            buttonElement.classList.remove('btn-brand');
+            buttonElement.classList.remove('unblockButton');
+            buttonElement.classList.add('blockButton');
+            buttonElement.classList.add('btn-danger');
+        }
+    })
+    .catch((error) => {
+        console.error(error);
+        // Handle errors or show an error message to the user
+    });
+}
+
+    
+
+    
+    
+    
+
+ 
+    
+
+
+</script>
