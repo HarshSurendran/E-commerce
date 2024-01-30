@@ -1,0 +1,101 @@
+        <main class="main-wrap">            
+            <section class="content-main">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="content-header">
+                            <h2 class="content-title">Add New Product</h2>                            
+                        </div>
+                    </div>
+                    <div class="col-lg-10">
+                        <div class="card mb-4">
+                            <form  onsubmit="return validate()" action="createuser"  method="post">
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <label for="fullname" class="form-label">Full name</label>
+                                        <input type="text" placeholder="Type here" class="form-control" name="fullname" id="fullname"/>
+                                        <p id="nameAlert" class="text-danger "></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="text" placeholder="Type here" class="form-control" name="email" id="email"/>
+                                        <p id="emailAlert" class="text-danger "></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="Phone"  class="form-label">Phone number</label>
+                                        <input type="tel" placeholder="Type here" class="form-control mb-3 shadow-none" id="Phone" aria-describedby="phoneHelp" name="phone">
+                                        <p id="phoneAlert" class="text-danger "></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="Password1"  class="form-label">Password</label>
+                                        <input type="password" placeholder="Type here" class="form-control shadow-none" id="password1" name="password">
+                                        <p id="passwordAlert" class="text-danger "></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="ConfirmPassword1"  class="form-label">Confirm Password</label>
+                                        <input type="password" placeholder="Type here" class="form-control shadow-none" id="password2" name="confirmpassword">
+                                        <p id="confirmPasswordAlert" class="text-danger "></p>
+                                    </div>
+                                    <div class="d-flex  justify-content-center ">
+                                        <button type="submit" class="btn btn-md rounded font-sm hover-up">Add User</button>
+                                    </div>                                    
+                                </div>                                    
+                            </form>
+                        </div>                        
+                    </div>
+                </div>
+            </section>            
+        </main>
+
+<script>
+
+    const nameAlert = document.getElementById("nameAlert");
+    const emailAlert = document.getElementById("emailAlert");
+    const phoneAlert = document.getElementById("phoneAlert");
+    const passwordAlert = document.getElementById("passwordAlert");
+    const confirmPasswordAlert = document.getElementById("confirmPasswordAlert");
+
+    function validate(){
+        console.log("Thisis validate function");
+        nameAlert.innerText = "";
+        emailAlert.innerText = "";
+        phoneAlert.innerText = "";
+        passwordAlert.innerText = "";
+        confirmPasswordAlert.innerText = "";
+        const fullname = document.getElementById("fullname").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password1").value;
+        const confirmPassword = document.getElementById("password2").value;
+
+        console.log(fullname)
+        console.log("Thisis validate functioqweqwn");
+
+        if(fullname.trim() === ""){
+            console.log("This is inside fillnamecheck")
+            nameAlert.innerText = "Name can't be empty";
+            return false;
+        }else if(email.trim() === ""){
+            emailAlert.innerText = "Email can't be empty";
+            return false;
+        }else if(password.trim() === ""){
+            passwordAlert.innerText = "Password can't be empty";
+            return false;
+        }else if(confirmPassword.trim() === ""){
+            confirmPasswordAlert.innerText = "Confirm Password can't be empty";
+            return false;
+        }
+
+        let nameRegex = /^[A-Z]/
+        if(!fullname.match(nameRegex)){
+            nameAlert.innerText = "First letter of the name should be capital."
+            return false
+        }
+        let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/       
+        if(!email.match(emailRegex)){
+            emailAlert.innerText = "Email is not valid."
+            return false
+        }
+
+        
+    }
+
+</script>

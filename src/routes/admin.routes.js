@@ -17,7 +17,7 @@ router.get("/" ,(req,res)=>{
 //router.patch("/usermanagement-unblock", adminController.unblockUser)
 router.patch("/blockunblock/:userId", adminController.blockUnblockUser)
 
-router.get("/test", adminController.userList);
+
 
 router.post("/", adminController.adminlogin);
 router.get("/dashboard", auth.verifyAdminJWT, adminController.renderDashboard);
@@ -31,7 +31,11 @@ router.get("/edit-product/:id", auth.verifyAdminJWT, productController.editProdu
 router.post("/editProduct", auth.verifyAdminJWT, productController.editProduct);
 router.get("/delete-product/:id", auth.verifyAdminJWT, productController.deleteProduct);
 
-
+//user handling
+router.get("/users", auth.verifyAdminJWT, adminController.userList);
+router.get("/delete-user/:id", auth.verifyAdminJWT, adminController.deleteUser);
+router.get("/createuser", auth.verifyAdminJWT, adminController.createUserPage);
+router.post("/createuser", auth.verifyAdminJWT, adminController.createUser);
 
 // Secured routes
 router.get("/logout", auth.verifyAdminJWT, adminController.logout)

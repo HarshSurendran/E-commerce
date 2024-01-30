@@ -114,24 +114,58 @@ const userList = asyncHandler( async(req, res)=>{
     .render("admin/userlist",{ admin:true, title:"Urbane Wardrobw", userDetails: userList});
 });
 
-// const unblockUser = asyncHandler( async(req,res)=>{
-//     const {id} = req.body;
-//     const user = await User.updateOne({_id:id},{
-//         $set: { isBlocked: false }
-//     });
+const createUserPage = asyncHandler( async(req,res)=>{
+    res
+    .status(200)
+    .render("admin/addUser", {admin:true, title:"Urbane Wardrobe"})
+})
 
-//     if(!user){
-//         throw new ApiError (500 , "something went wrong while unblocking user")
-//     }
+const createUser = asyncHandler( async(req,res)=>{        
+    console.log(req.body);
+    const {fullname,phone,email,password} = req.body;
+    console.log(fullname);    
 
-//     res
-//     .status(200)
-//     .json({
-//         statuscode: 200,
-//         success: true,
-//     })
+        //validation
+        if(fullname.trim() === ""){
+            throw new ApiError(400, "fullname is required")
+        }else if(email.trim() === ""){
+            throw new ApiError(400, "email is required")
+        }else if(password.trim() === ""){
+            throw new ApiError(400, "password is required")
+        }
+        let nameRegex = /^[A-Z]/
+        if(!fullname.match(nameRegex)){
+            throw new ApiError(400, "First name has to start with a capital letter")     
+        }
+        let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/       
+        if(!email.match(emailRegex)){
+            throw new ApiError(400, "Email is not valid")
+        }
+    
+        const emailExist = await User.findOne({email})
+        
+        if(emailExist){
+            console.log("Details of existing email id", emailExist);
+            throw new ApiError(409,"Email already exists");
+        }    
 
-// })
+        const user = await User.create({
+            fullname,
+            phone,
+            email,
+            password,            
+        });
+    
+        const createdUser = await User.findOne({_id: user._id}).select("-password -refreshtoken");
+    
+        if(!createdUser){
+            throw new ApiError(500,"Error while registering a user");
+        }
+    
+        return res
+        .status(201)
+        .redirect("test");
+})
 
 const blockUnblockUser = asyncHandler( async(req,res)=>{
     const id = req.params.userId;
@@ -157,28 +191,24 @@ const blockUnblockUser = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .json( new ApiResponse(200, {}, "task success"))
+});
+
+const deleteUser = asyncHandler( async(req,res)=>{
+
+    const id = req.params.id;
+    let deleteUser
+    try{        
+        deleteUser = await User.deleteOne({_id:id});
+    }catch (error) {
+        console.log("some error while deleting the user", error);
+    }
+
+    console.log("This is the response after deletion");
+    
+    res
+    .status(200)
+    .redirect("/api/v1/admin/test");
 })
-
-// const blockUser = asyncHandler( async( req,res)=>{
-//     const {id} = req.body;
-//     const user = await User.updateOne({_id:id},{
-//         $set: { isBlocked: true }
-//     });
-
-//     if(!user){
-//         throw new ApiError (500 , "something went wrong while blocking user")
-//     }
-
-//     res
-//     .status(200)
-//     .json({
-//         statuscode: 200,
-//         success: true,
-//     })
-// })
-
-
-
 
 
 module.exports = {
@@ -186,5 +216,8 @@ module.exports = {
     logout,
     renderDashboard,
     userList,
-    blockUnblockUser    
+    blockUnblockUser,
+    deleteUser,
+    createUser,
+    createUserPage
 }
