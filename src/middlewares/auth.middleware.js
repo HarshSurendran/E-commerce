@@ -2,8 +2,9 @@ const ApiError = require("../utils/ApiError");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.models");
 const Admin = require("../models/admin.models.js");
+const asyncHandler = require("../utils/asynchandler.js");
 
-const verifyUserJWT = async(req,_,next)=>{
+const verifyUserJWT = asyncHandler( async(req,_,next)=>{
     try {
         //getting token from request
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
@@ -29,9 +30,9 @@ const verifyUserJWT = async(req,_,next)=>{
     } catch (error) {
         throw new ApiError(401,"Verification of JWT unsuccessful.")
     }
-}
+})
 
-const verifyAdminJWT = async(req,_,next)=>{
+const verifyAdminJWT = asyncHandler( async(req,_,next)=>{
     try {
         //getting token from request
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
@@ -56,7 +57,7 @@ const verifyAdminJWT = async(req,_,next)=>{
     } catch (error) {
         throw new ApiError(401,"Verification of JWT unsuccessful.")
     }
-}
+})
 
 module.exports = {
     verifyUserJWT,

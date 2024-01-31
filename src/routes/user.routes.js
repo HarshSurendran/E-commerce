@@ -8,9 +8,7 @@ const insertUser = require("../middlewares/insertUser.middleware.js");
 const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 
-router.get("/login", (req,res)=>{
-    res.render("users/userlogin",{user:true});
-});
+
 router.get("/register", (req,res)=>{
     res.render("users/userregister",{user:true});
 });

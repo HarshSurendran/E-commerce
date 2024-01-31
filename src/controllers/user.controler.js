@@ -191,9 +191,9 @@ const loginUser = asyncHandler( async (req,res)=>{
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
-    console.log(accessToken);
-
     const userLoggedIn =  await User.findOne({_id: user._id}).select("-password -refreshToken");
+
+    console.log(userLoggedIn);
 
     const options ={
         httpOnly : true,
@@ -212,7 +212,7 @@ const loginUser = asyncHandler( async (req,res)=>{
     //     },
     //     "User succesfully logged in"
     // ));
-    .render("users/userhome", {user:true})
+    .render("users/userhome", {user:userLoggedIn})
     
 })
 
