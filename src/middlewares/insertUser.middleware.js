@@ -13,7 +13,7 @@ const insertUser = asyncHandler( async (req, _,next)=>{
     //     throw new ApiError(500,"Image path is null");
     // }
 
-    const imageLocalPath = req.file?.path; 
+    //const imageLocalPath = req.file?.path; 
 
     //validation
     // if(fullname.trim() === ""){
@@ -50,6 +50,20 @@ const insertUser = asyncHandler( async (req, _,next)=>{
     //const imageUploaded = await uploadOnCloudinary(imageLocalPath);
 
     //console.log("\n the url after image uploaded", imageUploaded.url);
+
+
+    //checking weather the same email or phone number exists
+    
+    const emailExist = await User.findOne({email}).select("-password -refreshtoken -createdAt -updatedAt");
+    if(emailExist){
+        throw new ApiError(400,"Email already exists");
+    }
+    const phoneExist = await User.findOne({phone}).select("-password -refreshtoken -createdAt -updatedAt");
+    if(phoneExist){
+        throw new ApiError(400,"Phone number already exists");
+    }
+    console.log("this is emailExist :",emailExist);
+
 
     const user = await User.create({
         fullname,
