@@ -11,7 +11,6 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
 
-
 //Functions for use inside this file
 const generateAccessAndRefreshToken = async (userid)=>{
     try{
@@ -37,7 +36,6 @@ const transporter = nodemailer.createTransport({
       pass: process.env.GOOGLEPASSWORD,
     },
 });
-
 
 // const registerUser = asyncHandler(async(req,res)=>{   
 //     console.log(req.body);
@@ -383,8 +381,6 @@ const allproductlist = asyncHandler( async(req,res)=>{
 
 
 })
-
-
 
 
 module.exports = {    

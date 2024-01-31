@@ -207,7 +207,7 @@ const deleteUser = asyncHandler( async(req,res)=>{
     
     res
     .status(200)
-    .redirect("/api/v1/admin/test");
+    .redirect("/api/v1/admin/users");
 })
 
 

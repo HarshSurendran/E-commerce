@@ -1,0 +1,124 @@
+<main class="main-wrap"> 
+    <section id="productVarientForm" class="content-main" >
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add Product varient</h2>                            
+                </div>
+            </div>
+            <div id="target" class="col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between ">
+                        <h4>Basic</h4>
+                        {{!-- <button type="button" id="addForm" class="btn btn-md rounded font-sm hover-up">+</button> --}}
+                    </div>
+                    <form method="post" action="products-varient" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="productname" class="form-label">Product Name (It should match with the Product submited)</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="productname" name="productname" required />
+                                </div>
+                            </div>                
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label">Color</label>
+                                    <select id="color" class="form-select" name="color">
+                                        {{#each color}}
+                                        <option>{{this.color}}</option>
+                                        {{/each}}                                                
+                                    </select>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label">Size</label>
+                                    <select id="size" class="form-select" name="size">
+                                        {{#each size}}
+                                        <option>{{this.size}}</option>
+                                        {{/each}}                                                
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 mb-3">
+                                    <label for="price" class="form-label">Price</label>
+                                    <input type="number" placeholder="Type here" class="form-control" id="price" name="price" required />
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <label for="cost" class="form-label">Cost</label>
+                                    <input type="number" placeholder="Type here" class="form-control" id="cost" name="cost" required />
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <label for="stock" class="form-label">Stock</label>
+                                    <input type="number" placeholder="Type here" class="form-control" id="stock" name="stock" required />
+                                </div>                                        
+                            </div>
+                                {{!-- Upload image with preview --}}
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4>Media</h4>
+                                </div>
+                                <div class="row">
+                                    <div class="card-body col-sm-3">
+                                        <div class="input-upload">
+                                            <img id="image-preview1" src="/assets/imgs/theme/upload.svg" alt="" />
+                                            <input data-id="1" class="form-control" name="images" type="file" id="image-input-1" accept="image/*" onchange="previewImage(event)" required />
+                                        </div>
+                                    </div>
+                                    <div class="card-body col-sm-3">
+                                        <div class="input-upload">
+                                            <img id="image-preview2" src="/assets/imgs/theme/upload.svg" alt="" />
+                                            <input data-id="2" class="form-control" name="images" type="file" id="image-input-2" accept="image/*" onchange="previewImage(event)" required />
+                                        </div>
+                                    </div>
+                                    <div class="card-body col-sm-3">
+                                        <div class="input-upload">
+                                            <img id="image-preview3" src="/assets/imgs/theme/upload.svg" alt="" />
+                                            <input data-id="3" class="form-control" name="images" type="file" id="image-input-3" accept="image/*" onchange="previewImage(event)" required />
+                                        </div>
+                                    </div>
+                                    <div class="card-body col-sm-3">
+                                        <div class="input-upload">
+                                            <img id="image-preview4" src="/assets/imgs/theme/upload.svg" alt="" />
+                                            <input data-id="4" class="form-control" name="images" type="file" id="image-input-4" accept="image/*" onchange="previewImage(event)" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" id="productVarientButton" class="btn btn-md rounded font-sm hover-up">Add product-Varient</button>
+                            </div>
+                            <h3 id="varientAlert" class="text-center text-success"></h3>
+                        </div>
+                    </form>
+                </div>
+                <!-- card end// -->
+            </div>                    
+        </div>
+    </section>
+</main>
+
+ <script>
+    //preview image
+
+    function previewImage(event) {
+        const input = event.target;
+        console.log( "Entered preview image" ,input)
+        let number = input.getAttribute("data-id");
+        
+        console.log(`image-preview${number}`);
+        const preview = document.getElementById(`image-preview${number}`);
+
+       
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+ </script>

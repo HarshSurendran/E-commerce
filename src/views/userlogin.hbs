@@ -7,7 +7,7 @@
         <h3>Login</h3>
       </div>
 
-      <form action="home" method="post">        
+      <form action="users/home" method="post">        
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label">Email address</label>
           <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="value">
@@ -50,36 +50,29 @@
             </div>
         </div>
         <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-           
-            <div class="modal-body">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-body">
                 <h5 class="text-dark "> Enter OTP</h5>
                 <div class="mb-3 row">
-                   
-                    <div class="col-sm-12">
-                        
-                        <div class="d-flex flex-wrap justify-content-center ">
-                            <input type="number" class="form-control mb-2 mx-2" id="otpInput1" maxlength="1" style="width: 4em; height: 4em;">
-                            <input type="number" class="form-control mb-2 mx-2" id="otpInput2" maxlength="1" style="width: 4em; height: 4em;">
-                            <input type="number" class="form-control mb-2 mx-2" id="otpInput3" maxlength="1" style="width: 4em; height: 4em;">
-                            <input type="number" class="form-control mb-2 mx-2" id="otpInput4" maxlength="1" style="width: 4em; height: 4em;">
-                          
-                        </div>
+                  <div class="col-sm-12">
+                    <div class="d-flex flex-wrap justify-content-center ">
+                        <input type="number" class="form-control mb-2 mx-2" id="otpInput1" maxlength="1" style="width: 4em; height: 4em;">
+                        <input type="number" class="form-control mb-2 mx-2" id="otpInput2" maxlength="1" style="width: 4em; height: 4em;">
+                        <input type="number" class="form-control mb-2 mx-2" id="otpInput3" maxlength="1" style="width: 4em; height: 4em;">
+                        <input type="number" class="form-control mb-2 mx-2" id="otpInput4" maxlength="1" style="width: 4em; height: 4em;">
                     </div>
+                  </div>
                 </div>
-                
-                
-                
-            </div>
-            <div class="modal-footer d-flex justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="/verifyotp" data-bs-toggle="modal" data-bs-target="#staticBackdrop3"><button type="button" class="btn btn-primary " data-bs-target="#staticBackdrop2">Continue</button></a>
-            </div>
+              </div>
+              <div class="modal-footer d-flex justify-content-center">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <a href="/verifyotp" data-bs-toggle="modal" data-bs-target="#staticBackdrop3"><button type="button" class="btn btn-primary " data-bs-target="#staticBackdrop2">Continue</button></a>
+              </div>
            
+            </div>
+          </div>
         </div>
-    </div>
-</div>
         <button type="submit" class="btn w-100 submit_button hover-shadow mb-3 mt-3  ">Submit</button>
         <div class="mb-3 d-flex justify-content-center ">
           <a href="register">Join our family. Create a account</a>

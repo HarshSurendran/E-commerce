@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>{{title}}</title>
+
+    {{#if admin}}
     {{!-- Font --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,8 +21,9 @@
     <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg" />
     <!-- Template CSS -->
     <link href="/assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    {{/if}}
 
-
+    {{#if user}}
     {{!-- user template --}}
     <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
@@ -35,7 +38,7 @@
     <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/css/style.css" type="text/css">
-
+    {{/if}}
   </head>
   <body>
     {{#if common}}

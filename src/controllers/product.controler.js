@@ -11,14 +11,16 @@ const mongoose = require("mongoose");
 
 
 const addProductPage = asyncHandler( async (req,res)=>{
-    const color = await Color.find({}).select("-createdAt -updatedAt -hex");    
-    const size = await Size.find({}).select("-createdAt -updatedAt ");    
+        
     const category = await Category.find({}).select("-createdAt -updatedAt ");
     
-    if(!(color || size || category)){
+    if(!category){
         throw new ApiError(500,"server error while getting size and color")
     }
-    res.render("admin/addproduct",{admin:true, title:"Urbane Products", color, size, category});
+    
+    res
+    .status(200)
+    .render("admin/addproduct",{admin:true, title:"Urbane Products", category});
 });
 
 const addProduct = asyncHandler( async (req,res)=>{
@@ -210,11 +212,23 @@ const deleteProduct = asyncHandler( async(req,res)=>{
     .redirect("/api/v1/admin/products");
 })
 
+const addProductVarientPage = asyncHandler( async(req,res)=>{
+    const color = await Color.find({}).select("-createdAt -updatedAt -hex");    
+    const size = await Size.find({}).select("-createdAt -updatedAt ");
+
+    if(!(color || size)){
+        throw new ApiError(500,"server error while getting size and color")
+    }    
+
+    res
+    .status(200)
+    .render("admin/addproductVarient",{admin:true, title:"Urbane Wardrobe", color, size});
+})
 
 const addProductVarient = asyncHandler( async (req,res)=>{
     //get product details
     const {productname, color, size, stock, price, cost} = req.body //add remaining parameters to add into product collection
-    
+        
     //collecting the _id from product,color and size 
     const productId = await Product.findOne({name:productname}).select("-name -about -category -islisted -createdAt -updatedAt");    
     const colorId = await Color.findOne({color:color}).select("-color -hex -createdAt -updatedAt");    
@@ -258,12 +272,13 @@ const addProductVarient = asyncHandler( async (req,res)=>{
 
     return res
     .status(200)
-    .json( new ApiResponse(
-        200,
-        productVarient,
-        "productvarient uploaded successfully"
-        )
-    )
+    // .json( new ApiResponse(
+    //     200,
+    //     productVarient,
+    //     "productvarient uploaded successfully"
+    //     )
+    // )
+    .redirect("products")
 });
 
 const editProductVarient = asyncHandler( async (req,res)=>{
@@ -349,5 +364,6 @@ module.exports = {
     onlyProductsList,
     editProductPage,
     editProduct,
-    deleteProduct
+    deleteProduct,
+    addProductVarientPage
 }
