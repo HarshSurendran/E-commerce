@@ -351,7 +351,7 @@ const otpPageLoader = asyncHandler( async(req,res)=>{
 
     //while rendoring it to the otp verification page should send user email or id which should be given in hidden input form so that we will get to know who is the sender while verifying the code. 
     console.log("This is the userid i am sending with the render",req.otp.userid);
-    res.render("users/otpvalidation", {userId : req.otp.userid});
+    res.render("users/otpvalidation", {userId : req.otp.userid, title:"Urbane Wardrobe", user:true});
 
     // return res.
     // status(200)

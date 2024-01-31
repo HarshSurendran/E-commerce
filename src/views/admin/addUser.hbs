@@ -22,7 +22,7 @@
                                     </div>
                                     <div class="mb-4">
                                         <label for="Phone"  class="form-label">Phone number</label>
-                                        <input type="tel" placeholder="Type here" class="form-control mb-3 shadow-none" id="Phone" aria-describedby="phoneHelp" name="phone">
+                                        <input type="tel" placeholder="Type here" class="form-control mb-3 shadow-none" id="phone" aria-describedby="phoneHelp" name="phone">
                                         <p id="phoneAlert" class="text-danger "></p>
                                     </div>
                                     <div class="mb-4">
@@ -63,6 +63,7 @@
         confirmPasswordAlert.innerText = "";
         const fullname = document.getElementById("fullname").value;
         const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
         const password = document.getElementById("password1").value;
         const confirmPassword = document.getElementById("password2").value;
 
@@ -70,11 +71,13 @@
         console.log("Thisis validate functioqweqwn");
 
         if(fullname.trim() === ""){
-            console.log("This is inside fillnamecheck")
             nameAlert.innerText = "Name can't be empty";
             return false;
         }else if(email.trim() === ""){
             emailAlert.innerText = "Email can't be empty";
+            return false;
+        }else if(phone.trim() === ""){
+            phoneAlert.innerText = "Phone number can't be empty";
             return false;
         }else if(password.trim() === ""){
             passwordAlert.innerText = "Password can't be empty";

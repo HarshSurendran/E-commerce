@@ -70,57 +70,114 @@
 </div> --}}
 
 <div class="container mt-5">
-  <div class="row ">
-    <div class="col-lg-6 col-12  ">
-      <div class=" m-lg-5  ">
-        <form  action="users/register" method="post" >
-          <div class="d-flex justify-content-center ">
-            <h3>Register</h3>
-          </div>
-          <div class="mb-3">
-            <label for="exampleInputEmail1"  class="form-label">Full name</label>
-            <input type="text" class="form-control mb-3 shadow-none " id="Fullname" aria-describedby="Name" name="fullname">
-        
+    <div class="row ">
+      <div class="col-lg-6 col-12  ">
+        <div class=" m-lg-5  ">
+          <form onsubmit="return validate()"  action="users/register" method="post" >
+            <div class="d-flex justify-content-center ">
+              <h3>Register</h3>
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputEmail1"  class="form-label">Full name</label>
+              <input type="text" class="form-control mb-3 shadow-none " id="Fullname" aria-describedby="Name" name="fullname" required>
+              <p id="fullnamealert" class="text-danger "></p>
           
-            <label for="exampleInputEmail1"  class="form-label">Email address</label>
-            <input type="email" class="form-control mb-3 shadow-none" id="Email" aria-describedby="emailHelp" name="email">
-        
             
-            <label for="exampleInputPhone"  class="form-label">Phone number</label>
-            <input type="tel" class="form-control mb-3 shadow-none" id="Phone" aria-describedby="phoneHelp" name="phone">
-          </div>
+              <label for="exampleInputEmail1"  class="form-label">Email address</label>
+              <input type="email" class="form-control mb-3 shadow-none" id="Email" aria-describedby="emailHelp" name="email"  required>
+              <p id="emailalert" class="text-danger "></p>
           
-          <div class="mb-3">
-            <label for="exampleInputPassword1"  class="form-label">Password</label>
-            <input type="password" class="form-control shadow-none" id="Password1" name="password">
+              
+              <label for="exampleInputPhone"  class="form-label">Phone number</label>
+              <input type="tel" class="form-control mb-3 shadow-none" id="Phone" aria-describedby="phoneHelp" name="phone"  required>
+              <p id="phonealert" class="text-danger "></p>
+            </div>
+            
+            <div class="mb-3">
+              <label for="exampleInputPassword1"  class="form-label">Password</label>
+              <input type="password" class="form-control shadow-none" id="Password1" name="password"  id="password" required>
+              <p id="passwordalert" class="text-danger "></p>
+            </div>
+            <div class="mb-5">
+              <label for="exampleInputPassword1"  class="form-label">Confirm Password</label>
+              <input type="password" class="form-control shadow-none" id="Password2" name="confirmpassword" id="confirmpassword" required>
+              <p id="cpasswordalert" class="text-danger "></p>
+            </div>       
+            
+            {{!-- <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="exampleCheck1">
+              <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            </div> --}}
+            <button type="submit" class="btn w-100 mb-3 mt-3 submit_button">Submit</button>
+          </form>
+          <div class="d-flex justify-content-center ">
+              <p>Already our proud member? <a href="login">Go to Login</a></p>
           </div>
-          <div class="mb-5">
-            <label for="exampleInputPassword1"  class="form-label">Confirm Password</label>
-            <input type="password" class="form-control shadow-none" id="Password2" name="confirmpassword">
-          </div>       
-          
-          {{!-- <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="exampleCheck1">
-            <label class="form-check-label" for="exampleCheck1">Check me out</label>
-          </div> --}}
-          <button type="submit" class="btn w-100 mb-3 mt-3 submit_button">Submit</button>
-        </form>
-        <div class="d-flex justify-content-center ">
-            <p>Already our proud member? <a href="login">Go to Login</a></p>
         </div>
       </div>
+
+
+      <div class="col-lg-1 col-12 my-lg-auto  d-flex justify-content-center mt-5  ">     
+        <h3 class="m-0  ">OR</h3>     
+      </div>
+
+      <div class="col-lg-5 col-12 my-lg-auto mt-5 ">
+        <button type="submit" class="btn w-100 submit_button ">Sign up with google</button>
+      </div>
     </div>
-
-
-    <div class="col-lg-1 col-12 my-lg-auto  d-flex justify-content-center mt-5  ">     
-      <h3 class="m-0  ">OR</h3>     
-    </div>
-
-    <div class="col-lg-5 col-12 my-lg-auto mt-5 ">
-      <button type="submit" class="btn w-100 submit_button ">Sign up with google</button>
-    </div>
-
-  </div>
-
-
 </div>
+
+<script>
+
+  const nameAlert = document.getElementById("fullnamealert");
+  const emailAlert = document.getElementById("emailalert");
+  const phoneAlert = document.getElementById("phonealert");
+  const passwordAlert = document.getElementById("passwordalert");
+  const cpasswordAlert = document.getElementById("cpasswordalert");
+  const confirmPassword = document.getElementById("confirmpassword");
+
+  function validate(){
+    console.log("This is validate")
+    const fullname = document.getElementById("Fullname").value;
+    const email = document.getElementById("Email").value;
+    const phone = document.getElementById("Phone").value;
+    const password = document.getElementById("Password1").value;
+    const confirmPassword = document.getElementById("Password2").value;
+
+    nameAlert.innerText="";
+    emailAlert.innerText="";
+    phoneAlert.innerText="";
+    passwordAlert.innerText="";
+    cpasswordAlert.innerText="";
+
+    if(fullname.trim() === ""){
+        console.log("This is inside fillnamecheck")
+        nameAlert.innerText = "Name can't be empty";
+        return false;
+    }else if(email.trim() === ""){
+        emailAlert.innerText = "Email can't be empty";
+        return false;
+    }else if(phone.trim() === ""){
+        phoneAlert.innerText = "Phone can't be empty";
+        return false;
+    }else if(password.trim() === ""){
+        passwordAlert.innerText = "Password can't be empty";
+        return false;
+    }else if(confirmPassword.trim() === ""){
+        confirmPasswordAlert.innerText = "Confirm Password can't be empty";
+        return false;
+    }
+
+    let nameRegex = /^[A-Z]/
+    if(!fullname.match(nameRegex)){
+        nameAlert.innerText = "First letter of the name should be capital."
+        return false
+    }
+    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/       
+    if(!email.match(emailRegex)){
+        emailAlert.innerText = "Email is not valid."
+        return false
+    }
+    
+  }
+</script>
