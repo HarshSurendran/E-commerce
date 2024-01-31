@@ -61,19 +61,21 @@
     const alert = document.getElementById("alert");
     const target = document.getElementById("target");
     const productButton = document.getElementById("productButton");
+    const alertProductName = document.getElementById("alertProductName");
+    const alertDescription = document.getElementById("alertDescription");
     
 
-    function addProdduct() {        
+    function addProduct() {        
+        console.log("add product  fucntion")
         const productName= document.getElementById("productName").value;
         const about= document.getElementById("about").value;
         const category= document.getElementById("category").value;
-        const islisted = document.getElementById("islisted").value;
-        const alertProductName = document.getElementById("alertProductName");
-        const alertDescription = document.getElementById("alertDescription");
+        const islisted = document.getElementById("islisted").value;        
         alertProductName.innerText = "";
         alertDescription.innerText = "";
 
         if(productName.trim()==""){
+            console.log("entered empty name")
             alertProductName.innerText = "Product title can't be empty."
             return
         }
@@ -108,7 +110,7 @@
         })
     }
 
-    productButton.addEventListener("click",addProdduct);
+    productButton.addEventListener("click",addProduct);
 
 
     //Code to repeat the form

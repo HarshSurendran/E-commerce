@@ -82,7 +82,7 @@ const onlyProductsList = asyncHandler( async (req,res)=>{
               _id: 1,
               date: {
                 $dateToString: {
-                  format: "%Y-%m-%d",
+                  format: "%d-%m-%Y",
                   date: "$createdAt"
                 }
               },

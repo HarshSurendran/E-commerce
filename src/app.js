@@ -16,6 +16,10 @@ console.log(__dirname);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials', function (err) {});
+hbs.registerHelper('inc', function (value) {
+  return parseInt(value) + 1;
+});
+
 
 
 //Require routes

@@ -8,10 +8,13 @@ const sizeController = require("../controllers/size.controler.js");
 const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 
-
+router.get("/test",(req,res)=>{
+    res.render("admin/category",{admin:true, title:"Urbane Wardrobe"});
+})
 router.get("/" ,(req,res)=>{
     res.render("admin/adminlogin")
 });
+
 
 
 router.post("/", adminController.adminlogin);
@@ -36,6 +39,10 @@ router.get("/delete-user/:id", auth.verifyAdminJWT, adminController.deleteUser);
 router.get("/createuser", auth.verifyAdminJWT, adminController.createUserPage);
 router.post("/createuser", auth.verifyAdminJWT, adminController.createUser);
 
+//category handling
+router.get("/category", auth.verifyAdminJWT, categoryController.categoryPage);
+router.post("/category", auth.verifyAdminJWT, categoryController.addCategory);
+router.get("/delete-category/:id", auth.verifyAdminJWT, categoryController.deleteCategory);
 // Secured routes
 router.get("/logout", auth.verifyAdminJWT, adminController.logout)
 
