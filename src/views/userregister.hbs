@@ -178,6 +178,10 @@
         emailAlert.innerText = "Email is not valid."
         return false
     }
-    
+    const phoneRegex = /^\d{10}$/
+    if(!phone.match(phoneRegex)){
+        phoneAlert.innerText = "Phone number is not valid."
+        return false
+    }
   }
 </script>

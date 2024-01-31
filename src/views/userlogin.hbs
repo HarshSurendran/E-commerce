@@ -7,16 +7,18 @@
         <h3>Login</h3>
       </div>
 
-      <form action="users/home" method="post">        
+      <form onsubmit="return validate()" action="users/home" method="post">        
         <div class="mb-3">
-          <label for="exampleInputEmail1" class="form-label">Email address</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="value">
+          <label for="Value" class="form-label">Email address or Phone number</label>
+          <input type="text" class="form-control" id="Value" aria-describedby="emailHelp" name="value" required>
+          <p id="valueAlert" class="text-danger "></p>
           <div id="emailHelp" class="form-text">We'll never share your email with anyone else.            
           </div>
         </div>
         <div class="mb-3">
-          <label for="exampleInputPassword1" class="form-label">Password</label>
-          <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+          <label for="Password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="Password" name="password" required>
+          <p id="passwordAlert" class="text-danger "></p>
         </div>
         
         {{!-- <div class="mb-3">
@@ -81,3 +83,38 @@
     </div>
   </div>
 </section>
+
+<script>
+  const valueAlert = document.getElementById("valueAlert");
+  const passwordAlert = document.getElementById("passwordAlert");
+
+  function validate(){
+    console.log("This is validate")
+    
+    const value = document.getElementById("Value").value;
+    const password = document.getElementById("Password").value;
+    
+    valueAlert.innerText="";
+    passwordAlert.innerText="";
+
+    if(value.trim() === ""){
+        valueAlert.innerText = "Email or phone number can't be empty";
+        return false;
+    }else if(password.trim() === ""){
+        passwordAlert.innerText = "Password can't be empty";
+        return false;
+    }
+
+
+    const phoneRegex = /^\d{10}$/
+    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+    if(value.match(phoneRegex) || value.match(emailRegex)){
+      console.log("Value is matching");
+      return true;
+    }
+
+    valueAlert.innerText = "Invalid email or phonenumber";
+    return false    
+  }
+</script>
