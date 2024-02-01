@@ -6,6 +6,8 @@ const asyncHandler = require("../utils/asynchandler.js");
 const Cart = require("../models/cart.models.js");
 const ProductVarient = require("../models/productvarient.models.js");
 const User = require("../models/user.models.js");
+const { default: mongoose } = require("mongoose");
+const { json } = require("express");
 
 const addToCart = asyncHandler( async(req, res)=>{
     const user_id = req.user._id;
@@ -32,8 +34,100 @@ const addToCart = asyncHandler( async(req, res)=>{
     .status(200)
     .json( new ApiResponse(200,{}, "Added to cart successfully"))
 
+});
+
+const renderCartPage = asyncHandler( async(req,res)=>{
+    const user = req.user;
+    console.log(user);
+    const cart = await Cart.aggregate([
+        {
+          $match: {
+              user_id : user._id
+          }
+        },
+        {
+          $lookup: {
+            from: "productvarients",
+            localField: "productVarient_id",
+            foreignField: "_id",
+            as: "product",
+            pipeline: [   
+                {
+                    $lookup: {
+                        from: "products",
+                        localField : "product_id",
+                        foreignField : "_id",
+                        as: "name",
+                        pipeline: [
+                            {
+                                $lookup: {
+                                    from: "categories",
+                                    localField: "category",
+                                    foreignField: "_id",
+                                    as: "category"
+                                }
+                            },
+                            {
+                                $addFields: {
+                                    category: { $first: "$category" }
+                                }
+                            }
+                        ]
+                    }        
+                },
+                {
+                    $lookup: {
+                        from: "colors",
+                        localField : "color_id",
+                        foreignField : "_id",
+                        as: "color"
+                    } 
+                },
+                {
+                    $lookup: {
+                        from: "sizes",
+                        localField : "size_id",
+                        foreignField : "_id",
+                        as: "size"
+                    } 
+                },
+                {            
+                    $addFields : {
+                        name : { $first: "$name" },
+                        color : { $first: "$color"},
+                        size : { $first: "$size" },
+                    }                       
+                },
+                {
+                    $project : {
+                        name:1,
+                        color:1,
+                        size:1,
+                        images:1,
+                        stock:1,
+                        price:1
+                    }
+                }
+            ]
+          }
+        },
+        {
+            $addFields: {
+                product: { $first: "$product" }
+            }
+        }
+      ])
+    
+    let items = JSON.stringify(cart[0])
+    console.log("this is cart items",items)
+    
+    res
+    .status(200)
+    .render("users/cartpage",{user: user , title:"Urbane Wardrobe", cart})
+        
 })
 
 module.exports = {
-    addToCart
+    addToCart,
+    renderCartPage
 }

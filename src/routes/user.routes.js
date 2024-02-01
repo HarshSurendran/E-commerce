@@ -15,7 +15,7 @@ router.get("/register", (req,res)=>{
 });
 
 router.get("/test", (req,res)=>{
-    res.render("users/productlist",{user:true})
+    res.render("users/cartpage",{user:true})
 })
 
 router.get("/listproducts", productController.listProducts)
@@ -26,6 +26,7 @@ router.post("/home", userController.loginUser);
 //router.get("/product-list", userController.allproductlist)
 
 // cart management
+router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage)
 router.post("/cart", auth.verifyUserJWT, cartController.addToCart);
 
 //secured route

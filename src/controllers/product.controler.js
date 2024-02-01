@@ -353,7 +353,9 @@ const listProducts = asyncHandler( async(req,res)=>{
     ]
     );
 
-    res.render("users/productlist",{user:true, products: productList});
+    res
+    .status(200)
+    .render("users/productlist",{user:true, products: productList});
 });
 
 
