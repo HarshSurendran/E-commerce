@@ -37,7 +37,7 @@ router.patch("/blockunblock/:userId", adminController.blockUnblockUser)
 router.get("/users", auth.verifyAdminJWT, adminController.userList);
 router.get("/delete-user/:id", auth.verifyAdminJWT, adminController.deleteUser);
 router.get("/createuser", auth.verifyAdminJWT, adminController.createUserPage);
-router.post("/createuser", auth.verifyAdminJWT, adminController.createUser);
+router.post("/createuser", auth.verifyAdminJWT, adminController.createUser); //we could have used insert user middleware
 
 //category handling
 router.get("/category", auth.verifyAdminJWT, categoryController.categoryPage);

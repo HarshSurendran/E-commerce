@@ -297,6 +297,11 @@ const listProducts = asyncHandler( async(req,res)=>{
                 as: "name",
                 pipeline: [
                     {
+                        $match: {
+                            islisted : true
+                        }
+                    },
+                    {
                         $lookup: {
                             from: "categories",
                             localField: "category",
@@ -348,8 +353,7 @@ const listProducts = asyncHandler( async(req,res)=>{
     ]
     );
 
-    console.log(productList);
-    res.render("users/test",{user:true, allProducts: productList});
+    res.render("users/productlist",{user:true, products: productList});
 });
 
 

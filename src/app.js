@@ -19,6 +19,13 @@ hbs.registerPartials(__dirname + '/views/partials', function (err) {});
 hbs.registerHelper('inc', function (value) {
   return parseInt(value) + 1;
 });
+// hbs.registerHelper('ifZero', function (value) {
+//   if(value == 0){
+//     return true
+//   }else{
+//   return false;
+//   }
+// });
 
 
 
