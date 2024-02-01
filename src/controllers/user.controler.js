@@ -197,6 +197,72 @@ const loginUser = asyncHandler( async (req,res)=>{
         httpOnly : true,
         secure: true 
     }
+    //fetching data to user home page
+    const productList = await ProductVarient.aggregate(
+        [   
+            {
+                $lookup: {
+                    from: "products",
+                    localField : "product_id",
+                    foreignField : "_id",
+                    as: "name",
+                    pipeline: [
+                        {
+                            $match: {
+                                islisted : true
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "categories",
+                                localField: "category",
+                                foreignField: "_id",
+                                as: "category"
+                            }
+                        },
+                        {
+                            $addFields: {
+                                category: { $first: "$category" }
+                            }
+                        }
+                    ]
+                }        
+            },
+            {
+                $lookup: {
+                    from: "colors",
+                    localField : "color_id",
+                    foreignField : "_id",
+                    as: "color"
+                } 
+            },
+            {
+                $lookup: {
+                    from: "sizes",
+                    localField : "size_id",
+                    foreignField : "_id",
+                    as: "size"
+                } 
+            },
+            {            
+                $addFields : {
+                    name : { $first: "$name" },
+                    color : { $first: "$color"},
+                    size : { $first: "$size" },
+                }                       
+            },
+            {
+                $project : {
+                    name:1,
+                    color:1,
+                    size:1,
+                    images:1,
+                    stock:1,
+                    price:1
+                }
+            }
+        ]
+        );
 
     //sending the tokens to browser through cookie
 
@@ -210,7 +276,7 @@ const loginUser = asyncHandler( async (req,res)=>{
     //     },
     //     "User succesfully logged in"
     // ));
-    .render("users/userhome", {user:userLoggedIn})
+    .render("users/userhome", {user:userLoggedIn , title: "Urbane Wardrobe", products:productList})
     
 })
 
