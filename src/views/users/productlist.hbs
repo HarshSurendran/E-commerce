@@ -92,6 +92,7 @@
 
         element.addEventListener("click",function addCart(event){
             event.preventDefault();
+            event.stopPropagation();
             console.log(element);
             const productId = element.getAttribute("data-id");
             console.log(productId);
@@ -106,6 +107,7 @@
             }).then( (res)=> {
                 if(!res.ok){
                 console.log("Something went wrong while fetching");
+                showNotification("Item already in Cart")
                 return
                 }
                 console.log("fetch successfull")

@@ -181,7 +181,7 @@
         <div class="row property__gallery">
             {{#each products}}
             {{#if this.name}}
-            <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.name.category.category}}">
+            <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.name.category.category}} prodDetailsDiv" data-prodid="{{this._id}}">
                 <div class="product__item">
                     <div class="product__item__pic set-bg" data-setbg="{{this.images.[0]}}">
                     {{!-- label above the image --}}
@@ -662,6 +662,7 @@
 
         element.addEventListener("click",function addCart(event){
             event.preventDefault();
+            event.stopPropagation();
             console.log(element);
             const productId = element.getAttribute("data-id");
             console.log(productId);
@@ -675,7 +676,7 @@
                 })
             }).then( (res)=> {
                 if(!res.ok){
-                console.log("Something went wrong while fetching");
+                showNotification("Product already in cart.")
                 return
                 }
                 console.log("fetch successfull")
@@ -683,8 +684,25 @@
             })
         });
 
-    })
+    });
     
+    //redirecting to prodetails page
+
+    const prodDetailDiv = document.querySelectorAll(".prodDetailsDiv");
+
+    console.log(prodDetailDiv)
+
+    prodDetailDiv.forEach((element)=>{
+
+        element.addEventListener("click", function renderProdDetails(event){
+            event.preventDefault();
+            console.log(element);
+            const prodId = element.getAttribute("data-prodid");
+
+            window.location.href =`/api/v1/users/productdetails/${prodId}`;
+
+        });
+    });
 
 </script>
 

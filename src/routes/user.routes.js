@@ -19,8 +19,8 @@ router.get("/test", (req,res)=>{
 })
 
 // product related
-router.get("/listproducts", productController.listProducts);
-router.get("/productdetails/:id", productController.productDetailsPage);
+router.get("/listproducts",auth.verifyUserJWT, productController.listProducts);
+router.get("/productdetails/:id", auth.verifyUserJWT, productController.productDetailsPage);
 
 
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
@@ -35,7 +35,7 @@ router.post("/cart", auth.verifyUserJWT, cartController.addToCart);
 router.delete("/cart", auth.verifyUserJWT, cartController.deleteCart);
 
 //secured route
-router.post("/logout", auth.verifyUserJWT, userController.logoutUser);
+router.get("/logout", auth.verifyUserJWT, userController.logoutUser);
 router.post("/refresh-token",auth.verifyUserJWT, userController.refreshAccessToken);
 router.patch("/userdetails", auth.verifyUserJWT, userController.updateUserDetails);
 router.patch("/password", auth.verifyUserJWT, userController.changeCurrentPassword);

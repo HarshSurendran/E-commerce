@@ -355,12 +355,13 @@ const listProducts = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    .render("users/productlist",{user:true, products: productList});
+    .render("users/productlist",{user:req.user, products: productList});
 });
 
 const productDetailsPage = asyncHandler( async(req,res)=>{
     const prodId = req.params.id;
     console.log("This is the product id to productdetails",prodId);
+    console.log("This is user ", req.user);
 
     const prod = await ProductVarient.aggregate([
         {
@@ -506,7 +507,7 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     
     res
     .status(200)
-    .render("proddetails", {user:true, title:"Urbane Wardrobe", product: prodDetails, prodVarients});
+    .render("proddetails", {user:req.user, title:"Urbane Wardrobe", product: prodDetails, prodVarients});
 })
 
 

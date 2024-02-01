@@ -350,7 +350,7 @@ const homePageRender = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    .render("users/userhome", {user:req.user._id , title: "Urbane Wardrobe", products:productList})
+    .render("users/userhome", {user:req.user , title: "Urbane Wardrobe", products:productList})
 
 });
 
@@ -372,7 +372,8 @@ const logoutUser = asyncHandler( async (req,res)=>{
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("RefreshToken", options)
-    .json(new ApiResponse(200,{},"User successfully logged out"));
+    //.json(new ApiResponse(200,{},"User successfully logged out"));
+    .render("landingPage", {common:true, title: "Urbane Wardrobe"});
 })
 
 const refreshAccessToken = asyncHandler( async (req,res)=>{
