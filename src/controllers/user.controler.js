@@ -280,6 +280,80 @@ const loginUser = asyncHandler( async (req,res)=>{
     
 })
 
+const homePageRender = asyncHandler( async(req,res)=>{
+
+    const productList = await ProductVarient.aggregate(
+        [   
+            {
+                $lookup: {
+                    from: "products",
+                    localField : "product_id",
+                    foreignField : "_id",
+                    as: "name",
+                    pipeline: [
+                        {
+                            $match: {
+                                islisted : true
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "categories",
+                                localField: "category",
+                                foreignField: "_id",
+                                as: "category"
+                            }
+                        },
+                        {
+                            $addFields: {
+                                category: { $first: "$category" }
+                            }
+                        }
+                    ]
+                }        
+            },
+            {
+                $lookup: {
+                    from: "colors",
+                    localField : "color_id",
+                    foreignField : "_id",
+                    as: "color"
+                } 
+            },
+            {
+                $lookup: {
+                    from: "sizes",
+                    localField : "size_id",
+                    foreignField : "_id",
+                    as: "size"
+                } 
+            },
+            {            
+                $addFields : {
+                    name : { $first: "$name" },
+                    color : { $first: "$color"},
+                    size : { $first: "$size" },
+                }                       
+            },
+            {
+                $project : {
+                    name:1,
+                    color:1,
+                    size:1,
+                    images:1,
+                    stock:1,
+                    price:1
+                }
+            }
+        ]
+        );
+
+    res
+    .status(200)
+    .render("users/userhome", {user:req.user._id , title: "Urbane Wardrobe", products:productList})
+
+});
+
 const logoutUser = asyncHandler( async (req,res)=>{
     // get data about the user
     // delete the refreshtoken 
@@ -458,5 +532,6 @@ module.exports = {
     updateUserDetails,
     otpPageLoader,
     verifiedUserLogin,
-    allproductlist
+    allproductlist,
+    homePageRender
 }

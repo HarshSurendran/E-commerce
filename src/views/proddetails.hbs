@@ -1,3 +1,19 @@
+<head>
+    <style>
+    /* Notification styles */
+    .notification {
+      display: none;
+      position: fixed;
+      top: 10px;
+      right: 40%;
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    </style>
+</head>
 
 <body>
     <!-- Page Preloder -->
@@ -5,7 +21,31 @@
         <div class="loader"></div>
     </div>
 
-    {{!-- <!-- Breadcrumb Begin -->
+    <!-- Offcanvas Menu Begin -->
+    <div class="offcanvas-menu-overlay"></div>
+    <div class="offcanvas-menu-wrapper">
+        <div class="offcanvas__close">+</div>
+        <ul class="offcanvas__widget">
+            <li><span class="icon_search search-switch"></span></li>
+            <li><a href="#"><span class="icon_heart_alt"></span>
+                <div class="tip">2</div>
+            </a></li>
+            <li><a href="#"><span class="icon_bag_alt"></span>
+                <div class="tip">2</div>
+            </a></li>
+        </ul>
+        <div class="offcanvas__logo">
+            <a href="./index.html"><img src="/img/logo.png" alt=""></a>
+        </div>
+        <div id="mobile-menu-wrap"></div>
+        <div class="offcanvas__auth">
+            <a href="#">Login</a>
+            <a href="#">Register</a>
+        </div>
+    </div>
+    <!-- Offcanvas Menu End -->
+
+    <!-- Breadcrumb Begin -->
     <div class="breadcrumb-option">
         <div class="container">
             <div class="row">
@@ -19,7 +59,7 @@
             </div>
         </div>
     </div>
-    <!-- Breadcrumb End --> --}}
+    <!-- Breadcrumb End -->
 
     <!-- Product Details Section Begin -->
     <section class="product-details spad">
@@ -29,36 +69,31 @@
                     <div class="product__details__pic">
                         <div class="product__details__pic__left product__thumb nice-scroll">
                             <a class="pt active" href="#product-1">
-                                <img src="/img/product/details/thumb-1.jpg" alt="">
+                                <img src="{{product.images.[0]}}" alt="">
                             </a>
                             <a class="pt" href="#product-2">
-                                <img src="/img/product/details/thumb-2.jpg" alt="">
+                                <img src="{{product.images.[1]}}" alt="">
                             </a>
                             <a class="pt" href="#product-3">
-                                <img src="/img/product/details/thumb-3.jpg" alt="">
+                                <img src="{{product.images.[2]}}" alt="">
                             </a>
                             <a class="pt" href="#product-4">
-                                <img src="/img/product/details/thumb-4.jpg" alt="">
+                                <img src="{{product.images.[4]}}" alt="">
                             </a>
                         </div>
-                        <div  class="product__details__slider__content">
-                            {{!-- <div id="img-container" class="product__details__pic__slider owl-carousel">
-                                <img data-hash="product-1" class="product__big__img" src="/img/product/details/product-1.jpg" alt="">
-                                <img data-hash="product-2" class="product__big__img" src="/img/product/details/product-3.jpg" alt="">
-                                <img data-hash="product-3" class="product__big__img" src="/img/product/details/product-2.jpg" alt="">
-                                <img data-hash="product-4" class="product__big__img" src="/img/product/details/product-4.jpg" alt="">
-                            </div> --}}
-
-                            <div id="img-container">
-                                 <img data-hash="product-1" class="product__big__img" src="/img/product/details/product-1.jpg" alt="">
+                        <div class="product__details__slider__content">
+                            <div class="product__details__pic__slider owl-carousel">
+                                <img data-hash="product-1" class="product__big__img" src="{{product.images.[0]}}" alt="">
+                                <img data-hash="product-2" class="product__big__img" src="{{product.images.[1]}}" alt="">
+                                <img data-hash="product-3" class="product__big__img" src="{{product.images.[2]}}" alt="">
+                                <img data-hash="product-4" class="product__big__img" src="{{product.images.[3]}}" alt="">
+                            </div>
                         </div>
-                        </div>
-                        
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="product__details__text">
-                        <h3>Essential structured blazer <span>Brand: SKMEIMore Men Watches from SKMEI</span></h3>
+                        <h3>{{product.name.name}}<span>Brand: SKMEIMore Men Watches from SKMEI</span></h3>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -67,9 +102,8 @@
                             <i class="fa fa-star"></i>
                             <span>( 138 reviews )</span>
                         </div>
-                        <div class="product__details__price">$ 75.0 <span>$ 83.0</span></div>
-                        <p>Nemo enim ipsam voluptatem quia aspernatur aut odit aut loret fugit, sed quia consequuntur
-                        magni lores eos qui ratione voluptatem sequi nesciunt.</p>
+                        <div class="product__details__price">{{product.price}}<span>Rs 83.0</span></div>
+                        <p>{{product.name.about}}</p>
                         <div class="product__details__button">
                             <div class="quantity">
                                 <span>Quantity:</span>
@@ -77,7 +111,7 @@
                                     <input type="text" value="1">
                                 </div>
                             </div>
-                            <a href="#" class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</a>
+                            <button id="addtocartbutton" data-id="{{product._id}}" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Add to cart</button>
                             <ul>
                                 <li><a href="#"><span class="icon_heart_alt"></span></a></li>
                                 <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
@@ -98,18 +132,20 @@
                                 <li>
                                     <span>Available color:</span>
                                     <div class="color__checkbox">
-                                        <label for="red">
-                                            <input type="radio" name="color__radio" id="red" checked>
-                                            <span class="checkmark"></span>
+                                        {{#each prodVarients}}
+                                        <label for="{{this.color.color}}">
+                                            <input type="radio" name="color__radio" id="{{this.color.color}}" checked>
+                                            <span class="checkmark {{this.color.color}}-bg"></span>
                                         </label>
-                                        <label for="black">
+                                        {{/each}}
+                                        {{!-- <label for="black">
                                             <input type="radio" name="color__radio" id="black">
                                             <span class="checkmark black-bg"></span>
                                         </label>
                                         <label for="grey">
                                             <input type="radio" name="color__radio" id="grey">
                                             <span class="checkmark grey-bg"></span>
-                                        </label>
+                                        </label> --}}
                                     </div>
                                 </li>
                                 <li>
@@ -198,6 +234,9 @@
                     </div>
                 </div>
             </div>
+            <div id="notification" class="notification"></div>
+
+            {{!-- Related Products start --}}
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <div class="related__title">
@@ -295,138 +334,13 @@
                     </div>
                 </div>
             </div>
+            {{!-- related products end --}}
         </div>
     </section>
     <!-- Product Details Section End -->
 
-    <!-- Instagram Begin -->
-    <div class="instagram">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="/img/instagram/insta-1.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="/img/instagram/insta-2.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="/img/instagram/insta-3.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="/img/instagram/insta-4.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="/img/instagram/insta-5.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="/img/instagram/insta-6.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Instagram End -->
 
-    <!-- Footer Section Begin -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-7">
-                    <div class="footer__about">
-                        <div class="footer__logo">
-                            <a href="./index.html"><img src="/img/logo.png" alt=""></a>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-                        cilisis.</p>
-                        <div class="footer__payment">
-                            <a href="#"><img src="/img/payment/payment-1.png" alt=""></a>
-                            <a href="#"><img src="/img/payment/payment-2.png" alt=""></a>
-                            <a href="#"><img src="/img/payment/payment-3.png" alt=""></a>
-                            <a href="#"><img src="/img/payment/payment-4.png" alt=""></a>
-                            <a href="#"><img src="/img/payment/payment-5.png" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-5">
-                    <div class="footer__widget">
-                        <h6>Quick links</h6>
-                        <ul>
-                            <li><a href="#">About</a></li>
-                            <li><a href="#">Blogs</a></li>
-                            <li><a href="#">Contact</a></li>
-                            <li><a href="#">FAQ</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4">
-                    <div class="footer__widget">
-                        <h6>Account</h6>
-                        <ul>
-                            <li><a href="#">My Account</a></li>
-                            <li><a href="#">Orders Tracking</a></li>
-                            <li><a href="#">Checkout</a></li>
-                            <li><a href="#">Wishlist</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-8 col-sm-8">
-                    <div class="footer__newslatter">
-                        <h6>NEWSLETTER</h6>
-                        <form action="#">
-                            <input type="text" placeholder="Email">
-                            <button type="submit" class="site-btn">Subscribe</button>
-                        </form>
-                        <div class="footer__social">
-                            <a href="#"><i class="fa fa-facebook"></i></a>
-                            <a href="#"><i class="fa fa-twitter"></i></a>
-                            <a href="#"><i class="fa fa-youtube-play"></i></a>
-                            <a href="#"><i class="fa fa-instagram"></i></a>
-                            <a href="#"><i class="fa fa-pinterest"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    <div class="footer__copyright__text">
-                        <p>Copyright &copy; <script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a></p>
-                    </div>
-                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!-- Footer Section End -->
+    
 
     <!-- Search Begin -->
     <div class="search-model">
@@ -438,36 +352,46 @@
         </div>
     </div>
     <!-- Search End -->
-
-    <!-- Js Plugins -->
-    {{!-- <script src="/js/jquery-3.3.1.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/jquery.magnific-popup.min.js"></script>
-    <script src="/js/jquery-ui.min.js"></script>
-    <script src="/js/mixitup.min.js"></script>
-    <script src="/js/jquery.countdown.min.js"></script>
-    <script src="/js/jquery.slicknav.js"></script>
-    <script src="/js/owl.carousel.min.js"></script>
-    <script src="/js/jquery.nicescroll.min.js"></script>
-    <script src="/js/main.js"></script> --}}
 </body>
 
-{{!-- Zoom picture  --}}
-<script src="https://unpkg.com/js-image-zoom@0.7.0/js-image-zoom.js" type="application/javascript"></script>
 <script>
+    const addToCartButton = document.getElementById("addtocartbutton");
 
-    var options1 = {
-        width: 400,
-        zoomWidth: 500,
-        offset: {vertical: 0, horizontal: 10}
-    };
+    function showNotification(message) {
+        const notificationElement = document.getElementById('notification');
+        notificationElement.textContent = message;
+        notificationElement.style.display = 'block';
 
-    var options2 = {
-        fillContainer: true,
-        width:200,
-        offset: {vertical: 0, horizontal: 10}
-    };
+        // Hide the notification after 5 seconds
+        setTimeout(() => {
+        notificationElement.style.display = 'none';
+        }, 2000);
+    }
 
+    addToCartButton.addEventListener("click", ()=>{
+        const productId = addToCartButton.getAttribute("data-id");
+        console.log("this is product id ", productId);
 
-    new ImageZoom(document.getElementById("img-container"), options1);
+        fetch("/api/v1/users/cart",{
+            method : "POST",
+            headers : {
+                "content-type" : "application/json"
+            },
+            body: JSON.stringify({
+                productId : productId
+            })
+        })
+        .then((res)=>{
+            if(!res.ok){
+                showNotification("Product already in cart")
+                return
+            }
+            console.log(res);
+            addToCartButton.disabled = true;
+            addToCartButton.innerText= "ADDED"
+            addToCartButton.style.backgroundColor = "green"
+            showNotification("Product added to cart")
+        })
+    })
+
 </script>

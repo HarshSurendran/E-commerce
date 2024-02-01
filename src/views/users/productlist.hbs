@@ -12,7 +12,7 @@
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
-  </style>
+    </style>
 </head>
 
 <body>
@@ -37,17 +37,18 @@
             <div class="row property__gallery">
                 {{#each products}}
                 {{#if this.name}}
-                <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.name.category.category}}">
+                <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.name.category.category}} prodDetailsDiv" data-prodid="{{this._id}}">
                     <div class="product__item">
                         <div class="product__item__pic set-bg" data-setbg="{{this.images.[0]}}">
                         {{!-- label above the image --}}
                             {{!-- <div class="label new">New</div> --}}
                             {{!-- <div class="label">Sale</div> --}}
                             {{!-- <div class="label stockout">out of stock</div> --}}
-                            <ul class="product__hover">
+                            <ul class="product__hover">                                
                                 <li><a href="{{this.images.[0]}}" class="image-popup"><span class="arrow_expand"></span></a></li>
                                 <li id="wishlist" ><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                <li id="addToCart" class="addToCart" data-id="{{this._id}}" ><a href="#"><span class="icon_bag_alt"></span></a></li>
+                                <li id="addToCart" class="addToCart" data-id="{{this._id}}"><a href="#"><span class="icon_bag_alt"></span></a></li>
+                                {{!-- <li><a href="productdetails/{{this._id}}" class="" ><span class="icon_details" ></span></a></li> --}}
                             </ul>
                         </div>
                         <div class="product__item__text">
@@ -112,4 +113,30 @@
             })
         });
     });
+
+
+    //redirecting to prodetails page
+
+    const prodDetailDiv = document.querySelectorAll(".prodDetailsDiv");
+
+    console.log(prodDetailDiv)
+
+    prodDetailDiv.forEach((element)=>{
+
+        element.addEventListener("click", function renderProdDetails(event){
+            event.preventDefault();
+            console.log(element);
+            const prodId = element.getAttribute("data-prodid");
+
+            window.location.href =`/api/v1/users/productdetails/${prodId}`;
+
+            /* fetch("api/v1/users/productdetails",{
+                method : "POST",
+
+
+            })*/
+            
+        })
+    })
+
 </script>

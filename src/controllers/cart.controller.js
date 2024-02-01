@@ -14,9 +14,14 @@ const addToCart = asyncHandler( async(req, res)=>{
     const productVarient_id = req.body.productId;
     const quantity = req.body?.quantity;
 
-    
-
     console.log( user_id,"userid and proid", productVarient_id);
+
+    const cartAlreadyExist = await Cart.find({ user_id, productVarient_id})
+    console.log("this  is cart a;ready exist",cartAlreadyExist)
+
+    if(cartAlreadyExist == []){
+        throw new ApiError(400,"Product already in cart");
+    }
 
     const cart = await Cart.create({
         user_id,
@@ -125,9 +130,22 @@ const renderCartPage = asyncHandler( async(req,res)=>{
     .status(200)
     .render("users/cartpage",{user: user , title:"Urbane Wardrobe", cart})
         
+});
+
+const deleteCart = asyncHandler( async(req,res)=>{
+    const id = req.body.id;
+
+    const deleteCart = await Cart.deleteOne({_id:id});
+    console.log(deleteCart)
+    
+    res
+    .status(200)
+    .json( new ApiResponse(200,{},"Product deleted from cart"))
+
 })
 
 module.exports = {
     addToCart,
-    renderCartPage
+    renderCartPage,
+    deleteCart
 }

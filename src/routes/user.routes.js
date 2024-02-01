@@ -15,19 +15,24 @@ router.get("/register", (req,res)=>{
 });
 
 router.get("/test", (req,res)=>{
-    res.render("users/cartpage",{user:true})
+    res.render("proddetails",{user:true})
 })
 
-router.get("/listproducts", productController.listProducts)
+// product related
+router.get("/listproducts", productController.listProducts);
+router.get("/productdetails/:id", productController.productDetailsPage);
+
 
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
 router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
 router.post("/home", userController.loginUser);
+router.get("/home", auth.verifyUserJWT, userController.homePageRender)
 //router.get("/product-list", userController.allproductlist)
 
 // cart management
-router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage)
+router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage);
 router.post("/cart", auth.verifyUserJWT, cartController.addToCart);
+router.delete("/cart", auth.verifyUserJWT, cartController.deleteCart);
 
 //secured route
 router.post("/logout", auth.verifyUserJWT, userController.logoutUser);
