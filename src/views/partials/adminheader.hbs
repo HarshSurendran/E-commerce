@@ -29,6 +29,12 @@
                             <span class="text">Users</span>
                         </a>
                     </li>
+                    <li class="menu-item ">
+                        <a class="menu-link" href="/api/v1/admin/category">
+                            <i class="icon material-icons md-shopping_bag"></i>
+                            <span class="text">Category</span>
+                        </a>
+                    </li>
                     {{!-- <li class="menu-item has-submenu">
                         <a class="menu-link" href="addproduct">
                             <i class="icon material-icons md-shopping_bag"></i>
@@ -144,14 +150,14 @@
                         </div>
                     </li>
                     <li class="dropdown nav-item">
-                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/assets/imgs/people/avatar-2.png" alt="User" /></a>
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="/api/v1/admin/logout" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/assets/imgs/people/avatar-2.png" alt="User" /></a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
                             <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                            <a class="dropdown-item text-danger" href="/api/v1/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
                         </div>
                     </li>                        
                 </ul>

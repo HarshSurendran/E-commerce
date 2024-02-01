@@ -100,7 +100,8 @@ const logout = asyncHandler( async(req,res)=>{
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json( new ApiResponse(200,{},"admin logged out successfully"));
+    // .json( new ApiResponse(200,{},"admin logged out successfully"));
+    .render("admin/adminlogin", {title:"Urbane Wardrobe"})
 });
 
 const userList = asyncHandler( async(req, res)=>{
