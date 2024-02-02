@@ -1,19 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const commonController = require("../controllers/common.controller.js");
+const userController = require("../controllers/user.controler.js");
+const auth = require("../middlewares/auth.middleware.js");
 
-router.get("/test", (req,res)=>{
-    res.render("test");
-})
-router.get("/", commonController.renderHomePage);
 
-router.get("/login", commonController.renderLoginPage);
+router.get("/", auth.checkUserJWT, commonController.renderHomePage);
 
-router.get("/register", commonController.renderRegisterPage);
+router.post("/signup", userController.loginUser);
 
-router.get("/product", (req,res)=>{
-    res.render("productdetails", {user:true , title:"Urbane Wardrobe"});
-})
+router.get("/login", auth.checkUserJWT, commonController.renderLoginPage);
+
+router.get("/register", auth.checkUserJWT, commonController.renderRegisterPage);
+
 
 
 module.exports = router

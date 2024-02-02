@@ -1,9 +1,9 @@
 const ApiError = require("../utils/ApiError.js");
 const asyncHandler = require("../utils/asynchandler.js");
 const Otp = require("../models/otp.models.js");
-const User = require("../models/user.models.js")
+const User = require("../models/user.models.js");
 
-const verifyOtp = asyncHandler( async(req,_,next)=>{
+const verifyOtp = asyncHandler( async(req,res,next)=>{
     console.log(req.body);
     const { userId, otp1,otp2,otp3,otp4,otp5,otp6 } = req.body
     console.log(userId);
@@ -11,7 +11,7 @@ const verifyOtp = asyncHandler( async(req,_,next)=>{
     console.log(otp);
 
     const userOtp = await Otp.findOne({userid:userId});
-
+try{
     if(!userOtp){
         throw new ApiError(400,"Invalid");
     }
@@ -28,6 +28,9 @@ const verifyOtp = asyncHandler( async(req,_,next)=>{
     }
     req.user = userId
     next();
+} catch(error){
+    res.render("users/otpvalidation", {userId : userId, title:"Urbane Wardrobe", user:true, message: error.message});
+}
 });
 
 module.exports = verifyOtp;

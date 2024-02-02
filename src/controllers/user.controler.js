@@ -142,7 +142,7 @@ const verifiedUserLogin = asyncHandler( async (req,res)=>{
     //     },
     //     "User succesfully logged in"
     // ));
-    .render("users/userhome",{user:userLoggedIn});
+    .redirect("/api/v1/users/home");
 })
 
 const loginUser = asyncHandler( async (req,res)=>{
@@ -152,7 +152,7 @@ const loginUser = asyncHandler( async (req,res)=>{
     // check wether the password is correct -Done
     // generate refresh and accesstoken -Done
     // respond with access and refresh token in cookie -Done
-    
+    try{
     const {value, password} = req.body;
 
     console.log(value,"and",password);
@@ -176,93 +176,29 @@ const loginUser = asyncHandler( async (req,res)=>{
     const user = await User.findOne( {$or: [{phone},{email}]} );
 
     if(!user){
-        throw new ApiError(400, "user not found");
+        throw new ApiError(400, "User not found. Please Register");
+    }
+
+    if(user.isBlocked){
+        throw new ApiError(400, "This User is blocked")
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password);
 
     if(!isPasswordValid){
-        throw new ApiError(400, "Entered wrong credentials");
+        throw new ApiError(400, "Entered wrong Password");
     }
 
     //generating access and refresh token to the user
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
-    const userLoggedIn =  await User.findOne({_id: user._id}).select("-password -refreshToken");
-
-    console.log(userLoggedIn);
+    const userLoggedIn =  await User.findOne({_id: user._id}).select("-password -refreshToken");    
 
     const options ={
         httpOnly : true,
         secure: true 
-    }
-    //fetching data to user home page
-    const productList = await ProductVarient.aggregate(
-        [   
-            {
-                $lookup: {
-                    from: "products",
-                    localField : "product_id",
-                    foreignField : "_id",
-                    as: "name",
-                    pipeline: [
-                        {
-                            $match: {
-                                islisted : true
-                            }
-                        },
-                        {
-                            $lookup: {
-                                from: "categories",
-                                localField: "category",
-                                foreignField: "_id",
-                                as: "category"
-                            }
-                        },
-                        {
-                            $addFields: {
-                                category: { $first: "$category" }
-                            }
-                        }
-                    ]
-                }        
-            },
-            {
-                $lookup: {
-                    from: "colors",
-                    localField : "color_id",
-                    foreignField : "_id",
-                    as: "color"
-                } 
-            },
-            {
-                $lookup: {
-                    from: "sizes",
-                    localField : "size_id",
-                    foreignField : "_id",
-                    as: "size"
-                } 
-            },
-            {            
-                $addFields : {
-                    name : { $first: "$name" },
-                    color : { $first: "$color"},
-                    size : { $first: "$size" },
-                }                       
-            },
-            {
-                $project : {
-                    name:1,
-                    color:1,
-                    size:1,
-                    images:1,
-                    stock:1,
-                    price:1
-                }
-            }
-        ]
-        );
+    }    
 
     //sending the tokens to browser through cookie
 
@@ -276,8 +212,12 @@ const loginUser = asyncHandler( async (req,res)=>{
     //     },
     //     "User succesfully logged in"
     // ));
-    .render("users/userhome", {user:userLoggedIn , title: "Urbane Wardrobe", products:productList})
-    
+    // .render("users/userhome", {user:userLoggedIn , title: "Urbane Wardrobe", products:productList})
+    .redirect("/api/v1/users/home");
+    } catch (error){
+        console.log("This is error",error.message);
+        res.render("userlogin", {common:true , title: "Urbane Wardrobe", message: error.message});
+    }
 })
 
 const homePageRender = asyncHandler( async(req,res)=>{

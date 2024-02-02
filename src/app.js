@@ -3,6 +3,7 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const path = require("path");
 const hbs = require("hbs");
+const nocache = require("nocache");
 //const errorHandlingMiddleware = require("./middlewares/errorHandling.middleware.js")
 
 app.use(express.json());
@@ -27,6 +28,7 @@ hbs.registerHelper('inc', function (value) {
 //   }
 // });
 
+app.use(nocache());
 
 
 //Require routes
@@ -40,5 +42,10 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/admin", adminRouter);
 
 
+app.use((req,res,next)=>{
+  res
+  .status(404)
+  .render("error");
+});
 
 module.exports = app;

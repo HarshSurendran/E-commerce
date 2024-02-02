@@ -10,22 +10,15 @@ const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 
 
-router.get("/register", (req,res)=>{
-    res.render("users/userregister",{user:true});
-});
-
-router.get("/test", (req,res)=>{
-    res.render("proddetails",{user:true})
-})
 
 // product related
-router.get("/listproducts",auth.verifyUserJWT, productController.listProducts);
-router.get("/productdetails/:id", auth.verifyUserJWT, productController.productDetailsPage);
+router.get("/listproducts", auth.verifyUserJWT,  productController.listProducts);
+router.get("/productdetails/:id", auth.verifyUserJWT,  productController.productDetailsPage);
 
 
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
 router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
-router.post("/home", userController.loginUser);
+//router.post("/signup", userController.loginUser);
 router.get("/home", auth.verifyUserJWT, userController.homePageRender)
 //router.get("/product-list", userController.allproductlist)
 

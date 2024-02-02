@@ -6,10 +6,12 @@
       <div class="d-flex justify-content-center ">
         <h3>Login</h3>
       </div>
-
-      <form onsubmit="return validate()" action="users/home" method="post">        
+      {{#if message}}
+      <p class="text-danger text-center">{{message}}</p>
+      {{/if}}
+      <form onsubmit="return validate()" action="/api/v1/signup" method="post">        
         <div class="mb-3">
-          <label for="Value" class="form-label">Email address or Phone number</label>
+          <label for="Value" class="form-label mt-2 ">Email address or Phone number</label>
           <input type="text" class="form-control" id="Value" aria-describedby="emailHelp" name="value" required>
           <p id="valueAlert" class="text-danger "></p>
           <div id="emailHelp" class="form-text">We'll never share your email with anyone else.            

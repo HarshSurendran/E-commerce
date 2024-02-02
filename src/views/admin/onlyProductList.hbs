@@ -10,6 +10,7 @@
                         {{!-- <a href="#" class="btn btn-light rounded font-md">Export</a>
                         <a href="#" class="btn btn-light rounded font-md">Import</a> --}}
                         <a href="addproduct" class="btn btn-primary btn-sm rounded">Add Product</a>
+                        <a href="products-varient" class="btn btn-primary btn-sm rounded">Add Product Varient</a>
                     </div>
                 </div>
                 <div class="card mb-4">
@@ -64,7 +65,11 @@
                                 </div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-price text-center "><span>{{this.category.category}}</span></div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-status text-center ">
+                                    {{#if this.islisted}}
                                     <span class="badge rounded-pill alert-success">{{this.islisted}}</span>
+                                    {{else}}
+                                    <span class="badge rounded-pill alert-danger">{{this.islisted}}</span>
+                                    {{/if}}
                                 </div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-date text-center ">
                                     <span>{{this.date}}</span>

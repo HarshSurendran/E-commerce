@@ -22,47 +22,77 @@ const generateAccessAndRefreshToken = async (adminid)=>{
     }
 }
 
+const verifyEmailPassword = asyncHandler( async(req,res)=>{
+
+    try{
+        console.log("Entered verify");
+        const {email,password} = req.body;
+        console.log(email, "email and pass" , password);
+        if(email.trim()=="" || password.trim()==""){
+            throw new ApiError(400,"Email and password is compulsory");
+        }
+        const admin = await Admin.findOne({email});
+        if(!admin){
+            throw new ApiError(400,"Invalid email-id");
+        }
+        const isPasswordCorrect = await admin.isPasswordCorrect(password);
+        if(!isPasswordCorrect){
+            throw new ApiError(400,"Incorrect Password");
+        }
+
+        res
+        .status(200)
+        .json( new ApiResponse( 200, {}, "Admin verified"));
+
+    } catch(error){
+        res
+        .status(400)
+        .json( new ApiError( 400, "Invalid Credentials"))
+    }
+})
+
 const adminlogin = asyncHandler( async(req,res)=>{
-    const {email, password} = req.body;
+    try{
+        const {email, password} = req.body;
+        // validation
+        if(email.trim()=="" || password.trim()==""){
+            throw new ApiError(400, "Email and Password can't be empty");
+        }
+        const admin = await Admin.findOne({email});
+        if(!admin){
+            throw new ApiError(400, "Unauthorised Email-id");
+        }
+        //checking password
+        const isPasswordCorrect = await admin.isPasswordCorrect(password);
+        if(!isPasswordCorrect){
+            throw new ApiError(400, "Wrong Password");
+        }
+        //generate tokens
+        const {accessToken, refreshToken} = await generateAccessAndRefreshToken(admin._id);
 
-    //validation
-    if(email.trim()=="" || password.trim()==""){
-        throw new ApiError(400,"Email and password is compulsory");
+        console.log(accessToken,"new redresh token", refreshToken);
+
+        const adminLoggedIn = Admin.findOne({_id:admin._id}).select("-password -refreshToken")
+        
+        const options ={
+            httpOnly: true,
+            secure: true
+        }
+
+        return res.status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        // .json( new ApiResponse(
+        //     200,
+        //     {},
+        //     "Admin logged in successfully"
+        // ));
+        // .render("admin/dashboard",{admin:true});
+        .redirect("/api/v1/admin/dashboard");
+
+    } catch(error){
+        res.render("admin/adminlogin", {title:"Urbane Wardrobe", message: error.message})
     }
-
-    const admin = await Admin.findOne({email});
-
-    if(!admin){
-        throw new ApiError(400,"Invalid email id");
-    }
-    //checking password
-    const isPasswordCorrect = await admin.isPasswordCorrect(password);
-
-    if(!isPasswordCorrect){
-        throw new ApiError(400,"Incorrect Credentials");
-    }
-
-    //generate tokens
-    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(admin._id);
-
-    console.log(accessToken,"new redresh token", refreshToken);
-
-    const adminLoggedIn = Admin.findOne({_id:admin._id}).select("-password -refreshToken")
-    
-    const options ={
-        httpOnly: true,
-        secure: true
-    }
-
-    return res.status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    // .json( new ApiResponse(
-    //     200,
-    //     {},
-    //     "Admin logged in successfully"
-    // ));
-    .render("admin/dashboard",{admin:true});
 });
 
 const renderDashboard = asyncHandler( async(req,res)=>{
@@ -70,7 +100,7 @@ const renderDashboard = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    .render("admin/dashboard",{admin:true, title: "Urbane wardrobe" , adminDetails})
+    .render("admin/dashboard",{admin:adminDetails, title: "Urbane wardrobe" , adminDetails})
 });
 
 const logout = asyncHandler( async(req,res)=>{
@@ -220,5 +250,6 @@ module.exports = {
     blockUnblockUser,
     deleteUser,
     createUser,
-    createUserPage
+    createUserPage,
+    verifyEmailPassword
 }

@@ -8,16 +8,16 @@ const sizeController = require("../controllers/size.controler.js");
 const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 
-router.get("/test",(req,res)=>{
-    res.render("admin/category",{admin:true, title:"Urbane Wardrobe"});
-})
-router.get("/" ,(req,res)=>{
-    res.render("admin/adminlogin")
+// router.get("/test",(req,res)=>{
+//     res.render("admin/category",{admin:true, title:"Urbane Wardrobe"});
+// })
+
+router.get("/" , auth.checkAdminJWT , (req,res)=>{
+    res.render("admin/adminlogin", {title:"Urbane Wardrobe"})
 });
 
-
-
 router.post("/", adminController.adminlogin);
+router.post("/verify", adminController.verifyEmailPassword);
 router.get("/dashboard", auth.verifyAdminJWT, adminController.renderDashboard);
 
 router.get("/addproduct", auth.verifyAdminJWT, productController.addProductPage);
@@ -33,7 +33,7 @@ router.get("/products-varient", auth.verifyAdminJWT, productController.addProduc
 router.post("/products-varient", auth.verifyAdminJWT, upload.array("images",4), productController.addProductVarient);
 
 //user handling
-router.patch("/blockunblock/:userId", adminController.blockUnblockUser)
+router.patch("/blockunblock/:userId", auth.verifyAdminJWT, adminController.blockUnblockUser)
 router.get("/users", auth.verifyAdminJWT, adminController.userList);
 router.get("/delete-user/:id", auth.verifyAdminJWT, adminController.deleteUser);
 router.get("/createuser", auth.verifyAdminJWT, adminController.createUserPage);
