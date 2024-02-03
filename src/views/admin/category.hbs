@@ -56,14 +56,26 @@
                                             </div>
                                         </td> --}}
                                         <td >{{inc @index}}</td>
-                                        <td><b>{{this.category}}</b></td>
+
+
+                                        <td ><input id="category{{this._id}}" disabled class="d-block border-0 category " type="text"  value="{{this.category}}"></td>
+                                        {{!-- <td id="editcategory" class="d-none"><b><input class="border-0 " type="text" value="{{this.category}}"></b></td> --}}
+
+
                                         <td>{{this.date}}</td>
                                         {{!-- <td>Cake & Milk</td>
                                         <td>/cake</td>
                                         <td>1</td> --}}
                                         <td class="text-end">
                                             <div>
-                                                <a href="edit-caegory/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> Edit </a>
+                                                {{!-- <a href="edit-caegory/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> Edit </a> --}}
+
+
+                                                <a id="editbutton" data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-brand d-inline-block editbutton "> <i class="material-icons md-edit"></i> Edit </a>
+                                                <a id="savebutton" data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-brand d-none savebutton "> <i class="material-icons md-save"></i> Save </a>
+
+
+
                                                 <a onclick=" return confirm('Are you sure to delete {{this.category}}')" href="delete-category/{{this._id}}"  class="btn btn-sm font-sm rounded btn-danger"><i class="material-icons md-delete_forever"></i>Delete</a>
                                             </div>
                                             <!-- dropdown //end -->               
@@ -88,6 +100,11 @@
 <script>
     const catAlert = document.getElementById("catAlert");
     const addCatButton = document.getElementById("addCatButton");
+    const editButton = document.querySelectorAll(".editbutton");
+    const saveButton = document.querySelectorAll(".savebutton");
+    const categoryElem = document.querySelectorAll(".category");
+    const block = "d-inline-block"
+    const none = "d-none"
 
     function addCategory() {
         console.log("entered fetch")
@@ -120,5 +137,50 @@
     }
     
     addCatButton.addEventListener("click", addCategory);
+
+    /*let save = [];
+    saveButton.forEach((element)=>{
+        save.push(element);
+    })
+    console.log("thid is save",save);*/
+
+    editButton.forEach((element,index)=>{
+        element.addEventListener("click", ()=>{        
+            console.log("index",index)
+            categoryElem[index].disabled = !categoryElem[index].disabled;
+            element.classList.replace(block,none);
+            saveButton[index].classList.replace(none,block);
+        })
+    });
+
+    saveButton.forEach((element,index)=>{
+        element.addEventListener("click", ()=>{
+            let id = element.getAttribute("data-id");
+            let value = document.getElementById(`category${id}`).value
+            console.log(value);
+            
+            fetch("/api/v1/admin/category", {
+                method: "PATCH",
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({
+                   category : value,
+                   id
+                })
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if (data) {
+                    //showNotification("Details saved");
+                    categoryElem[index].disabled = !categoryElem[index].disabled;
+                    element.classList.replace(block,none);
+                    editButton[index].classList.replace(none,block);
+
+                    console.log(data);
+                }
+            });
+        })
+    })
 
 </script>

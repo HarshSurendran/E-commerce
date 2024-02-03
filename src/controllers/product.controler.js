@@ -91,7 +91,7 @@ const onlyProductsList = asyncHandler( async (req,res)=>{
               category:1,
               islisted:1
             }
-          }
+        }
     ]);
 
     if(!products){
@@ -281,10 +281,10 @@ const addProductVarient = asyncHandler( async (req,res)=>{
     .redirect("products")
 });
 
-const editProductVarient = asyncHandler( async (req,res)=>{
-    //get datas name, about, category, islisted, 
-    //check whether every pic is edited
-});
+// const editProductVarient = asyncHandler( async (req,res)=>{
+//     //get datas name, about, category, islisted, 
+//     //check whether every pic is edited
+// });
 
 const listProducts = asyncHandler( async(req,res)=>{
     const productList = await ProductVarient.aggregate(

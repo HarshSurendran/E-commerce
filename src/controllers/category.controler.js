@@ -68,6 +68,31 @@ const addCategory = asyncHandler( async(req,res)=>{
     );    
 })
 
+const editCategory = asyncHandler( async(req,res)=>{
+    const {category, id} = req.body;
+    console.log(category,"ccat and id",id);
+    
+    const catedited = await Category.updateOne(
+            {
+                _id:id
+            },
+            {
+                $set: {category}
+            }
+        );
+    
+    if(!catedited){
+        res
+        .status(500)
+        .json( new ApiError(500, "Category not updated."));
+    }
+
+    res
+    .status(200)
+    .json( new ApiResponse(200, {catedited}, "Category updated"));
+
+})
+
 const deleteCategory = asyncHandler( async(req,res)=>{
     const id = req.params.id;
     console.log("This is delte id " ,id);
@@ -86,5 +111,6 @@ const deleteCategory = asyncHandler( async(req,res)=>{
 module.exports = {
     addCategory,
     categoryPage,
-    deleteCategory
+    deleteCategory,
+    editCategory
 }

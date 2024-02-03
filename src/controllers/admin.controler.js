@@ -6,6 +6,12 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/admin.models.js");
 const User = require("../models/user.models.js");
 
+const renderLoginPage =  asyncHandler( async(req,res)=>{
+    res
+    .status(200)
+    .render("admin/adminlogin", {title:"Urbane Wardrobe"})
+})
+
 const generateAccessAndRefreshToken = async (adminid)=>{
     try{
     const admin = await Admin.findOne({_id:adminid});    
@@ -251,5 +257,6 @@ module.exports = {
     deleteUser,
     createUser,
     createUserPage,
-    verifyEmailPassword
+    verifyEmailPassword,
+    renderLoginPage
 }

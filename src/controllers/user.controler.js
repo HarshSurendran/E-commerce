@@ -463,6 +463,33 @@ const allproductlist = asyncHandler( async(req,res)=>{
 
 })
 
+const addProfilepicture = asyncHandler( async(req,res)=>{
+    const userId = req.user._id;
+    const url = req.file.path;
+    console.log("Entered update profdile ",url);
+    
+    const uploadedToCloudinary = await uploadOnCloudinary(url);
+    
+    if(!uploadedToCloudinary){
+        throw new ApiError(500,`Error in uploading file `)
+    }
+
+    avatarPath = uploadedToCloudinary.url;
+    
+    const updated = await User.updateOne({_id: userId},{
+        $set : { 
+            image: avatarPath 
+        }
+    });
+
+    if(!updated){
+        throw new ApiError(500, "not updated")
+    }
+
+    res.redirect("/api/v1/users/test");
+    
+})
+
 
 module.exports = {    
     loginUser,
@@ -474,5 +501,6 @@ module.exports = {
     otpPageLoader,
     verifiedUserLogin,
     allproductlist,
-    homePageRender
+    homePageRender,
+    addProfilepicture
 }

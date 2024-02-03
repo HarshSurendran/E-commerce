@@ -36,7 +36,8 @@ const userSchema = mongoose.Schema({
         default: false
     },
     image:{ 
-        type: String, //cloudinary url 
+        type: String, //cloudinary url
+        default: "/assets/imgs/theme/upload.svg"
     },
     refreshToken:{
         type: String

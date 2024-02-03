@@ -26,8 +26,7 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
             
             throw new ApiError(400, "The user is blocked");
         }
-        
-        console.log(user);
+       
         // giving the user_id to the request property
         req.user = user;
         next();       

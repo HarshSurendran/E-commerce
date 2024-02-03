@@ -9,18 +9,21 @@ const insertUser = require("../middlewares/insertUser.middleware.js");
 const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 
+router.get("/test", auth.verifyUserJWT, (req,res)=>{
+    console.log(req.user);   
+    res.render("users/profile",{user:req.user, layout:"userprofilelayout"});
+});
 
+
+router.get("/home", auth.verifyUserJWT, userController.homePageRender);
+router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
+router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
+//router.post("/signup", userController.loginUser);
+//router.get("/product-list", userController.allproductlist)
 
 // product related
 router.get("/listproducts", auth.verifyUserJWT,  productController.listProducts);
 router.get("/productdetails/:id", auth.verifyUserJWT,  productController.productDetailsPage);
-
-
-router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
-router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
-//router.post("/signup", userController.loginUser);
-router.get("/home", auth.verifyUserJWT, userController.homePageRender)
-//router.get("/product-list", userController.allproductlist)
 
 // cart management
 router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage);
@@ -33,5 +36,9 @@ router.post("/refresh-token",auth.verifyUserJWT, userController.refreshAccessTok
 router.patch("/userdetails", auth.verifyUserJWT, userController.updateUserDetails);
 router.patch("/password", auth.verifyUserJWT, userController.changeCurrentPassword);
 router.get('/getuser', auth.verifyUserJWT, userController.getCurrentUser);
+
+//user profile
+router.patch("/details", auth.verifyUserJWT, userController.updateUserDetails);
+router.post("/profilepicture", auth.verifyAdminJWT, upload.single("avatar",1), userController.addProfilepicture);
 
 module.exports = router;

@@ -1,0 +1,151 @@
+
+
+<div class="screen-overlay"></div>
+<aside class="navbar-aside" id="offcanvas_aside">
+    <div class="aside-top">
+        <a href="/api/v1" class="brand-wrap">
+            <img src="/assets/imgs/theme/logo1.png" class="logo" alt="UrbaneWardrobe Dashboard" />
+        </a>
+        <div>
+            <button class="btn btn-icon btn-aside-minimize"><i class="text-muted material-icons md-menu_open"></i></button>
+        </div>
+    </div>
+    <nav>
+        <ul class="menu-aside">
+            <li class="menu-item">
+                <a class="menu-link">
+                    <i class="icon material-icons md-home"></i>
+                    <span class="text">Hi,{{user.fullname}}</span>
+                </a>
+            </li>
+            <li class="menu-item active">
+                <a class="menu-link" href="/api/v1/admin/dashboard">
+                    <i class="icon material-icons md-home"></i>
+                    <span class="text">Profile</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/api/v1/admin/products">
+                    <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Products</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/api/v1/admin/users">
+                    <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Users</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/api/v1/admin/category">
+                    <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Category</span>
+                </a>
+            </li>
+            {{!-- <li class="menu-item has-submenu">
+                <a class="menu-link" href="addproduct">
+                    <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Prodructs</span>
+                </a>
+            </li>
+            <li class="menu-item has-submenu">
+                <a class="menu-link" href="page-orders-1.html">
+                    <i class="icon material-icons md-shopping_cart"></i>
+                    <span class="text">Orders</span>
+                </a>
+            </li>
+            <li class="menu-item has-submenu">
+                <a class="menu-link" href="page-sellers-cards.html">
+                    <i class="icon material-icons md-store"></i>
+                    <span class="text">Sellers</span>
+                </a>
+            </li>
+            <li class="menu-item has-submenu">
+                <a class="menu-link" href="page-form-product-1.html">
+                    <i class="icon material-icons md-add_box"></i>
+                    <span class="text">Add product</span>
+                </a>
+            </li>
+            <li class="menu-item has-submenu">
+                <a class="menu-link" href="page-transactions-1.html">
+                    <i class="icon material-icons md-monetization_on"></i>
+                    <span class="text">Transactions</span>
+                </a>
+            </li>
+            <li class="menu-item has-submenu">
+                <a class="menu-link" href="#">
+                    <i class="icon material-icons md-person"></i>
+                    <span class="text">Account</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="page-reviews.html">
+                    <i class="icon material-icons md-comment"></i>
+                    <span class="text">Reviews</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i> <span class="text">Brands</span> </a>
+            </li> --}}
+            <li class="menu-item">
+                <a class="menu-link" disabled href="#">
+                    <i class="icon material-icons md-pie_chart"></i>
+                    <span class="text">Statistics</span>
+                </a>
+            </li>
+        </ul>
+        <hr />
+        <ul class="menu-aside">
+            <li class="menu-item has-submenu">
+                <a class="menu-link" href="#">
+                    <i class="icon material-icons md-settings"></i>
+                    <span class="text">Settings</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="page-blank.html">
+                    <i class="icon material-icons md-local_offer"></i>
+                    <span class="text"> Starter page </span>
+                </a>
+            </li>
+        </ul>
+        <br />
+        <br />
+    </nav>
+</aside>
+
+
+{{!-- header --}}
+<div class="main-wrap">
+    <nav class="navbar navbar-expand-lg bg-white"> 
+        <div class=" container-fluid">
+            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-lg-center" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link active" aria-current="page" href="/api/v1/users/home">Home</a>
+                <a class="nav-link" href="listproducts">Shop</a>
+                <a class="nav-link" href="#">Mens</a>
+                <a class="nav-link" href="#">Womens</a>
+                <a class="nav-link" href="#">Kids</a> 
+                <a class="nav-link" href="#">Contact</a>         
+            </div>
+            </div>
+            <div class="navbar-nav me-4">
+            <a class="nav-link " href="/api/v1/users/logout">logout</a>  
+            {{!-- change to {{user.fullname}} to direct to profile details etc now its logout --}}
+            </div>
+            <ul class="header__right__widget d-flex ms-3 ">
+            <li><span class="icon_search search-switch  "></span></li>
+            <li><a href="#"><span class="icon_heart_alt  "></span>
+                <div class="tip">2</div>
+            </a></li>
+            <li><a href="/api/v1/users/cart"><span class="icon_bag_alt "></span>
+                <div class="tip">2</div>
+            </a></li>
+            </ul>
+        </div>
+    </nav>
+</div>
