@@ -5,7 +5,7 @@ const uploadOnCloudinary = require("../utils/cloudinary.js");
 const fs = require("fs");
 
 
-const insertUser = asyncHandler( async (req, _,next)=>{   
+const insertUser = asyncHandler( async (req, res,next)=>{   
     
     const {fullname,phone,email,password,confirmpassword} = req.body;
 
@@ -56,11 +56,13 @@ const insertUser = asyncHandler( async (req, _,next)=>{
     
     const emailExist = await User.findOne({email}).select("-password -refreshtoken -createdAt -updatedAt");
     if(emailExist){
-        throw new ApiError(400,"Email already exists");
+        // throw new ApiError(400,"Email already exists");
+        res.render("userregister", {title:"Urbane Wardrobe", message: "Email already exists", common:true});
     }
     const phoneExist = await User.findOne({phone}).select("-password -refreshtoken -createdAt -updatedAt");
     if(phoneExist){
-        throw new ApiError(400,"Phone number already exists");
+        //throw new ApiError(400,"Phone number already exists");
+        res.render("userregister", {title:"Urbane Wardrobe", message: "Phone number already exists", common:true});
     }
     console.log("this is emailExist :",emailExist);
 

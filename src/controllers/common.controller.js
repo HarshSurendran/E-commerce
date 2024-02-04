@@ -3,6 +3,7 @@ const ApiResponse = require("../utils/ApiResponse.js");
 const asyncHandler = require("../utils/asynchandler.js");
 const ProductVarient = require("../models/productvarient.models.js");
 const Product = require("../models/product.models.js");
+const User = require("../models/user.models.js");
 const mongoose = require("mongoose");
 
 const renderHomePage = asyncHandler( async(req,res)=>{
@@ -314,10 +315,48 @@ const listProducts = asyncHandler( async(req,res)=>{
     .render("common/guestlistproducts",{common:true, products: productList});
 });
 
+const checkEmail = asyncHandler( async(req,res)=>{
+    const {email} = req.body;
+    console.log("This cheeck mail",email);
+
+    const emailExist = await User.findOne({email}).select("-password -refreshtoken -createdAt -updatedAt");
+
+    if(emailExist){
+        // throw new ApiError(400,"Email already exists");
+        return res
+        .status(400)
+        .json( new ApiError(400,"Email already exist"));
+    }
+
+    res
+    .status(200)
+    .json( new ApiResponse(200,{},"Email is valid"))
+});
+
+const checkPhone = asyncHandler( async(req,res)=>{
+    const {phone} = req.body;
+    console.log("This cheeck mail",phone);
+
+    const phoneExist = await User.findOne({phone}).select("-password -refreshtoken -createdAt -updatedAt");
+
+    if(phoneExist){
+        // throw new ApiError(400,"Email already exists");
+        return res
+        .status(400)
+        .json( new ApiError(400,"Phone already exist"));
+    }
+
+    res
+    .status(200)
+    .json( new ApiResponse(200,{},"Phone number is valid"))
+});
+
 module.exports= {
     renderHomePage,
     renderLoginPage,
     renderRegisterPage,
     productDetailsPage,
-    listProducts
+    listProducts,
+    checkEmail,
+    checkPhone
 }

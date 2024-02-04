@@ -158,6 +158,7 @@
     .then( (response)=>{
         if(!response.ok){
             catAlert.innerText="Category not added. Please try again"
+            return
         }
         catAlert.className="text-success text-center "
         catAlert.innerText = "Category added successfully"

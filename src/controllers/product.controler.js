@@ -427,8 +427,11 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
         }
     ]);
 
-    if(!prod){
-        throw new ApiError(400,"Bad request prod id is not valid");
+
+    if(prod.length === 0){
+        return res
+        .status(400)
+        .render("error")        
     }
 
     const prodDetails = prod[0];

@@ -17,4 +17,8 @@ router.get("/productdetails/:id", commonController.productDetailsPage);
 
 router.get("/productlist", commonController.listProducts);
 
+router.post("/checkemail", commonController.checkEmail);
+
+router.post("/checkphone", commonController.checkPhone);
+
 module.exports = router

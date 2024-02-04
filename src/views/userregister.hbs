@@ -73,10 +73,13 @@
     <div class="row ">
       <div class="col-lg-6 col-12  ">
         <div class=" m-lg-5  ">
-          <form onsubmit="return validate()"  action="users/register" method="post" >
+          <form onsubmit="return validate()"  action="/api/v1/users/register" method="post" >
             <div class="d-flex justify-content-center ">
               <h3>Register</h3>
             </div>
+            {{#if message}}
+            <p class="text-danger text-center">{{message}}</p>
+            {{/if}}
             <div class="mb-3">
               <label for="exampleInputEmail1"  class="form-label">Full name</label>
               <input type="text" class="form-control mb-3 shadow-none " id="Fullname" aria-describedby="Name" name="fullname" required>
@@ -88,19 +91,19 @@
               <p id="emailalert" class="text-danger "></p>
           
               
-              <label for="exampleInputPhone"  class="form-label">Phone number</label>
+              <label for="Phonenumber"  class="form-label">Phone number</label>
               <input type="tel" class="form-control mb-3 shadow-none" id="Phone" aria-describedby="phoneHelp" name="phone"  required>
               <p id="phonealert" class="text-danger "></p>
             </div>
             
             <div class="mb-3">
-              <label for="exampleInputPassword1"  class="form-label">Password</label>
-              <input type="password" class="form-control shadow-none" id="Password1" name="password"  id="password" required>
+              <label for="password"  class="form-label">Password</label>
+              <input type="password" class="form-control shadow-none" id="Password1" name="password"   required>
               <p id="passwordalert" class="text-danger "></p>
             </div>
             <div class="mb-5">
-              <label for="exampleInputPassword1"  class="form-label">Confirm Password</label>
-              <input type="password" class="form-control shadow-none" id="Password2" name="confirmpassword" id="confirmpassword" required>
+              <label for="confirmpassword"  class="form-label">Confirm Password</label>
+              <input type="password" class="form-control shadow-none" id="Password2" name="confirmpassword" required>
               <p id="cpasswordalert" class="text-danger "></p>
             </div>       
             
@@ -134,7 +137,11 @@
   const phoneAlert = document.getElementById("phonealert");
   const passwordAlert = document.getElementById("passwordalert");
   const cpasswordAlert = document.getElementById("cpasswordalert");
-  const confirmPassword = document.getElementById("confirmpassword");
+  const password = document.getElementById("Password1"); 
+  const confirmPassword = document.getElementById("Password2");
+  const phone = document.getElementById("Phone");
+  const email = document.getElementById("Email");
+
 
   function validate(){
     console.log("This is validate")
@@ -183,5 +190,108 @@
         phoneAlert.innerText = "Phone number is not valid."
         return false
     }
+    const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if(!password.match(strongPasswordRegex)){
+        passwordAlert.innerText = "Phone number is not valid."
+        return false
+    }
   }
+  
+  //checking password matches strong password
+  password.addEventListener("input", ()=>{
+
+    let value = document.getElementById("Password1").value;
+    console.log("This  is keydiwn listener :", value)
+
+    const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if(strongPasswordRegex.test(value)){
+      passwordAlert.classList.replace("text-danger","text-success");
+      passwordAlert.innerText = "Password is strong"
+      return
+    }
+    passwordAlert.classList.replace("text-success","text-danger");
+    passwordAlert.innerText = "Password should contain 8 characters with numbers and symbols.";
+  });
+
+  //checking whether confirm password matched password
+  confirmPassword.addEventListener("input", ()=>{
+
+    console.log("This  is keydiwn listener for cpass")
+
+    let value = document.getElementById("Password1").value;
+    let cvalue = document.getElementById("Password2").value;
+
+    console.log("pass :", value, "cpass :", cvalue)
+
+    if(value === cvalue){
+      cpasswordAlert.classList.replace("text-danger","text-success");
+      cpasswordAlert.innerText = "Password is matching"
+      return
+    }
+    cpasswordAlert.classList.replace("text-success","text-danger");
+    cpasswordAlert.innerText = "Password doesn't match";
+  });
+
+  phone.addEventListener("input", ()=>{
+
+    console.log("This  is keydiwn listener for phone")
+
+    let value = document.getElementById("Phone").value;  
+    const phoneRegex = /^\d{10}$/;
+
+    if(value.match(phoneRegex)){ 
+
+      fetch("/api/v1/checkphone",{
+          method : "POST",
+          headers : {
+              "content-type" : "application/json"
+          },
+          body: JSON.stringify({
+              phone :  value
+          })
+      })
+      .then( res => res.json())
+      .then((data)=>{        
+          if (data.success) {
+              //showNotification("Details saved");
+              phoneAlert.classList.replace("text-danger","text-success");
+              phoneAlert.innerText = "Phone number valid"                      
+              return
+          }
+          phoneAlert.classList.replace("text-success","text-danger");
+          phoneAlert.innerText = "Phone number already exists"
+      });
+    }
+  
+    phoneAlert.classList.replace("text-success","text-danger");
+    phoneAlert.innerText = "Phone number is not valid"
+  
+  });
+   
+  email.addEventListener("input", ()=>{
+      const email = document.getElementById("Email").value;
+      console.log("this is emmail in fetch ", email);
+
+      fetch("/api/v1/checkemail",{
+          method : "POST",
+          headers : {
+              "content-type" : "application/json"
+          },
+          body: JSON.stringify({
+              email
+          })
+      })
+      .then( res => res.json())
+      .then((data)=>{        
+          if (data.success) {
+              //showNotification("Details saved");
+              emailAlert.innerText="";          
+              return
+          }                        
+          emailAlert.innerText = "Email already exists"
+      });
+      
+    })
+
 </script>
