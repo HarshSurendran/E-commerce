@@ -131,7 +131,6 @@
 </div>
 
 <script>
-
   const nameAlert = document.getElementById("fullnamealert");
   const emailAlert = document.getElementById("emailalert");
   const phoneAlert = document.getElementById("phonealert");
@@ -142,7 +141,7 @@
   const phone = document.getElementById("Phone");
   const email = document.getElementById("Email");
 
-
+  //validating the form 
   function validate(){
     console.log("This is validate")
     const fullname = document.getElementById("Fullname").value;
@@ -233,6 +232,7 @@
     cpasswordAlert.innerText = "Password doesn't match";
   });
 
+  //checking whether phone exists
   phone.addEventListener("input", ()=>{
 
     console.log("This  is keydiwn listener for phone")
@@ -269,6 +269,7 @@
   
   });
    
+  //checking whether email exists
   email.addEventListener("input", ()=>{
       const email = document.getElementById("Email").value;
       console.log("this is emmail in fetch ", email);

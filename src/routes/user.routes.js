@@ -19,11 +19,14 @@ router.get("/test", auth.verifyUserJWT, (req,res)=>{
 });
 
 
-router.get("/home", auth.verifyUserJWT, userController.homePageRender);
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
 router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
+router.post("/resendotp", otpGenerator, userController.resendotpsender);
 //router.post("/signup", userController.loginUser);
 //router.get("/product-list", userController.allproductlist)
+
+
+router.get("/home", auth.verifyUserJWT, userController.homePageRender);
 
 // product related
 router.get("/listproducts", auth.verifyUserJWT,  productController.listProducts);

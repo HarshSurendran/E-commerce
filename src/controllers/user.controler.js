@@ -183,6 +183,10 @@ const loginUser = asyncHandler( async (req,res)=>{
         throw new ApiError(400, "This User is blocked")
     }
 
+    if(!user.isVerified){
+        throw new ApiError(400, "Verification is not complete.")
+    }
+
     const isPasswordValid = await user.isPasswordCorrect(password);
 
     if(!isPasswordValid){
@@ -432,7 +436,7 @@ const otpPageLoader = asyncHandler( async(req,res)=>{
 
     //while rendoring it to the otp verification page should send user email or id which should be given in hidden input form so that we will get to know who is the sender while verifying the code. 
     console.log("This is the userid i am sending with the render",req.otp.userid);
-    res.render("users/otpvalidation", {userId : req.otp.userid, title:"Urbane Wardrobe", user:true});
+    res.render("users/otpvalidation", {userId : req.otp.userid, title:"Urbane Wardrobe", common:true});
 
     // return res.
     // status(200)
@@ -490,6 +494,37 @@ const addProfilepicture = asyncHandler( async(req,res)=>{
     
 })
 
+const resendotpsender = asyncHandler( async(req,res)=>{
+    const generatedOtp = req.otp.otp;
+    console.log("Entered resendotpsender", generatedOtp);
+
+    // try{
+        const user = await User.findOne({_id:req.body.userid}).select("-passwoed -refreshToken");
+        //sending otp to senders mail
+        const mailOptions = {
+            from: "harshsurendran@gmail.com",
+            to: user.email,
+            subject: "OTP Verification",
+            text: `Your OTP for verification is: ${generatedOtp}`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+            throw new ApiError(500, "Something went wrong with sending email", error.message);   
+            }
+        });
+        //while rendoring it to the otp verification page should send user email or id which should be given in hidden input form so that we will get to know who is the sender while verifying the code.
+        res
+        .status(200)
+        .json( new ApiResponse(200,{},"Otp is sent to the user"));
+    // }
+    // catch (error) {
+    //     res
+    //     .status(500)
+    //     .render("users/otpvalidation", {common:true, title:"Urbane Wardrobe", message: error.message})
+    // }
+})
+
 
 module.exports = {    
     loginUser,
@@ -502,5 +537,6 @@ module.exports = {
     verifiedUserLogin,
     allproductlist,
     homePageRender,
-    addProfilepicture
+    addProfilepicture,
+    resendotpsender
 }

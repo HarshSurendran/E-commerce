@@ -1,6 +1,8 @@
 const ApiError = require("../utils/ApiError");
+const ApiResponse = require("../utils/ApiResponse");
 const asyncHandler = require("../utils/asynchandler");
-const Otp = require("../models/otp.models")
+const Otp = require("../models/otp.models");
+const User = require("../models/user.models");
 
 const speakeasy = require("speakeasy");
 
@@ -20,8 +22,18 @@ const generateOtp = ()=>{
     return otp
 }
 
-const otpGenerator = asyncHandler( async(req , _, next)=>{
-    console.log(req.user._id);    
+const otpGenerator = asyncHandler( async(req , _, next)=>{  
+    //if its coming from resend otp
+    if(req.body.userid){
+        const user = await User.findOne({_id:req.body.userid}).select("-password -refreshToken");
+        if(!user){
+            return res
+            .status(400)
+            .json( new ApiError(400,"Registration timed out"))
+        }
+        console.log("this is pure", req.body.userid) 
+        const deleteOtp = await Otp.deleteMany({userid: req.body.userid});
+    }   
  
     const generatedOtp = await generateOtp();
 
@@ -29,8 +41,18 @@ const otpGenerator = asyncHandler( async(req , _, next)=>{
         throw new ApiError(500,"Otp generation failed");
     }
 
+    
+
+    // if(req.user._id){
+    //     console.lo
+    //     userid = req.user._id
+    //     console.log("Entered req.user._id :", userid);
+    // }
+
+    const userid = req?.user?._id;
+
     const otp = await Otp.create({
-        userid: req.user._id,
+        userid : userid ?? req.body.userid,
         otp: generatedOtp
     });
 
