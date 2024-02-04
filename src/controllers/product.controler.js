@@ -508,7 +508,35 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .render("proddetails", {user:req.user, title:"Urbane Wardrobe", product: prodDetails, prodVarients});
-})
+});
+
+const listUnlistProduct = asyncHandler( async(req,res)=>{
+    const id = req.params.id;
+    console.log(id);
+    const product = await Product.findOne({_id:id})
+
+    if(!product){
+        res
+        .status(400)
+        .json( new ApiError(400,"Bad request product id is not valid"))
+    }
+
+    if(product.islisted == true){
+        console.log("Entered islisted true");
+        const Updated = await Product.updateOne({_id:id},{
+            $set: { islisted: false }
+        });
+    }else{
+        console.log("Entered islisted false");
+        const Updated = await Product.updateOne({_id:id},{
+            $set: { islisted: true }
+        });    
+    }
+
+    res
+    .status(200)
+    .json( new ApiResponse(200, {}, "task success"))
+});
 
 
 
@@ -524,5 +552,6 @@ module.exports = {
     editProduct,
     deleteProduct,
     addProductVarientPage,
-    productDetailsPage
+    productDetailsPage,
+    listUnlistProduct
 }

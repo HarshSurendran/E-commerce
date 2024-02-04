@@ -13,6 +13,8 @@ router.get("/login", auth.checkUserJWT, commonController.renderLoginPage);
 
 router.get("/register", auth.checkUserJWT, commonController.renderRegisterPage);
 
+router.get("/productdetails/:id", commonController.productDetailsPage);
 
+router.get("/productlist", commonController.listProducts);
 
 module.exports = router

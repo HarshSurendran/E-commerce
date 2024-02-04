@@ -139,8 +139,7 @@ function blockUnblockUser(userId, buttonElement) {
     })
     .then((data) => {
         // Update the button text and style based on the server response
-        if (buttonElement.classList.contains('blockButton')) {
-            console.log("THis is  ")
+        if (buttonElement.classList.contains('blockButton')) {            
             buttonElement.innerText = 'Unblock';
             buttonElement.classList.remove('blockButton');
             buttonElement.classList.add('unblockButton');
@@ -160,14 +159,5 @@ function blockUnblockUser(userId, buttonElement) {
     });
 }
 
-    
-
-    
-    
-    
-
  
-    
-
-
 </script>

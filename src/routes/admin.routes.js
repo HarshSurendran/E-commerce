@@ -22,10 +22,11 @@ router.get("/addproduct", auth.verifyAdminJWT, productController.addProductPage)
 router.post("/addproduct", auth.verifyAdminJWT, productController.addProduct);
 router.get("/edit-product/:id", auth.verifyAdminJWT, productController.editProductPage);
 router.post("/editProduct", auth.verifyAdminJWT, productController.editProduct);
-router.get("/delete-product/:id", auth.verifyAdminJWT, productController.deleteProduct);
+//router.get("/delete-product/:id", auth.verifyAdminJWT, productController.deleteProduct); delete product is not needed.
 router.get("/productlist", auth.verifyAdminJWT, productController.listProducts);
 router.get("/products-varient", auth.verifyAdminJWT, productController.addProductVarientPage);
 router.post("/products-varient", auth.verifyAdminJWT, upload.array("images",4), productController.addProductVarient);
+router.patch("/listunlist/:id", auth.verifyAdminJWT, productController.listUnlistProduct);
 
 router.get("/test",(req,res)=>{
     res.render("admin/userdetails",{admin:true});

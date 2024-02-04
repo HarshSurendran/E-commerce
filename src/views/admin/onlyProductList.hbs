@@ -43,7 +43,7 @@
                         </div>
                     </header>
                     <!-- card-header end// -->
-                    <div class="card-body">
+                    <div id="productlist" class="card-body">
                         {{#each products}}
                         <article class="itemlist">
                         
@@ -66,9 +66,9 @@
                                 <div class="col-lg-2 col-sm-2 col-4 col-price text-center "><span>{{this.category.category}}</span></div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-status text-center ">
                                     {{#if this.islisted}}
-                                    <span class="badge rounded-pill alert-success">{{this.islisted}}</span>
+                                    <span class="badge rounded-pill alert-success">Listed</span>
                                     {{else}}
-                                    <span class="badge rounded-pill alert-danger">{{this.islisted}}</span>
+                                    <span class="badge rounded-pill alert-danger">Unlisted</span>
                                     {{/if}}
                                 </div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-date text-center ">
@@ -77,7 +77,12 @@
                                 <div class="col-lg-3 col-sm-2 col-4 col-action text-end">
                                     <a href="detailproduct/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> details </a>
                                     <a href="edit-product/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> Edit </a>
-                                    <a onclick=" return confirm('Are you sure to delete {{this.name}}')" href="delete-product/{{this._id}}"  class="btn btn-sm font-sm rounded btn-danger"><i class="material-icons md-delete_forever"></i>Delete</a>
+                                    {{!-- <a onclick=" return confirm('Are you sure to delete {{this.name}}')" href="delete-product/{{this._id}}"  class="btn btn-sm font-sm rounded btn-danger"><i class="material-icons md-delete_forever"></i>Delete</a> --}}
+                                    {{#if this.islisted}}
+                                        <button data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-danger unlistButton"> Unlist</button>
+                                    {{else}}
+                                        <button data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-brand listButton"> List </button>
+                                    {{/if}}
                                 </div>
                             </div>
                             <!-- row .// -->
@@ -108,3 +113,61 @@
         </main>        
     </body>
 
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Attach click event listener to the parent element of the user list
+        document.getElementById('productlist').addEventListener('click', function (event) {
+            const target = event.target;
+
+            console.log("This is the taget :", target)
+            // Check if the clicked element is a button with class 'blockButton' or 'unblockButton'
+            if (target.tagName === 'BUTTON' && (target.classList.contains('listButton') || target.classList.contains('unlistButton'))) {
+                // Get the user ID associated with the clicked button
+                const productId = target.dataset.id;
+
+                console.log("This is prodid", productId)
+
+                // Perform the block/unblock action
+                listUnlistProduct(productId, target);
+            }
+        });
+    });
+
+    // Function to block/unblock a user
+    function listUnlistProduct(productId, buttonElement) {
+        console.log("You have entered blovkfunctuion")
+        // Make a Fetch request to your server to handle the block/unblock action
+        fetch(`/api/v1/admin/listunlist/${productId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // Include any additional data you need to send to the server
+            }),
+        })
+        .then( res => res.json())
+        .then((data) => {
+            // Update the button text and style based on the server response
+            if (buttonElement.classList.contains('listButton')) {            
+                buttonElement.innerText = 'Unlist';
+                buttonElement.classList.remove('listButton');
+                buttonElement.classList.add('unlistButton');
+                buttonElement.classList.remove('btn-brand');
+                buttonElement.classList.add('btn-danger');
+            } else if (buttonElement.classList.contains('unlistButton')) {
+                buttonElement.innerText = ` List `;
+                buttonElement.classList.remove('btn-danger');
+                buttonElement.classList.remove('unlistButton');
+                buttonElement.classList.add('listButton');
+                buttonElement.classList.add('btn-brand');
+            }
+            window.location.reload();
+        })
+        .catch((error) => {
+            console.log(error);
+            // Handle errors or show an error message to the user
+        });
+    }
+</script>

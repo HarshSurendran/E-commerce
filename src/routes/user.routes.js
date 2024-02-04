@@ -9,6 +9,10 @@ const insertUser = require("../middlewares/insertUser.middleware.js");
 const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 
+router.get("/otp", (req,res)=>{
+    res.render("users/otpvalidation",{user:true});
+})
+
 router.get("/test", auth.verifyUserJWT, (req,res)=>{
     console.log(req.user);   
     res.render("users/profile",{user:req.user, layout:"userprofilelayout"});
@@ -23,7 +27,7 @@ router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
 
 // product related
 router.get("/listproducts", auth.verifyUserJWT,  productController.listProducts);
-router.get("/productdetails/:id", auth.verifyUserJWT,  productController.productDetailsPage);
+router.get("/productdetails/:id", auth.verifyUserJWT, productController.productDetailsPage);
 
 // cart management
 router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage);

@@ -10,30 +10,60 @@
                     {{/if}}
                 </div>
                 <div class="card-body m-5 ">
-                    <form action="verify-otp" method="post">
+                    {{!-- <form action="verify-otp" method="post">
                         <div class="d-flex ">
                             <input type="hidden" class="form-control p-3" id="userid" name="userId" value="{{userId}}">
-                            <div class="form-group me-2 ">                            
+                            <div class="form-group me-2 p-2  ">                            
                                 <input type="text" class="form-control p-3" id="otp1" name="otp1" maxlength="1" required>
                             </div>
-                            <div class="form-group me-2">                            
+                            <div class="form-group me-2 p-2 ">                            
                                 <input type="text" class="form-control p-3" id="otp2" name="otp2" maxlength="1" required>
                             </div>
-                            <div class="form-group me-2">                            
+                            <div class="form-group me-2 p-2">                            
                                 <input type="text" class="form-control p-3" id="otp3" name="otp3" maxlength="1" required>
                             </div>
-                            <div class="form-group me-2">                            
+                            <div class="form-group me-2 p-2">                            
                                 <input type="text" class="form-control p-3" id="otp4" name="otp4" maxlength="1" required>
                             </div>
-                            <div class="form-group me-2" >                            
+                            <div class="form-group me-2 p-2" >                            
                                 <input type="text" class="form-control p-3" id="otp5" name="otp5" maxlength="1" required>
                             </div>
-                            <div class="form-group">                            
+                            <div class="form-group p-2 ">                            
                                 <input type="text" class="form-control p-3" id="otp6" name="otp6" maxlength="1" required>
                             </div>
                         </div>
                         <div class="d-flex justify-content-center mt-5   ">
                             <button type="submit" class="btn btn-primary">Submit OTP</button>
+                        </div>
+                    </form> --}}
+
+                    <form action="verify-otp" method="post" id="otpForm">
+                        <div class="d-flex">
+                            <input type="hidden" class="form-control p-3" id="userid" name="userId" value="{{userId}}">
+                            <div class="form-group me-2 p-2">
+                            <input type="text" class="form-control p-3 otp-input" id="otp1" name="otp1" maxlength="1" required>
+                            </div>
+                            <div class="form-group me-2 p-2">
+                            <input type="text" class="form-control p-3 otp-input" id="otp2" name="otp2" maxlength="1" required>
+                            </div>
+                            <div class="form-group me-2 p-2">
+                            <input type="text" class="form-control p-3 otp-input" id="otp3" name="otp3" maxlength="1" required>
+                            </div>
+                            <div class="form-group me-2 p-2">
+                            <input type="text" class="form-control p-3 otp-input" id="otp4" name="otp4" maxlength="1" required>
+                            </div>
+                            <div class="form-group me-2 p-2">
+                            <input type="text" class="form-control p-3 otp-input" id="otp5" name="otp5" maxlength="1" required>
+                            </div>
+                            <div class="form-group p-2">
+                            <input type="text" class="form-control p-3 otp-input" id="otp6" name="otp6" maxlength="1" required>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button type="submit" class="btn btn-primary">Submit OTP</button>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <p id="resendTimer">Resend OTP in <span id="timer">60</span> seconds</p>
                         </div>
                     </form>
                 </div>
@@ -41,5 +71,71 @@
         </div>
     </div>
 </div>
+
+<script>
+    window.addEventListener("load", function () {
+        // Make updateTimer and startTimer global
+        let secondsRemaining = 10;
+
+        const updateTimer = () => {
+            const timerElement = document.getElementById("timer");
+            if (timerElement) {
+                timerElement.textContent = secondsRemaining;
+            }
+        };
+
+        const startTimer = () => {
+            const timerInterval = setInterval(() => {
+                secondsRemaining -= 1;
+                updateTimer();
+
+                if (secondsRemaining === 0) {
+                    clearInterval(timerInterval);
+                    const resendTimerElement = document.getElementById("resendTimer");
+                    if (resendTimerElement) {
+                        resendTimerElement.innerHTML = '<button onclick="resendOTP()" class="btn btn-link">Resend OTP</button>';
+                    }
+                }
+            }, 1000);
+        };
+
+        const resendOTP = () => {
+            // Implement logic to resend OTP
+            // You may want to reset the timer and show a loading indicator during the resend process
+            secondsRemaining = 10;
+            updateTimer();
+            startTimer();
+        };
+
+        const otpInputs = document.querySelectorAll(".otp-input");
+
+        otpInputs.forEach((input, index) => {
+            input.addEventListener("input", (event) => {
+                const value = event.target.value;
+
+                if (value !== "") {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                } else {
+                    if (index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener("keydown", (event) => {
+                const isBackspace = event.key === "Backspace";
+
+                if (isBackspace && index > 0 && input.value === "") {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        startTimer();
+    });
+
+</script>
 
 
