@@ -44,7 +44,8 @@ const categoryPage = asyncHandler( async(req,res)=>{
 const addCategory = asyncHandler( async(req,res)=>{
     const {category} = req.body;
 
-    const categoryExist = await Category.findOne({category});
+    //const categoryExist = await Category.findOne({category});
+    const categoryExist = await Category.findOne({ category: { $regex: `^${category}$`, $options: 'i' } }); //checking without case sensitivity
 
     if(categoryExist){
         throw new ApiError(400,"Category already exist");
@@ -70,7 +71,15 @@ const addCategory = asyncHandler( async(req,res)=>{
 
 const editCategory = asyncHandler( async(req,res)=>{
     const {category, id} = req.body;
-    console.log(category,"ccat and id",id);
+    console.log("edit cat",category);
+    const categoryExist = await Category.findOne({ category: { $regex: `^${category}$`, $options: 'i' } });
+    console.log("This is categ exist",categoryExist);
+
+    if(categoryExist){        
+        return res
+        .status(500)
+        .json( new ApiError(500, "Category already exist."));        
+    }
     
     const catedited = await Category.updateOne(
             {
@@ -82,12 +91,12 @@ const editCategory = asyncHandler( async(req,res)=>{
         );
     
     if(!catedited){
-        res
+        return res
         .status(500)
         .json( new ApiError(500, "Category not updated."));
     }
 
-    res
+    return res
     .status(200)
     .json( new ApiResponse(200, {catedited}, "Category updated"));
 
