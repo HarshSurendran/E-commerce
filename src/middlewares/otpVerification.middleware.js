@@ -36,7 +36,7 @@ try{
     next();
 
 } catch(error){
-    res.render("users/otpvalidation", {userId : userId, title:"Urbane Wardrobe", user:true, message: error.message});
+    res.render("forgotpassotppage", {userId : userId, title:"Urbane Wardrobe", user:true, message: error.message});
 }
 });
 

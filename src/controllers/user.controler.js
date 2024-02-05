@@ -525,6 +525,91 @@ const resendotpsender = asyncHandler( async(req,res)=>{
     // }
 })
 
+const forgotPassOtpSender = asyncHandler( async(req,res)=>{
+    const generatedOtp = req.otp.otp;
+    //sending otp to senders mail
+    const mailOptions = {
+        from: "harshsurendran@gmail.com",
+        to: req.user.email,
+        subject: "OTP Verification",
+        text: `Your OTP for verification is: ${generatedOtp}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          throw new ApiError(500, "Something went wrong with sending email", error.message);   
+        }
+    });
+     
+    console.log("This is the userid i am sending with the render",req.otp.userid);
+    res
+    .status(200)
+    //.json( new ApiResponse(200,{},"otp is sent to email"));
+    .render("forgotpassotppage", {userId : req.user._id, title:"Urbane Wardrobe", common:true});
+
+})
+
+const changePassFromOtp = asyncHandler( async(req,res)=>{
+   
+    const {userId, newPassword, confirmPassword} = req.body;
+
+    if(!(newPassword === confirmPassword)){
+        //throw new ApiError(400,"Passwords is not matching");
+        res
+        .status(400)
+        .render("/changepassword",{common:true, title:"Urbane Wardrobe", message:"Password doesn't match"})
+    }
+
+    const user = await User.findOne({_id: userId});
+
+    user.password = newPassword;
+    const passwordChanged = await user.save({validateBeforeSave:false});
+
+    if(!passwordChanged){
+        res
+        .status(400)
+        .render("/changepassword",{common:true, title:"Urbane Wardrobe", message:"Failed to change password.Try again"})
+    }
+
+    const userAfterChange = await User.findOne({_id: userId});
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(userId);
+
+    console.log(accessToken);
+
+    const userUpdated =  await User.updateOne(
+        {
+           _id: req.user
+        },
+        {
+            isVerified: true
+        }
+    );
+    
+    const userLoggedIn = await User.findOne({_id:userId}).select("-password -refreshToken");
+
+    console.log(userLoggedIn);    
+
+    const options ={
+        httpOnly : true,
+        secure: true 
+    }
+
+    // sending the tokens to browser through cookie
+
+    return res.status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    // .json( new ApiResponse(
+    //     200,
+    //     {
+    //     user: userLoggedIn,accessToken,refreshToken
+    //     },
+    //     "User succesfully logged in"
+    // ));
+    .redirect("/api/v1/users/home");
+})
+
 
 module.exports = {    
     loginUser,
@@ -538,5 +623,7 @@ module.exports = {
     allproductlist,
     homePageRender,
     addProfilepicture,
-    resendotpsender
+    resendotpsender,
+    forgotPassOtpSender,
+    changePassFromOtp
 }

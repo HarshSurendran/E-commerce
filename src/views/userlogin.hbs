@@ -34,7 +34,7 @@
         <!-- Button trigger modal -->
 
   
-        <!-- Modal one-->
+        {{!-- <!-- Modal one-->
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -76,7 +76,7 @@
            
             </div>
           </div>
-        </div>
+        </div> --}}
         <button type="submit" class="btn w-100 submit_button hover-shadow mb-3 mt-3  ">Submit</button>
         <div class="mb-3 d-flex justify-content-center ">
           <a href="register">Join our family. Create a account</a>
@@ -84,9 +84,30 @@
       </form>
     </div>
   </div>
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <form action="/api/v1/users/forgotpassword" method="post">
+            <div class="modal-body">
+                <h5 class="text-dark">Forgot Password? Enter your credentials</h5>
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label text-dark"></label>
+                    <input type="email" class="form-control" id="emailInput" name="email" placeholder="Enter the email ID" required>
+                    <p id="modalEmailAlert" class="text-danger"></p>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                {{!-- <button id="emailSubmitButton" type="button" class="btn btn-primary" onclick="continueToSecondModal()">Continue</button> --}}
+                <button onclick="return validationEmail()" id="emailSubmitButton" type="submit" class="btn btn-primary" >Continue</button>
+            </div>
+          </form>
+        </div>
+    </div>
+</div>
 </section>
 
-<script>
+<script> 
   const valueAlert = document.getElementById("valueAlert");
   const passwordAlert = document.getElementById("passwordAlert");
 
@@ -119,4 +140,50 @@
     valueAlert.innerText = "Invalid email or phonenumber";
     return false    
   }
+
+  const emailInput = document.getElementById("emailInput");
+  const modalEmailAlert = document.getElementById("modalEmailAlert");
+
+  emailInput.addEventListener("input", ()=>{
+      
+      const email = document.getElementById("emailInput").value;
+      let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+      if(!email.trim()===""){
+        modalEmailAlert.innerText = "Email field can't be empty";        
+        return
+      }
+
+      if(!email.match(emailRegex)){
+        modalEmailAlert.innerText = "Email is not valid";        
+        return
+      }
+      modalEmailAlert.innerText = "";
+      
+  });
+
+  async function validationEmail(){
+    const email = document.getElementById("emailInput").value;
+    const result = await fetch("/api/v1/checkemail",{
+                          method: "POST",
+                          headers:{
+                            "content-type" : "application/json"
+                          },
+                          body : JSON.stringify({
+                            email
+                          })
+                          .then((res)=>res.json)
+                          .then((data)=>{
+                            if(data.success){
+                              modalEmailAlert.innerText = "Email is not registered"; 
+                              return false  
+                            }
+                            return true
+                          })
+                        });
+    console.log("thsi is result ", result)
+
+  }
+
+
 </script>

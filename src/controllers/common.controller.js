@@ -351,6 +351,12 @@ const checkPhone = asyncHandler( async(req,res)=>{
     .json( new ApiResponse(200,{},"Phone number is valid"))
 });
 
+const changePasswordPage = asyncHandler( async(req,res)=>{
+    userId = req.user;
+    console.log("this is change pass page",userId);
+    res.render("changepassword",{common:true, title:"Urbane Wardrobe", userId});
+})
+
 module.exports= {
     renderHomePage,
     renderLoginPage,
@@ -358,5 +364,6 @@ module.exports= {
     productDetailsPage,
     listProducts,
     checkEmail,
-    checkPhone
+    checkPhone,
+    changePasswordPage
 }

@@ -10,7 +10,7 @@
                     {{/if}}
                 </div>
                 <div class="card-body m-5 ">
-                    <form action="verify-otp" method="post" id="otpForm">
+                    <form action="/api/v1/verifyotp" method="post" id="otpForm">
                         <div class="d-flex">
                             <input type="hidden" class="form-control p-3" id="userid" name="userId" value="{{userId}}">
                             <div class="form-group me-2 p-2">
@@ -134,91 +134,6 @@
 
 
 
-
-
-
-
-
-
-
-    //first reesult 
-    /*
-    window.addEventListener("load", function () {
-        // Make updateTimer and startTimer global
-        let secondsRemaining = 10;
-        
-        const updateTimer = () => {
-            const timerElement = document.getElementById("timer");
-            if (timerElement) {
-                timerElement.textContent = secondsRemaining;
-            }
-        };
-
-        const startTimer = () => {
-            const timerInterval = setInterval(() => {
-                secondsRemaining -= 1;
-                updateTimer();
-
-                if (secondsRemaining === 0) {
-                    clearInterval(timerInterval);
-                    const resendTimerElement = document.getElementById("resendTimer");
-                    if (resendTimerElement) {
-                        resendTimerElement.innerHTML = '<button type="button" onclick="resendOTP()" class="btn btn-link">Resend OTP</button>';
-                    }
-                }
-            }, 1000);
-        };
-
-        const resendOTP = () => {
-            
-            const userid = document.getElementById("userid");
-            fetch("/api/v1/users/resendotp", {
-                method: "post",
-                headers: {
-                    "content-type" : "application/json"
-                },
-                body : JSON.stringify({
-                    userid
-                })
-            })
-            // Implement logic to resend OTP
-            // You may want to reset the timer and show a loading indicator during the resend process
-            secondsRemaining = 10;
-            updateTimer();
-            startTimer();
-        };
-
-
-        //for continous flow of inputs
-        const otpInputs = document.querySelectorAll(".otp-input");
-
-        otpInputs.forEach((input, index) => {
-            input.addEventListener("input", (event) => {
-                const value = event.target.value;
-
-                if (value !== "") {
-                    if (index < otpInputs.length - 1) {
-                        otpInputs[index + 1].focus();
-                    }
-                } else {
-                    if (index > 0) {
-                        otpInputs[index - 1].focus();
-                    }
-                }
-            });
-
-            input.addEventListener("keydown", (event) => {
-                const isBackspace = event.key === "Backspace";
-
-                if (isBackspace && index > 0 && input.value === "") {
-                    otpInputs[index - 1].focus();
-                }
-            });
-        });
-
-        startTimer();
-    });
-    */
 
 </script>
 

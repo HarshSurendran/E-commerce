@@ -8,6 +8,7 @@ const auth = require("../middlewares/auth.middleware.js");
 const insertUser = require("../middlewares/insertUser.middleware.js");
 const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
+const getUserId = require("../middlewares/giveuserid.middleware.js");
 
 router.get("/otp", (req,res)=>{
     res.render("users/otpvalidation",{user:true});
@@ -24,6 +25,8 @@ router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
 router.post("/resendotp", otpGenerator, userController.resendotpsender);
 //router.post("/signup", userController.loginUser);
 //router.get("/product-list", userController.allproductlist)
+router.post("/forgotpassword", getUserId, otpGenerator, userController.forgotPassOtpSender);
+router.post("/changepassword", userController.changePassFromOtp);
 
 
 router.get("/home", auth.verifyUserJWT, userController.homePageRender);
