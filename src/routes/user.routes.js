@@ -36,6 +36,7 @@ router.get("/home", auth.verifyUserJWT, userController.homePageRender);
 router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage);
 router.post("/cart", auth.verifyUserJWT, cartController.addToCart);
 router.delete("/cart", auth.verifyUserJWT, cartController.deleteCart);
+router.patch("/cart", auth.verifyUserJWT, cartController.addQuantity)
 
 //secured route
 router.get("/logout", auth.verifyUserJWT, userController.logoutUser);
@@ -50,15 +51,22 @@ router.get("/profile", auth.verifyUserJWT, (req,res)=>{
     console.log(req.user);   
     res.render("users/profile",{user:req.user, layout:"userprofilelayout"});
 });
+router.get("/delete-user/:id", auth.verifyUserJWT, userController.deleteUser);
+router.patch("/details", auth.verifyUserJWT, userController.updateUserDetails);
+router.post("/profilepicture", auth.verifyAdminJWT, upload.single("avatar",1), userController.addProfilepicture);
+
+// user address
 router.get("/address", auth.verifyUserJWT, addressController.addressPage);
 router.post("/address", auth.verifyUserJWT, addressController.addAddress);
 router.get("/addaddress", auth.verifyUserJWT, addressController.addAddressPage);
 router.get("/editaddress/:id", auth.verifyUserJWT, addressController.editAddressPage);
-router.post("/editaddress", auth.verifyUserJWT, addressController.editAddress)
+router.post("/editaddress", auth.verifyUserJWT, addressController.editAddress);
+
+//checkout
+router.get("/checkout", auth.verifyUserJWT, addressController.checkOutPage)
 
 
-router.get("/delete-user/:id", auth.verifyUserJWT, userController.deleteUser);
-router.patch("/details", auth.verifyUserJWT, userController.updateUserDetails);
-router.post("/profilepicture", auth.verifyAdminJWT, upload.single("avatar",1), userController.addProfilepicture);
+
+
 
 module.exports = router;

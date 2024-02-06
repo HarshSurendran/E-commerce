@@ -122,14 +122,21 @@ const renderCartPage = asyncHandler( async(req,res)=>{
                 product: { $first: "$product" }
             }
         }
-      ])
+    ])
+
+
+    let total = 0;
+    cart.forEach(element => {
+
+        total = total + (element.quantity * element.product.price)
+    });
     
     let items = JSON.stringify(cart[0])
     console.log("this is cart items",items)
     
     res
     .status(200)
-    .render("users/cartpage",{user: user , title:"Urbane Wardrobe", cart})
+    .render("users/cartpage",{user: user , title:"Urbane Wardrobe", cart, total})
         
 });
 
@@ -143,10 +150,41 @@ const deleteCart = asyncHandler( async(req,res)=>{
     .status(200)
     .json( new ApiResponse(200,{},"Product deleted from cart"))
 
+});
+
+const addQuantity = asyncHandler( async(req,res)=>{
+    const {id, quantity} = req.body;
+    console.log(req.body);
+    const updateCart = await Cart.updateOne(
+        {
+            _id: id
+        },
+        {
+            $set: {
+                quantity
+            }
+        },
+        {
+            new: true
+        }
+    )
+    console.log("This is update cart ",updateCart);
+
+    if(updateCart.modifiedCount === 0){
+        console.log("entered error");
+        res
+        .status(500)
+        .json( new ApiError(500,"Server couldn't update cart"))
+    }
+    console.log("return succes");
+    res
+    .status(200)
+    .json( new ApiResponse(200,{updateCart},"Cart updated"))
 })
 
 module.exports = {
     addToCart,
     renderCartPage,
-    deleteCart
+    deleteCart,
+    addQuantity
 }

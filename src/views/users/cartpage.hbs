@@ -31,14 +31,21 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="cart__price">{{this.product.price}}</td>
-                                    <td class="cart__quantity">
-                                        <div class="pro-qty quantity123">
-                                            <input type="text" class="quantity-input" value="{{this.quantity}}">
+                                    <td class="cart_price">{{this.product.price}}</td>
+                                    <td style="width: 7rem;" class="cart__quantity ">
+                                        {{!-- <div class="pro-qty quantity123">
+                                            <input type="number" class="quantity-input" value="{{this.quantity}}">
                                             <span class="inc qtybtn">+</span>
+                                        </div> --}}
+                                        
+                                        <div class="input-group quantity">
+                                            <button class="btn btn-dark  dec qtybtn" type="button">-</button>
+                                            <input type="text" style="max-width: 3;" class="form-control quantity-input border-0 "  data-id="{{this._id}}" value="{{this.quantity}}" min="1">
+                                            <button class="btn btn-dark  inc qtybtn" type="button">+</button>
                                         </div>
+
                                     </td>
-                                    <td class="cart__total">{{this.product.price}}</td>
+                                    <td id="carttotal{{@index}}" class="cart_total">{{multiply this.quantity this.product.price}}</td>
                                     <a id="deleteCartBut" ><td class="cart__close deleteCartBut" data-id="{{this._id}}"><span class="icon_close"></span></td>
                                 </tr></a>
                                 {{/each}}
@@ -76,8 +83,8 @@
                     <div class="cart__total__procced">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Subtotal <span>$ 750.0</span></li>
-                            <li>Total <span>$ 750.0</span></li>
+                            <li>Subtotal <span id="subtotal">{{total}}</span></li>
+                            <li id="total">Total <span id="grandtotal">{{total}}</span></li>
                         </ul>
                         <a href="#" class="primary-btn">Proceed to checkout</a>
                     </div>
@@ -149,5 +156,66 @@
             }
         });
     })
+
+
+    function grandTotal(){
+        let totalPrice=0;
+        const cartTotal = document.querySelectorAll(".cart_total");
+        console.log("this isc carttotal", cartTotal);
+        cartTotal.forEach((price)=>{
+            totalPrice = totalPrice+ parseInt(price.textContent);
+        })
+        console.log("this is totalpricce", totalPrice);
+        const subTotal = document.getElementById("subtotal");
+        subTotal.textContent = totalPrice;
+        const grandTotal = document.getElementById("grandtotal");
+        grandTotal.textContent = totalPrice;
+    }
+
+    function updateTotal(qty, event){
+        
+        const priceelem = event.target.parentElement.parentElement.parentElement.querySelector(".cart_price");
+        const totalpriceelem = event.target.parentElement.parentElement.parentElement.querySelector(".cart_total");    
+        const price = parseInt(priceelem.textContent);
+        totalprice = qty*price;
+        totalpriceelem.textContent = totalprice;        
+        grandTotal();
+    }
+
+
+    document.querySelectorAll('.qtybtn').forEach((btn) => {
+        btn.addEventListener('click', (event) => {            
+            const input = event.target.parentElement.querySelector('.quantity-input');
+            const currentValue = parseInt(input.value);
+            const increment = event.target.classList.contains('inc') ? 1 : -1;
+            const id = input.getAttribute("data-id");
+            
+            if ((currentValue + increment >= 1) && (currentValue + increment <= 10)) {                
+                let qty = currentValue + increment;
+                //implement the stockleft calculation here
+                
+
+                fetch("/api/v1/users/cart",{
+                    method : "PATCH",
+                    headers: {
+                        "content-type" : "application/json"
+                    },
+                    body: JSON.stringify({
+                        id,
+                        quantity : qty
+                    })
+                })
+                .then(res=> res.json())
+                .then((data)=>{
+                    console.log(data)
+                    if(!data.success){
+                        return alert("couldnt add in cart")
+                    }
+                    input.value = qty;
+                    updateTotal(qty, event); 
+                })                
+            }
+        });
+    });
 
 </script>

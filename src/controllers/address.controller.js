@@ -134,11 +134,21 @@ const editAddress = asyncHandler( async(req,res)=>{
     .redirect("/api/v1/users/address");
 })
 
+const checkOutPage = asyncHandler( async(req,res)=>{
+    const user = req.user
+    const address = await Address.find({userid: user._id })
+    console.log(address);
+    res
+    .status(200)
+    .render("users/checkout",{title:"Urbane Wardrobe", address,})
+})
+
 module.exports = {
     addAddressPage,
     addAddress,
     addressPage,
     editAddressPage,
-    editAddress
+    editAddress,
+    checkOutPage
 
 }

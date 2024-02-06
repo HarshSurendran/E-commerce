@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const path = require("path");
 const hbs = require("hbs");
 const nocache = require("nocache");
+const moment = require("moment");
 //const errorHandlingMiddleware = require("./middlewares/errorHandling.middleware.js")
 
 app.use(express.json());
@@ -13,12 +14,17 @@ app.use(cookieParser());
 //app.use(errorHandlingMiddleware());
 
 //setup view-engine
-console.log(__dirname);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials', function (err) {});
 hbs.registerHelper('inc', function (value) {
   return parseInt(value) + 1;
+});
+hbs.handlebars.registerHelper('getCurrentDateTime', function () {
+  return moment().format('dddd, MMMM Do YYYY, h:mm:ss a');
+});
+hbs.registerHelper('multiply', function (a, b) {
+  return a * b;
 });
 // hbs.registerHelper('ifZero', function (value) {
 //   if(value == 0){
