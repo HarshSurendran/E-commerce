@@ -610,6 +610,32 @@ const changePassFromOtp = asyncHandler( async(req,res)=>{
     .redirect("/api/v1/users/home");
 })
 
+const deleteUser = asyncHandler( async(req,res)=>{
+
+    const id = req.params.id;   
+    
+    let deleteUser
+    try{        
+        deleteUser = await User.deleteOne({_id:id});
+    }catch (error) {
+        console.log("some error while deleting the user", error);
+    }
+    
+    console.log("This is the response after deletion");
+    
+    const options ={
+        httpOnly:true,
+        secure: true
+    }  
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("RefreshToken", options)
+    //.json(new ApiResponse(200,{},"User successfully logged out"));
+    .redirect("/api/v1");
+})
+
 
 module.exports = {    
     loginUser,
@@ -625,5 +651,6 @@ module.exports = {
     addProfilepicture,
     resendotpsender,
     forgotPassOtpSender,
-    changePassFromOtp
+    changePassFromOtp,
+    deleteUser
 }

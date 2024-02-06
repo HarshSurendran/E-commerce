@@ -1,0 +1,157 @@
+<body>
+    <div class="screen-overlay"></div>  
+    <main class="main-wrap">
+        <section class="content-main">
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-header">
+                        <h2 class="content-title">Edit Address</h2>
+                    </div>
+                </div>
+            </div>
+            {{!-- form --}}
+            <address>
+                <form onsubmit="return validate()" action="/api/v1/users/editaddress" method="post">            
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <h6>1. General info</h6>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" name="addressid" value="{{address._id}}" hidden>
+                                            <div class="mb-4">
+                                                <label class="form-label">Full Name</label>
+                                                <input name="fullName" id="Fullname" type="text" placeholder="Type here" class="form-control" value="{{address.fullname}}" required>
+                                                <p id="fullnamealert" class="text-danger "></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label">Phone</label>
+                                                <input name="phone" id="Phone" type="number" placeholder="Type here" class="form-control" value="{{address.phone}}" required>
+                                                <p id="phonealert" class="text-danger "></p>
+                                            </div>  
+                                            <div class="mb-4">
+                                                <label class="form-label">Type of Address</label>
+                                                <input name="type" type="text" placeholder="Home, Office.." value="{{address.type}}" class="form-control" required>
+                                            </div>  
+                                        </div> <!-- col.// -->
+                                    </div> <!-- row.// -->
+                                    <hr class="mb-4 mt-0">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <h6>2. Details</h6>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div class="mb-4">
+                                                <label class="form-label">House no., Street</label>
+                                                <input name="street" id="Street" type="text" placeholder="Type here" class="form-control" value="{{address.street}}" required>
+                                                <p id="streetalert" class="text-danger "></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label">Locality</label>
+                                                <input name="locality" id="Locality" type="text" placeholder="Type here" class="form-control" value="{{address.locality}}" required>
+                                                <p id="localityalert" class="text-danger "></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label">District</label>
+                                                <input name="district" id="District" type="text" placeholder="Type here" class="form-control" value="{{address.district}}" required>
+                                                <p id="districtalert" class="text-danger "></p>
+                                            </div>
+                                            <div class="row">
+                                                <div class="mb-4 col-md-6">
+                                                    <label class="form-label">State</label>
+                                                    <select name="state" class="form-select">
+                                                        <option>{{address.state}}</option>
+                                                        {{#each state}}
+                                                        <option> {{this.name}} </option>
+                                                        {{/each}}
+                                                    </select>
+                                                </div>
+                                                <div class="mb-4 col-md-6">
+                                                    <label class="form-label">Pin Code</label>
+                                                    <input name="pinCode" id="Pincode" type="number" placeholder="Type here" class="form-control" value="{{address.pincode}}" required>
+                                                    <p id="pincodealert" class="text-danger "></p>
+                                                </div>
+                                            </div>
+                                        </div>                                    
+                                    </div> 
+                                    <hr class="mb-4 mt-0"> 
+                                    <div class="row d-flex justify-content-center  ">
+                                    <button type="submit" class="btn btn-md rounded font-sm hover-up col-3 ">Submit</button>       
+                                    </div>                     
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </address>            
+        </section> <!-- content-main end// -->       
+</body>
+
+<script>
+    const nameAlert = document.getElementById("fullnamealert");    
+    const phoneAlert = document.getElementById("phonealert");
+    const streetAlert = document.getElementById("streetalert");
+    const localityAlert = document.getElementById("localityalert");
+    const districtAlert = document.getElementById("districtalert");
+    const pincodeAlert = document.getElementById("pincodealert");    
+
+    //validating the form 
+    function validate(){
+        console.log("This is validate")
+        const fullname = document.getElementById("Fullname").value;        
+        const phone = document.getElementById("Phone").value;
+        const street = document.getElementById("Street").value;
+        const locality = document.getElementById("Locality").value;
+        const district = document.getElementById("District").value;
+        const pincode = document.getElementById("Pincode").value;
+
+        nameAlert.innerText="";        
+        phoneAlert.innerText="";
+        streetAlert.innerText="";
+        localityAlert.innerText="";
+        districtAlert.innerText="";
+        pincodeAlert.innerText="";
+
+        if(fullname.trim() === ""){
+            console.log("This is inside fillnamecheck")
+            nameAlert.innerText = "Name can't be empty";
+            nameAlert.scrollIntoView({behavior:"smooth", block:"center"})
+            return false;        
+        }else if(phone.trim() === ""){
+            phoneAlert.innerText = "Phone can't be empty";
+            phoneAlert.scrollIntoView({behavior:"smooth", block:"center"})
+            return false;
+        }else if(street.trim() === ""){
+            streetAlert.innerText = "Street can't be empty";
+            streetAlert.scrollIntoView({behavior:"smooth", block:"center"})
+            return false;
+        }else if(locality.trim() === ""){
+            localityAlert.innerText = "Locality can't be empty";
+            localityAlert.scrollIntoView({behavior:"smooth", block:"center"})
+            return false;
+        }else if(district.trim() === ""){
+            districtAlert.innerText = "District can't be empty";
+            districtAlert.scrollIntoView({behavior:"smooth", block:"center"})
+            return false;
+        }else if(pincode.trim() === ""){
+            pincodeAlert.innerText = "Pincode can't be empty";
+            pincodeAlert.scrollIntoView({behavior:"smooth", block:"center"})
+            return false;
+        }
+
+        let nameRegex = /^[A-Z]/
+        if(!fullname.match(nameRegex)){
+            nameAlert.innerText = "First letter of the name should be capital."
+            return false
+        }        
+        const phoneRegex = /^\d{10}$/
+        if(!phone.match(phoneRegex)){
+            phoneAlert.innerText = "Phone number is not valid."
+            return false
+        }       
+        return true;
+    }
+</script>

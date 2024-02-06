@@ -1,0 +1,83 @@
+    <body>
+        <div class="screen-overlay"></div>        
+        <main class="main-wrap">            
+            <section class="content-main">
+                <div class="content-header">
+                    <h2 class="content-title">Address</h2>
+                    <div>
+                        <a href="/api/v1/users/addaddress" class="btn btn-primary d-flex align-items-center"><i class="material-icons md-plus"></i>Add Address</a>
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <header class="card-header">
+                        <div class="row gx-3">
+                            <div class="col-lg-4 col-md-6 me-auto">
+                                <input type="text" placeholder="Search..." class="form-control" />
+                            </div>
+                            <div class="col-lg-2 col-6 col-md-3">
+                                <select class="form-select">
+                                    <option>Show 20</option>
+                                    <option>Show 30</option>
+                                    <option>Show 40</option>
+                                    <option>Show all</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-6 col-md-3">
+                                <select class="form-select">
+                                    <option>Status: all</option>
+                                    <option>Active only</option>
+                                    <option>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </header>
+                    <!-- card-header end// -->
+                    <div class="card-body">
+                        <div class="row">                            
+                            {{#each address}}
+                                <div class="col-4">
+                                    <div class="card ">
+                                        <h5 class="card-header">{{this.type}}</h5>
+                                        <div class="card-body">
+                                            <h5 class="card-title">Full Name: <span>{{this.fullname}}</span></h5>
+                                            <p class="card-text"></p>
+                                            <p class="card-text">Phone: <span>{{this.phone}}</span></p>
+                                            <p class="card-text">Street: <span>{{this.street}}</span></p>
+                                            <p class="card-text">Locality: <span>{{this.locality}}</span></p>
+                                            <p class="card-text">District: <span>{{this.district}}</span></p>
+                                            <p class="card-text">State: <span>{{this.state}}</span></p>
+                                            <p class="card-text">Pin code: <span>{{this.pincode}}</span></p>
+                                            <div class="d-flex justify-content-center ">
+                                            <a href="/api/v1/users/editaddress/{{this._id}}" class="btn btn-primary ">Edit</a>
+                                            </div>
+                                        </div>
+                                    </div>                             
+                                </div>
+                            {{/each}}                           
+                        </div>
+                        <!-- row.// -->
+                    </div>
+                    <!-- card-body end// -->
+                </div>
+                <!-- card end// -->
+                <div class="pagination-area mt-15 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                            <li class="page-item"><a class="page-link" href="#">02</a></li>
+                            <li class="page-item"><a class="page-link" href="#">03</a></li>
+                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                            <li class="page-item"><a class="page-link" href="#">16</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+            <!-- content-main end// -->           
+           
+
+        </main>
+    </body>
+
