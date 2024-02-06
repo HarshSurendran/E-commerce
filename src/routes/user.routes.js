@@ -32,8 +32,7 @@ router.post("/changepassword", userController.changePassFromOtp);
 router.get("/home", auth.verifyUserJWT, userController.homePageRender);
 
 // product related
-router.get("/listproducts", auth.verifyUserJWT,  productController.listProducts);
-router.get("/productdetails/:id", auth.verifyUserJWT, productController.productDetailsPage);
+
 
 // cart management
 router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage);
