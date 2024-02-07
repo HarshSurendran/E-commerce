@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="shop__cart__table">
-                        <table>
+                        <table class="text-center">
                             <thead>
                                 <tr>
                                     <th>Product</th>
@@ -39,9 +39,9 @@
                                         </div> --}}
                                         
                                         <div class="input-group quantity">
-                                            <button class="btn btn-dark  dec qtybtn" type="button">-</button>
-                                            <input type="text" style="max-width: 3;" class="form-control quantity-input border-0 "  data-id="{{this._id}}" value="{{this.quantity}}" min="1">
-                                            <button class="btn btn-dark  inc qtybtn" type="button">+</button>
+                                            <button class="btn btn-light   dec qtybtn" type="button">-</button>
+                                            <input type="text" style="" class="form-control quantity-input border-0 text-center"  data-id="{{this._id}}" value="{{this.quantity}}" min="1" disabled >
+                                            <button class="btn btn-light  inc qtybtn" type="button">+</button>
                                         </div>
 
                                     </td>
@@ -128,33 +128,6 @@
             });
         });
 
-        /*const quantity = document.querySelectorAll(".quantity123");
-        quantity.forEach((element)=>{
-            element.addEventListener("click",()=>{
-                const value = document.querySelectorAll (".quantity-input").value 
-                console.log("This is quantity div and the input value is :", value);
-            })
-        })*/
-
-        document.body.addEventListener("input", (event) => {
-            const target = event.target;
-
-            // Check if the input field is the quantity-input class
-            if (target.classList.contains("quantity-input")) {
-                console.log("Input changed");
-                // Add your logic here to handle the input change event
-            }
-        });
-
-        document.body.addEventListener("change", (event) => {
-            const target = event.target;
-
-            // Check if the input field is the quantity-input class
-            if (target.classList.contains("quantity-input")) {
-                console.log("Value changed");
-                // Add your logic here to handle the value change event
-            }
-        });
     })
 
 
@@ -184,7 +157,7 @@
 
 
     document.querySelectorAll('.qtybtn').forEach((btn) => {
-        btn.addEventListener('click', (event) => {            
+        btn.addEventListener('click', (event) => {                   
             const input = event.target.parentElement.querySelector('.quantity-input');
             const currentValue = parseInt(input.value);
             const increment = event.target.classList.contains('inc') ? 1 : -1;
