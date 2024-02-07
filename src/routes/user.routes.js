@@ -1,15 +1,21 @@
 const express = require("express");
 const router = express.Router();
+
+//require controllers
 const addressController = require("../controllers/address.controller.js");
 const userController = require("../controllers/user.controler.js");
 const productController = require("../controllers/product.controler.js");
 const cartController = require("../controllers/cart.controller.js");
+const orderController = require("../controllers/order.controller.js");
+
+//require middlewares
 const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 const insertUser = require("../middlewares/insertUser.middleware.js");
 const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 const getUserId = require("../middlewares/giveuserid.middleware.js");
+
 
 router.get("/otp", (req,res)=>{
     res.render("users/otpvalidation",{user:true});
@@ -29,7 +35,7 @@ router.post("/changepassword", userController.changePassFromOtp);
 
 router.get("/home", auth.verifyUserJWT, userController.homePageRender);
 
-// product related
+
 
 
 // cart management
@@ -61,9 +67,11 @@ router.post("/address", auth.verifyUserJWT, addressController.addAddress);
 router.get("/addaddress", auth.verifyUserJWT, addressController.addAddressPage);
 router.get("/editaddress/:id", auth.verifyUserJWT, addressController.editAddressPage);
 router.post("/editaddress", auth.verifyUserJWT, addressController.editAddress);
+router.post("/fetchaddaddress", auth.verifyUserJWT, addressController.fetchAddAddress);
 
 //checkout
-router.get("/checkout", auth.verifyUserJWT, addressController.checkOutPage)
+router.get("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
+
 
 
 

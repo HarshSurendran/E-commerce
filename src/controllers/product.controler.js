@@ -287,6 +287,7 @@ const addProductVarient = asyncHandler( async (req,res)=>{
 // });
 
 const listProducts = asyncHandler( async(req,res)=>{
+    console.log("This is the request");
     const productList = await ProductVarient.aggregate(
     [   
         {
@@ -352,6 +353,8 @@ const listProducts = asyncHandler( async(req,res)=>{
         }
     ]
     );
+
+    console.log("This is the product list",productList);
 
     res
     .status(200)
@@ -541,9 +544,271 @@ const listUnlistProduct = asyncHandler( async(req,res)=>{
     .json( new ApiResponse(200, {}, "task success"))
 });
 
-const menslistPage = asyncHandler( async(req,res)=>{
+// const menslistPage = asyncHandler( async(req,res)=>{
 
-    const mensProductList = await ProductVarient.aggregate(
+//     const mensProductList = await ProductVarient.aggregate(
+//         [   
+//             {
+//                 $lookup: {
+//                     from: "products",
+//                     localField : "product_id",
+//                     foreignField : "_id",
+//                     as: "name",
+//                     pipeline: [
+//                         {
+//                             $match: {
+//                                 islisted : true,
+//                             }
+//                         },
+//                         {
+//                             $lookup: {
+//                                 from: "categories",
+//                                 localField: "category",
+//                                 foreignField: "_id",
+//                                 as: "category",
+//                                 pipeline: [
+//                                     {
+//                                         $match: {
+//                                             category: "Mens"
+//                                         }
+//                                     }
+//                                 ]
+//                             }
+//                         },
+//                         {
+//                             $addFields: {
+//                                 category: { $first: "$category" }
+//                             }
+//                         }
+//                     ]
+//                 }        
+//             },
+//             {
+//                 $lookup: {
+//                     from: "colors",
+//                     localField : "color_id",
+//                     foreignField : "_id",
+//                     as: "color"
+//                 } 
+//             },
+//             {
+//                 $lookup: {
+//                     from: "sizes",
+//                     localField : "size_id",
+//                     foreignField : "_id",
+//                     as: "size"
+//                 } 
+//             },
+//             {            
+//                 $addFields : {
+//                     name : { $first: "$name" },
+//                     color : { $first: "$color"},
+//                     size : { $first: "$size" },
+//                 }                       
+//             },
+//             {
+//                 $project : {
+//                     name:1,
+//                     color:1,
+//                     size:1,
+//                     images:1,
+//                     stock:1,
+//                     price:1
+//                 }
+//             }
+//         ]
+//         );
+//         const mensProducts = mensProductList.filter((element)=>{
+//             if(element.name.category){
+//                 return true
+//             }
+//             return false
+//         })
+        
+//         res
+//         .status(200)
+//         //.json( new ApiResponse(200, {mensProducts}, "fetched"))
+//         .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: mensProducts});
+// })
+
+// const womenslistPage = asyncHandler( async(req,res)=>{
+
+//     const womensProductList = await ProductVarient.aggregate(
+//         [   
+//             {
+//                 $lookup: {
+//                     from: "products",
+//                     localField : "product_id",
+//                     foreignField : "_id",
+//                     as: "name",
+//                     pipeline: [
+//                         {
+//                             $match: {
+//                                 islisted : true,
+//                             }
+//                         },
+//                         {
+//                             $lookup: {
+//                                 from: "categories",
+//                                 localField: "category",
+//                                 foreignField: "_id",
+//                                 as: "category",
+//                                 pipeline: [
+//                                     {
+//                                         $match: {
+//                                             category: "Womens"
+//                                         }
+//                                     }
+//                                 ]
+//                             }
+//                         },
+//                         {
+//                             $addFields: {
+//                                 category: { $first: "$category" }
+//                             }
+//                         }
+//                     ]
+//                 }        
+//             },
+//             {
+//                 $lookup: {
+//                     from: "colors",
+//                     localField : "color_id",
+//                     foreignField : "_id",
+//                     as: "color"
+//                 } 
+//             },
+//             {
+//                 $lookup: {
+//                     from: "sizes",
+//                     localField : "size_id",
+//                     foreignField : "_id",
+//                     as: "size"
+//                 } 
+//             },
+//             {            
+//                 $addFields : {
+//                     name : { $first: "$name" },
+//                     color : { $first: "$color"},
+//                     size : { $first: "$size" },
+//                 }                       
+//             },
+//             {
+//                 $project : {
+//                     name:1,
+//                     color:1,
+//                     size:1,
+//                     images:1,
+//                     stock:1,
+//                     price:1
+//                 }
+//             }
+//         ]
+//         );
+//         const womensProducts = womensProductList.filter((element)=>{
+//             if(element.name.category){
+//                 return true
+//             }
+//             return false
+//         })
+        
+//         res
+//         .status(200)
+//         //.json( new ApiResponse(200, {womensProducts}, "fetched"))
+//         .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: womensProducts});
+// })
+
+// const kidslistPage = asyncHandler( async(req,res)=>{
+
+//     const kidsProductList = await ProductVarient.aggregate(
+//         [   
+//             {
+//                 $lookup: {
+//                     from: "products",
+//                     localField : "product_id",
+//                     foreignField : "_id",
+//                     as: "name",
+//                     pipeline: [
+//                         {
+//                             $match: {
+//                                 islisted : true,
+//                             }
+//                         },
+//                         {
+//                             $lookup: {
+//                                 from: "categories",
+//                                 localField: "category",
+//                                 foreignField: "_id",
+//                                 as: "category",
+//                                 pipeline: [
+//                                     {
+//                                         $match: {
+//                                             category: "Kids"
+//                                         }
+//                                     }
+//                                 ]
+//                             }
+//                         },
+//                         {
+//                             $addFields: {
+//                                 category: { $first: "$category" }
+//                             }
+//                         }
+//                     ]
+//                 }        
+//             },
+//             {
+//                 $lookup: {
+//                     from: "colors",
+//                     localField : "color_id",
+//                     foreignField : "_id",
+//                     as: "color"
+//                 } 
+//             },
+//             {
+//                 $lookup: {
+//                     from: "sizes",
+//                     localField : "size_id",
+//                     foreignField : "_id",
+//                     as: "size"
+//                 } 
+//             },
+//             {            
+//                 $addFields : {
+//                     name : { $first: "$name" },
+//                     color : { $first: "$color"},
+//                     size : { $first: "$size" },
+//                 }                       
+//             },
+//             {
+//                 $project : {
+//                     name:1,
+//                     color:1,
+//                     size:1,
+//                     images:1,
+//                     stock:1,
+//                     price:1
+//                 }
+//             }
+//         ]
+//         );
+//         const kidsProducts = kidsProductList.filter((element)=>{
+//             if(element.name.category){
+//                 return true
+//             }
+//             return false
+//         })
+        
+//         res
+//         .status(200)
+//         //.json( new ApiResponse(200, {kidsProducts}, "fetched"))
+//         .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: kidsProducts});
+// })
+
+const categoryListPage = asyncHandler( async(req,res)=>{
+    const category = req.params.category;
+    
+    const categoryProductList = await ProductVarient.aggregate(
         [   
             {
                 $lookup: {
@@ -566,7 +831,7 @@ const menslistPage = asyncHandler( async(req,res)=>{
                                 pipeline: [
                                     {
                                         $match: {
-                                            category: "Mens"
+                                            category: category
                                         }
                                     }
                                 ]
@@ -615,7 +880,7 @@ const menslistPage = asyncHandler( async(req,res)=>{
             }
         ]
         );
-        const mensProducts = mensProductList.filter((element)=>{
+        const categoryProducts = categoryProductList.filter((element)=>{
             if(element.name.category){
                 return true
             }
@@ -625,183 +890,8 @@ const menslistPage = asyncHandler( async(req,res)=>{
         res
         .status(200)
         //.json( new ApiResponse(200, {mensProducts}, "fetched"))
-        .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: mensProducts});
+        .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: categoryProducts});
 })
-
-const womenslistPage = asyncHandler( async(req,res)=>{
-
-    const womensProductList = await ProductVarient.aggregate(
-        [   
-            {
-                $lookup: {
-                    from: "products",
-                    localField : "product_id",
-                    foreignField : "_id",
-                    as: "name",
-                    pipeline: [
-                        {
-                            $match: {
-                                islisted : true,
-                            }
-                        },
-                        {
-                            $lookup: {
-                                from: "categories",
-                                localField: "category",
-                                foreignField: "_id",
-                                as: "category",
-                                pipeline: [
-                                    {
-                                        $match: {
-                                            category: "Womens"
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            $addFields: {
-                                category: { $first: "$category" }
-                            }
-                        }
-                    ]
-                }        
-            },
-            {
-                $lookup: {
-                    from: "colors",
-                    localField : "color_id",
-                    foreignField : "_id",
-                    as: "color"
-                } 
-            },
-            {
-                $lookup: {
-                    from: "sizes",
-                    localField : "size_id",
-                    foreignField : "_id",
-                    as: "size"
-                } 
-            },
-            {            
-                $addFields : {
-                    name : { $first: "$name" },
-                    color : { $first: "$color"},
-                    size : { $first: "$size" },
-                }                       
-            },
-            {
-                $project : {
-                    name:1,
-                    color:1,
-                    size:1,
-                    images:1,
-                    stock:1,
-                    price:1
-                }
-            }
-        ]
-        );
-        const womensProducts = womensProductList.filter((element)=>{
-            if(element.name.category){
-                return true
-            }
-            return false
-        })
-        
-        res
-        .status(200)
-        //.json( new ApiResponse(200, {womensProducts}, "fetched"))
-        .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: womensProducts});
-})
-
-const kidslistPage = asyncHandler( async(req,res)=>{
-
-    const kidsProductList = await ProductVarient.aggregate(
-        [   
-            {
-                $lookup: {
-                    from: "products",
-                    localField : "product_id",
-                    foreignField : "_id",
-                    as: "name",
-                    pipeline: [
-                        {
-                            $match: {
-                                islisted : true,
-                            }
-                        },
-                        {
-                            $lookup: {
-                                from: "categories",
-                                localField: "category",
-                                foreignField: "_id",
-                                as: "category",
-                                pipeline: [
-                                    {
-                                        $match: {
-                                            category: "Kids"
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            $addFields: {
-                                category: { $first: "$category" }
-                            }
-                        }
-                    ]
-                }        
-            },
-            {
-                $lookup: {
-                    from: "colors",
-                    localField : "color_id",
-                    foreignField : "_id",
-                    as: "color"
-                } 
-            },
-            {
-                $lookup: {
-                    from: "sizes",
-                    localField : "size_id",
-                    foreignField : "_id",
-                    as: "size"
-                } 
-            },
-            {            
-                $addFields : {
-                    name : { $first: "$name" },
-                    color : { $first: "$color"},
-                    size : { $first: "$size" },
-                }                       
-            },
-            {
-                $project : {
-                    name:1,
-                    color:1,
-                    size:1,
-                    images:1,
-                    stock:1,
-                    price:1
-                }
-            }
-        ]
-        );
-        const kidsProducts = kidsProductList.filter((element)=>{
-            if(element.name.category){
-                return true
-            }
-            return false
-        })
-        
-        res
-        .status(200)
-        //.json( new ApiResponse(200, {kidsProducts}, "fetched"))
-        .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: kidsProducts});
-})
-
 
 
 
@@ -818,7 +908,8 @@ module.exports = {
     addProductVarientPage,
     productDetailsPage,
     listUnlistProduct,
-    menslistPage,
-    womenslistPage,
-    kidslistPage
+    // menslistPage,
+    // womenslistPage,
+    // kidslistPage,
+    categoryListPage
 }

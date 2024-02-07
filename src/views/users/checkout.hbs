@@ -8,6 +8,7 @@
     <meta property="og:type" content="" />
     <meta property="og:url" content="" />
     <meta property="og:image" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg" />
     <!-- Template CSS -->
@@ -18,7 +19,10 @@
       color: black;
     }
     input[type="radio"]:checked + .card {
-    border-color: blue; /* Change to the desired border color */
+    border-color: #e5aa3b; /* Change to the desired border color */
+    }
+    input[type="radio"]:checked + .paymentcard {
+    border-color: #e5aa3b; /* Change to the desired border color */
     }
     </style>
 </head>
@@ -36,11 +40,11 @@
 
             <div class="collapse navbar-collapse justify-content-lg-center" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-link active" aria-current="page" href="#">Home</a>
-                <a class="nav-link" href="/api/v1/productlist">Shop</a>
-                <a class="nav-link" href="#">Mens</a>
-                <a class="nav-link" href="#">Womens</a>
-                <a class="nav-link" href="#">Kids</a> 
+                <a class="nav-link active" aria-current="page" href="/api/v1/users/home">Home</a>
+                <a class="nav-link" href="/api/v1/products/listproducts">Shop</a>
+                <a class="nav-link" href="/api/v1/products/Mens">Mens</a>
+                <a class="nav-link" href="/api/v1/products/Womens">Womens</a>
+                <a class="nav-link" href="/api/v1/products/Kids">Kids</a> 
                 <a class="nav-link" href="#">Contact</a>         
             </div>
             </div>
@@ -68,7 +72,7 @@
                 </div>
             </div>
             <div class="card">
-                <header class="card-header">
+                <header style="background-color: #e5aa3b;" class="card-header  text-white">
                     <div class="row align-items-center">
                         <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
                             <span> <i class="material-icons md-calendar_today"></i> <b>{{getCurrentDateTime}}</b> </span> <br />                            
@@ -88,53 +92,12 @@
                 </header>
                 <!-- card-header end// -->
                 <div class="card-body"> 
-                    <div class="row">                            
-                        {{!-- {{#each address}}
-                            <div class="col-4">
-                                <div class="card ">
-                                    <h5 class="card-header">{{this.type}}</h5>
-                                    <div class="card-body">
-                                        <h5 class="card-title">Full Name: <span>{{this.fullname}}</span></h5>
-                                        <p class="card-text"></p>
-                                        <p class="card-text">Phone: <span>{{this.phone}}</span></p>
-                                        <p class="card-text">Street: <span>{{this.street}}</span></p>
-                                        <p class="card-text">Locality: <span>{{this.locality}}</span></p>
-                                        <p class="card-text">District: <span>{{this.district}}</span></p>
-                                        <p class="card-text">State: <span>{{this.state}}</span></p>
-                                        <p class="card-text">Pin code: <span>{{this.pincode}}</span></p>
-                                        <div class="d-flex justify-content-center ">
-                                        <a href="/api/v1/users/editaddress/{{this._id}}" class="btn btn-primary ">select</a>
-                                        </div>
-                                    </div>
-                                </div>                             
-                            </div>
-                        {{/each}}                            --}}
-
-
-
-                        {{!-- {{#each address}}
-                        <label for="address{{@index}}" class="col-4">
-                            <div class="card">
-                                 <input type="radio" id="address{{@index}}" name="selectedAddress" value="{{this._id}}">                                        
-                                <h5 class="card-header">{{this.type}}</h5>
-                                <div class="card-body">
-                                    <h5 class="card-title">Full Name: <span>{{this.fullname}}</span></h5>
-                                    <p class="card-text"></p>
-                                    <p class="card-text">Phone: <span>{{this.phone}}</span></p>
-                                    <p class="card-text">Street: <span>{{this.street}}</span></p>
-                                    <p class="card-text">Locality: <span>{{this.locality}}</span></p>
-                                    <p class="card-text">District: <span>{{this.district}}</span></p>
-                                    <p class="card-text">State: <span>{{this.state}}</span></p>
-                                    <p class="card-text">Pin code: <span>{{this.pincode}}</span></p>
-                                </div>
-                            </div>
-                        </label>
-                        {{/each}} --}}
+                    <div class="row">  
                         {{#each address}}
                             <label for="address{{@index}}" class="col-4">
                                 <input type="radio" id="address{{@index}}" name="selectedAddress" value="{{this._id}}" style="display: none;" checked>
                                 <div class="card">
-                                    <div class="card-header">{{this.type}}</div>
+                                    <div class="card-header text-center fw-bolder ">{{this.type}}</div>
                                     <div class="card-body">
                                         <h5 class="card-title">Full Name: <span>{{this.fullname}}</span></h5>
                                         <p class="card-text">Phone: <span>{{this.phone}}</span></p>
@@ -148,119 +111,160 @@
                             </label>
                         {{/each}}
                     </div> 
+                    <hr>
                     <!-- row // -->
-                    <div class="row">
-                        <div class="col-lg-7">
+                    <div class="row  my-3 justify-content-center ">                        
+                        <a id="addAddress" class="btn btn-outline-dark  col-4 justify-content-center " href=""><span>Add new address</span></a>
+                    </div>
+        {{!-- add address form --}}
+                    <address id="addressForm" hidden>
+                        <form onsubmit="return validate()" action="/api/v1/users/fetchaddaddress" method="post">            
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <h6>1. General info</h6>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <div class="mb-4">
+                                                        <label class="form-label">Full Name</label>
+                                                        <input name="fullName" id="Fullname" type="text" placeholder="Type here" class="form-control" required>
+                                                        <p id="fullnamealert" class="text-danger "></p>
+                                                    </div>
+                                                    <div class="mb-4">
+                                                        <label class="form-label">Phone</label>
+                                                        <input name="phone" id="Phone" type="number" placeholder="Type here" class="form-control" required>
+                                                        <p id="phonealert" class="text-danger "></p>
+                                                    </div>  
+                                                    <div class="mb-4">
+                                                        <label class="form-label">Type of Address</label>
+                                                        <input name="type" type="text" placeholder="Home, Office.." class="form-control" required>
+                                                    </div>  
+                                                </div> <!-- col.// -->
+                                            </div> <!-- row.// -->
+                                            <hr class="mb-4 mt-0">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <h6>2. Details</h6>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <div class="mb-4">
+                                                        <label class="form-label">House no., Street</label>
+                                                        <input name="street" id="Street" type="text" placeholder="Type here" class="form-control" required>
+                                                        <p id="streetalert" class="text-danger "></p>
+                                                    </div>
+                                                    <div class="mb-4">
+                                                        <label class="form-label">Locality</label>
+                                                        <input name="locality" id="Locality" type="text" placeholder="Type here" class="form-control" required>
+                                                        <p id="localityalert" class="text-danger "></p>
+                                                    </div>
+                                                    <div class="mb-4">
+                                                        <label class="form-label">District</label>
+                                                        <input name="district" id="District" type="text" placeholder="Type here" class="form-control" required>
+                                                        <p id="districtalert" class="text-danger "></p>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="mb-4 col-md-6">
+                                                            <label class="form-label">State</label>
+                                                            <select name="state" class="form-select">
+                                                                {{#each state}}
+                                                                <option> {{this.name}} </option>
+                                                                {{/each}}                                            
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-4 col-md-6">
+                                                            <label class="form-label">Pin Code</label>
+                                                            <input name="pinCode" id="Pincode" type="number" placeholder="Type here" class="form-control" required>
+                                                            <p id="pincodealert" class="text-danger "></p>
+                                                        </div>
+                                                    </div>
+                                                </div>                                    
+                                            </div> 
+                                            <hr class="mb-4 mt-0"> 
+                                            <div class="row d-flex justify-content-center ">
+                                            <button type="submit" class="btn btn-md rounded font-sm hover-up col-3 justify-content-center "><span>Submit</span></button>       
+                                            </div>                     
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </address> 
+            {{!-- add address form end --}}
+                    <hr>
+
+                    <!-- row // -->
+                    <div class="row ">
+                        <div class="col-lg-5">
                             <div class="table-responsive">
                                 <table class="table">
-                                    <thead>
+                                    <thead style="background-color: #e5aa3b;" class="text-white">
                                         <tr>
-                                            <th width="40%">Product</th>
-                                            <th width="20%">Unit Price</th>
-                                            <th width="20%">Quantity</th>
-                                            <th width="20%" class="text-end">Total</th>
+                                            <th width="40%">Price details</th>
+                                            <th width="20%" class="text-end"></th>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <a class="itemside" href="#">
-                                                    <div class="left">
-                                                        <img src="assets/imgs/items/1.jpg" width="40" height="40" class="img-xs" alt="Item" />
-                                                    </div>
-                                                    <div class="info">Haagen-Dazs Caramel Cone Ice</div>
-                                                </a>
-                                            </td>
-                                            <td>$44.25</td>
-                                            <td>2</td>
-                                            <td class="text-end">$99.50</td>
+                                        <tr>                                            
+                                            <td>Price</td>
+                                            <td class="text-end">{{total}}</td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <a class="itemside" href="#">
-                                                    <div class="left">
-                                                        <img src="assets/imgs/items/2.jpg" width="40" height="40" class="img-xs" alt="Item" />
-                                                    </div>
-                                                    <div class="info">Seeds of Change Organic</div>
-                                                </a>
-                                            </td>
-                                            <td>$7.50</td>
-                                            <td>2</td>
-                                            <td class="text-end">$15.00</td>
+                                        <tr>                                            
+                                            <td>Discount</td>
+                                            <td class="text-end">{{discount}}</td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <a class="itemside" href="#">
-                                                    <div class="left">
-                                                        <img src="assets/imgs/items/3.jpg" width="40" height="40" class="img-xs" alt="Item" />
-                                                    </div>
-                                                    <div class="info">All Natural Italian-Style</div>
-                                                </a>
-                                            </td>
-                                            <td>$43.50</td>
-                                            <td>2</td>
-                                            <td class="text-end">$102.04</td>
+                                        <tr>                                            
+                                            <td class="text-black-50 " >Shipping fee</td>
+                                            <td class="text-black-50  text-end">{{shipping}}</td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <a class="itemside" href="#">
-                                                    <div class="left">
-                                                        <img src="assets/imgs/items/4.jpg" width="40" height="40" class="img-xs" alt="Item" />
-                                                    </div>
-                                                    <div class="info">Sweet & Salty Kettle Corn</div>
-                                                </a>
-                                            </td>
-                                            <td>$99.00</td>
-                                            <td>3</td>
-                                            <td class="text-end">$297.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4">
-                                                <article class="float-end">
-                                                    <dl class="dlist">
-                                                        <dt>Subtotal:</dt>
-                                                        <dd>$973.35</dd>
-                                                    </dl>
-                                                    <dl class="dlist">
-                                                        <dt>Shipping cost:</dt>
-                                                        <dd>$10.00</dd>
-                                                    </dl>
-                                                    <dl class="dlist">
-                                                        <dt>Grand total:</dt>
-                                                        <dd><b class="h5">$983.00</b></dd>
-                                                    </dl>
-                                                    <dl class="dlist">
-                                                        <dt class="text-muted">Status:</dt>
-                                                        <dd>
-                                                            <span class="badge rounded-pill alert-success text-success">Payment done</span>
-                                                        </dd>
-                                                    </dl>
-                                                </article>
-                                            </td>
+                                        <tr>                                            
+                                            <td class="fw-bolder fs-5">Total price</td>
+                                            <td class="fw-bolder fs-5 text-end">{{calculateTotal total discount shipping}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <!-- table-responsive// -->
+                            <div class="justify-content-center d-flex">
+                            <button id="orderButton" class="btn btn-outline-dark w-50 justify-content-center "><span>Place Order</span></button>
+                            </div>
                         </div>
                         <!-- col// -->
                         <div class="col-lg-1"></div>
-                        <div class="col-lg-4">
-                            <div class="box shadow-sm bg-light">
-                                <h6 class="mb-15">Payment info</h6>
-                                <p>
-                                    <img src="assets/imgs/card-brands/2.png" class="border" height="20" /> Master Card **** **** 4768 <br />
-                                    Business name: Grand Market LLC <br />
-                                    Phone: +1 (800) 555-154-52
-                                </p>
+                        <div class="col-lg-6">
+                            <div style="background-color: #e5aa3b;"  class="box shadow-sm mb-2  ">
+                                <h4 class=" text-center text-white">Payment Method</h4>
                             </div>
-                            <div class="h-25 pt-4">
+                            <label for="razorpay" class="col-4 d-block w-100 ">
+                                <input type="radio" id="razorpay" name="paymentmethod" value="" style="display: none;">
+                                <div class="box shadow-sm bg-light mb-2 paymentcard">
+                                    <h6 class="mb-15">Razor Pay</h6>
+                                    <p>
+                                        <img src="/assets/imgs/card-brands/2.png" class="border" height="20" /> Master Card **** **** 4768 <br />
+                                        Business name: Grand Market LLC <br />
+                                        Phone: +1 (800) 555-154-52
+                                    </p>
+                                </div>
+                            </label>
+                            <label for="COD" class="col-4 d-block w-100  ">
+                                <input type="radio" id="COD" name="paymentmethod" value="" style="display: none;" checked>
+                                <div class="box shadow-sm bg-light paymentcard">
+                                    <h6 class="mb-15"><i class="fa-solid fa-money-bill-1-wave"></i> Cash On Delivery (COD)</h6>
+                                    <p>
+                                        We accept cash on delivery. But it is recommended to pay online.
+                                    </p>
+                                </div>
+                            </label>
+                            {{!-- <div class="h-25 pt-4">
                                 <div class="mb-3">
                                     <label>Notes</label>
                                     <textarea class="form-control" name="notes" id="notes" placeholder="Type some note"></textarea>
                                 </div>
                                 <button class="btn btn-primary">Save note</button>
-                            </div>
+                            </div> --}}
                         </div>
                         <!-- col// -->
                     </div>
@@ -294,6 +298,103 @@
                 // This depends on how you're rendering your template
             });
         });
+
+        
+    //toggling place order button
+        const cod = document.getElementById('COD');
+        cod.addEventListener('click', ()=>{
+            //logic to change button innertext
+            const orderButton = document.getElementById('orderButton');
+            orderButton.innerText = 'Place Order';
+        });
+
+        const razorpay = document.getElementById('razorpay');
+        razorpay.addEventListener('click', ()=>{
+            
+            const orderButton = document.getElementById('orderButton');
+            orderButton.innerText = 'Proceed to payment';
+        });
+
+    //toggling address form
+        const addAddress = document.getElementById('addAddress');
+        addAddress.addEventListener('click', (event)=>{
+            event.preventDefault();
+            const addressForm = document.getElementById("addressForm");
+            if (addressForm.hidden === true) {
+                addressForm.hidden = false;
+                addAddress.innerText = "Cancel";
+            } else {
+                addressForm.hidden = true;
+                addAddress.innerText = "Add new address";
+            }
+        });
+
+    //validation of address form
+
+        const nameAlert = document.getElementById("fullnamealert");    
+        const phoneAlert = document.getElementById("phonealert");
+        const streetAlert = document.getElementById("streetalert");
+        const localityAlert = document.getElementById("localityalert");
+        const districtAlert = document.getElementById("districtalert");
+        const pincodeAlert = document.getElementById("pincodealert");    
+
+         
+        function validate(){
+            console.log("This is validate")
+            const fullname = document.getElementById("Fullname").value;        
+            const phone = document.getElementById("Phone").value;
+            const street = document.getElementById("Street").value;
+            const locality = document.getElementById("Locality").value;
+            const district = document.getElementById("District").value;
+            const pincode = document.getElementById("Pincode").value;
+
+            nameAlert.innerText="";        
+            phoneAlert.innerText="";
+            streetAlert.innerText="";
+            localityAlert.innerText="";
+            districtAlert.innerText="";
+            pincodeAlert.innerText="";
+
+            if(fullname.trim() === ""){
+                console.log("This is inside fillnamecheck")
+                nameAlert.innerText = "Name can't be empty";
+                nameAlert.scrollIntoView({behavior:"smooth", block:"center"})
+                return false;        
+            }else if(phone.trim() === ""){
+                phoneAlert.innerText = "Phone can't be empty";
+                phoneAlert.scrollIntoView({behavior:"smooth", block:"center"})
+                return false;
+            }else if(street.trim() === ""){
+                streetAlert.innerText = "Street can't be empty";
+                streetAlert.scrollIntoView({behavior:"smooth", block:"center"})
+                return false;
+            }else if(locality.trim() === ""){
+                localityAlert.innerText = "Locality can't be empty";
+                localityAlert.scrollIntoView({behavior:"smooth", block:"center"})
+                return false;
+            }else if(district.trim() === ""){
+                districtAlert.innerText = "District can't be empty";
+                districtAlert.scrollIntoView({behavior:"smooth", block:"center"})
+                return false;
+            }else if(pincode.trim() === ""){
+                pincodeAlert.innerText = "Pincode can't be empty";
+                pincodeAlert.scrollIntoView({behavior:"smooth", block:"center"})
+                return false;
+            }
+
+            let nameRegex = /^[A-Z]/
+            if(!fullname.match(nameRegex)){
+                nameAlert.innerText = "First letter of the name should be capital."
+                return false
+            }        
+            const phoneRegex = /^\d{10}$/
+            if(!phone.match(phoneRegex)){
+                phoneAlert.innerText = "Phone number is not valid."
+                return false
+            }       
+            return true;
+        }
+
     </script>
 
 </body>

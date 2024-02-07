@@ -134,14 +134,39 @@ const editAddress = asyncHandler( async(req,res)=>{
     .redirect("/api/v1/users/address");
 })
 
-const checkOutPage = asyncHandler( async(req,res)=>{
-    const user = req.user
-    const address = await Address.find({userid: user._id })
-    console.log(address);
+const fetchAddAddress = asyncHandler( async(req,res)=>{
+    const user = req.user    
+    const {fullName, phone, type, street, locality, district, state, pinCode} = req.body;
+    console.log(req.body);
+    console.log(user._id)
+
+    const address =  await Address.create({
+        userid: user._id,
+        fullname : fullName,
+        phone,
+        type,
+        street,
+        locality,
+        district,
+        state,
+        pincode : pinCode
+    });
+
+    const addedAddress = await Address.findOne({_id: address._id})
+
+    if(!addedAddress){
+        res
+        .status(500)
+        .redirect("/api/v1/users/checkout");
+    }
+
     res
     .status(200)
-    .render("users/checkout",{title:"Urbane Wardrobe", address,})
+    .redirect("/api/v1/users/checkout");
 })
+
+
+
 
 module.exports = {
     addAddressPage,
@@ -149,6 +174,5 @@ module.exports = {
     addressPage,
     editAddressPage,
     editAddress,
-    checkOutPage
-
+    fetchAddAddress
 }

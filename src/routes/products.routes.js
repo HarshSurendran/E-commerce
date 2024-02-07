@@ -6,13 +6,15 @@ const productController = require("../controllers/product.controler.js");
 const auth = require("../middlewares/auth.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 
-router.get("/Mens", productController.menslistPage);
+router.get("/:category", productController.categoryListPage);
 
-router.get("/Womens", productController.womenslistPage);
+// router.get("/Mens", productController.menslistPage);
 
-router.get("/Kids", productController.kidslistPage);
+// router.get("/Womens", productController.womenslistPage);
 
-router.get("/listproducts", auth.verifyUserJWT,  productController.listProducts);
+// router.get("/Kids", productController.kidslistPage);
+
+router.get("/list/all", auth.verifyUserJWT,  productController.listProducts);
 
 router.get("/productdetails/:id", auth.verifyUserJWT, productController.productDetailsPage);
 

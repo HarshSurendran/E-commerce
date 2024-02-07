@@ -26,6 +26,22 @@ hbs.handlebars.registerHelper('getCurrentDateTime', function () {
 hbs.registerHelper('multiply', function (a, b) {
   return a * b;
 });
+hbs.registerHelper('calculateTotal', function(total, discount, shipping) {
+  // Parse input values as numbers
+  total = parseFloat(total);
+  discount = parseFloat(discount);
+  shipping = parseFloat(shipping);
+
+  // Check if any input is NaN
+  if (isNaN(total) || isNaN(discount) || isNaN(shipping)) {
+      return "Invalid input";
+  }
+
+  // Perform the calculation
+  const result = (total + shipping) - discount ;
+
+  return result;
+});
 // hbs.registerHelper('ifZero', function (value) {
 //   if(value == 0){
 //     return true
