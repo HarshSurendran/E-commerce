@@ -24,6 +24,19 @@
     input[type="radio"]:checked + .paymentcard {
     border-color: #e5aa3b; /* Change to the desired border color */
     }
+    
+    /* Notification styles */
+    .notification {
+      display: none;
+      position: fixed;
+      top: 10px;
+      right: 40%;
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
     </style>
 </head>
 
@@ -192,7 +205,7 @@
                             </div>
                         </form>
                     </address> 
-            {{!-- add address form end --}}
+        {{!-- add address form end --}}
                     <hr>
 
                     <!-- row // -->
@@ -239,7 +252,7 @@
                                 <h4 class=" text-center text-white">Payment Method</h4>
                             </div>
                             <label for="razorpay" class="col-4 d-block w-100 ">
-                                <input type="radio" id="razorpay" name="paymentmethod" value="" style="display: none;">
+                                <input type="radio" id="razorpay" name="paymentmethod" value="Online" style="display: none;">
                                 <div class="box shadow-sm bg-light mb-2 paymentcard">
                                     <h6 class="mb-15">Razor Pay</h6>
                                     <p>
@@ -250,7 +263,7 @@
                                 </div>
                             </label>
                             <label for="COD" class="col-4 d-block w-100  ">
-                                <input type="radio" id="COD" name="paymentmethod" value="" style="display: none;" checked>
+                                <input type="radio" id="COD" name="paymentmethod" value="COD" style="display: none;" checked>
                                 <div class="box shadow-sm bg-light paymentcard">
                                     <h6 class="mb-15"><i class="fa-solid fa-money-bill-1-wave"></i> Cash On Delivery (COD)</h6>
                                     <p>
@@ -273,6 +286,7 @@
             </div>
             <!-- card end// -->
         </section>
+        <div id="notification" class="notification"></div>
         <!-- content-main end// -->
     
     </main>
@@ -286,8 +300,24 @@
 
 
     <script>
+        function showNotification(message, color) {
+            const notificationElement = document.getElementById('notification');
+            if(color === "red" ){
+                notificationElement.style.backgroundColor = "red";
+            }
+            notificationElement.textContent = message;
+            notificationElement.style.display = 'block';
+
+            // Hide the notification after 5 seconds
+            setTimeout(() => {
+                if(color === "red"){
+                    notificationElement.style.backgroundColor = "#4CAF50";
+                }
+                notificationElement.style.display = 'none';
+            }, 2000);
+        }
         // Attach event listeners to radio buttons
-        document.querySelectorAll('input[name="selectedAddress"]').forEach((radioButton, index) => {
+        /*document.querySelectorAll('input[name="selectedAddress"]').forEach((radioButton, index) => {
             radioButton.addEventListener('change', () => {
                 // Update the selected property of the corresponding address
                 addresses.forEach((address, i) => {
@@ -297,21 +327,49 @@
                 // Re-render the address list to reflect the changes
                 // This depends on how you're rendering your template
             });
-        });
+        });*/
 
+        const orderButton = document.getElementById('orderButton');
+    //placing order 
+        orderButton.addEventListener("click", ()=>{
+            const checkedPaymentMethod = document.querySelector('input[name="paymentmethod"]:checked');
+            console.log("This is the checked patment method", checkedPaymentMethod);
+            const checkedAddress = document.querySelector('input[name="selectedAddress"]:checked');
+            console.log("This is the checked patment method", checkedAddress);
+            
+            const paymentMethod = checkedPaymentMethod.value;
+            const address = checkedAddress.value;
+
+            fetch("/api/v1/users/orderplaced",{
+                method:"POST",
+                headers: {
+                    "content-type" : "application/json"
+                },
+                body: JSON.stringify({
+                    paymentMethod,
+                    address,                    
+                })                
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(!data.success){
+                    showNotification("Order not placed. Try again", "red");
+                    return
+                }      
+                console.log(data)
+                let orderId = data.data.orderConfirm._id;         
+                location.href = `/api/v1/users/ordersuccess/${orderId}`;
+                return;
+            })
+        })
         
     //toggling place order button
         const cod = document.getElementById('COD');
         cod.addEventListener('click', ()=>{
-            //logic to change button innertext
-            const orderButton = document.getElementById('orderButton');
             orderButton.innerText = 'Place Order';
         });
-
         const razorpay = document.getElementById('razorpay');
-        razorpay.addEventListener('click', ()=>{
-            
-            const orderButton = document.getElementById('orderButton');
+        razorpay.addEventListener('click', ()=>{   
             orderButton.innerText = 'Proceed to payment';
         });
 
@@ -330,7 +388,6 @@
         });
 
     //validation of address form
-
         const nameAlert = document.getElementById("fullnamealert");    
         const phoneAlert = document.getElementById("phonealert");
         const streetAlert = document.getElementById("streetalert");
@@ -395,6 +452,7 @@
             return true;
         }
 
+        
     </script>
 
 </body>

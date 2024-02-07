@@ -71,6 +71,8 @@ router.post("/fetchaddaddress", auth.verifyUserJWT, addressController.fetchAddAd
 
 //checkout
 router.get("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
+router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);
+router.get("/ordersuccess/:id", auth.verifyUserJWT, orderController.orderSuccessPage);
 
 
 
