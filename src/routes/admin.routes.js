@@ -10,6 +10,161 @@ const auth = require("../middlewares/auth.middleware.js");
 
 
 
+const  mongoose  = require("mongoose");
+const Order = require("../models/order.models.js");
+const ApiResponse = require("../utils/ApiResponse");
+router.get("/test", async(req,res)=>{
+    let orderid = "65c5d1f53510aa6449324293";
+    console.log("this is id", new mongoose.Types.ObjectId(orderid));
+    const order = await Order.aggregate(
+    [
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(orderid) // orderid
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user",
+                pipeline: [
+                    {
+                        $project: {
+                            _id : 1,
+                            fullname : 1,
+                            phone : 1,
+                            email: 1
+                        }
+                    }
+                ]
+            },
+        },
+        {
+            $lookup: {
+                from: "addresses",
+                localField: "address",
+                foreignField: "_id",
+                as: "address",
+                pipeline: [
+                    {
+                        
+                        $project: {
+                            type : 1,
+                            fullname: 1,
+                            phone: 1,
+                            street: 1,
+                            locality: 1,
+                            district: 1,
+                            state: 1,
+                            pincode: 1,
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$orderedItems"
+        },
+        {
+            $lookup: {
+                from: "productvarients",
+                localField: "orderedItems.productVarientId",
+                foreignField: "_id",
+                as: "productVarient",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "products",
+                            localField: "product_id",
+                            foreignField: "_id",
+                            as: "product",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "categories",
+                                        localField: "category",
+                                        foreignField: "_id",
+                                        as: "category",
+                                        pipeline: [
+                                            {
+                                                $project: {
+                                                    category : 1
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },                            
+                                {                                       
+                                    $project: {
+                                        name : 1,
+                                        category: 1
+                                    }
+                                },
+                                {
+                                    $addFields: {
+                                        category: { $first: "$category" }
+                                    }
+                                }                             
+                            ]
+                        }
+                    },
+                    {                        
+                        $project: {
+                            _id:1,
+                            product: 1,
+                            images:1,
+                            price:1
+                        }
+                    },
+                    {
+                        $addFields: {
+                            product: { $first: "$product" }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                productVarient: {
+                    $arrayElemAt: ["$productVarient", 0]
+                },
+                user: {
+                    $arrayElemAt: ["$user", 0]
+                },
+                address: {
+                    $arrayElemAt: ["$address", 0]
+                }
+            }
+        }
+    ]);
+    // const order = await Order.findById(orderid);
+    console.log("this is order ", order);
+    res.json( new ApiResponse( 200, order, "Order details"))
+})
+
+
+
+
+
+
+
+
+
+
+
+// router.get("/test",(req,res)=>{
+//     res.render("admin/userdetails",{admin:true});
+// });
+
+
+// order
+router.get("/orderdetails/:id", adminController.renderOrderDetailsPage);
+router.get("/orders", adminController.renderOrdersPage);
+router.post("/updateorderstatus", adminController.changeOrderStatus);
+
 // login
 router.get("/", auth.checkAdminJWT , adminController.renderLoginPage);
 router.post("/", adminController.adminlogin);
@@ -28,26 +183,10 @@ router.get("/productlist", auth.verifyAdminJWT, productController.listProducts);
 router.get("/products-varient", auth.verifyAdminJWT, productController.addProductVarientPage);
 router.post("/products-varient", auth.verifyAdminJWT, upload.array("images",4), productController.addProductVarient);
 router.patch("/listunlist/:id", auth.verifyAdminJWT, productController.listUnlistProduct);
-
-router.get("/test",(req,res)=>{
-    res.render("admin/userdetails",{admin:true});
-});
-
-
-
-
-
-router.post("/updatephoto", upload.any(), productController.uploadImage)
-
+router.post("/updatephoto", upload.any(), productController.uploadImage);
 router.get("/editproductsvarient/:id", auth.verifyAdminJWT, productController.editProductVarientPage);
 router.post("/editproductvarient", auth.verifyAdminJWT, productController.editProductVarient);
-
-router.get("/productvarientdetails/:id", auth.verifyAdminJWT, productController.productVarientDetailsPage)
-
-
-
-
-
+router.get("/productvarientdetails/:id", auth.verifyAdminJWT, productController.productVarientDetailsPage);
 
 
 

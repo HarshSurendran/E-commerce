@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 // require modals
 const Admin = require("../models/admin.models.js");
 const User = require("../models/user.models.js");
+const Order = require("../models/order.models.js");
+const mongoose = require("mongoose");
 
 const renderLoginPage =  asyncHandler( async(req,res)=>{
     res
@@ -245,6 +247,205 @@ const deleteUser = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .redirect("/api/v1/admin/users");
+});
+
+const renderOrdersPage = asyncHandler( async(req,res)=>{
+    const orders = await Order.aggregate(
+        [
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {
+                $addFields: {
+                    user: {
+                        $arrayElemAt: ["$user", 0]
+                    }
+                }
+            }
+        ]
+        )
+
+    orders.forEach((order)=>{
+        const formattedCreatedAt = order.createdAt.toISOString().split('T')[0];
+        order.createdAt = formattedCreatedAt;        
+    });
+
+    console.log("this is orders", orders);
+
+    res
+    .status(200)
+    .render("admin/orderlist",{admin:true, title:"Urbane Wardrobe", orders});
+});
+
+const renderOrderDetailsPage = asyncHandler( async(req,res)=>{
+    const orderid = req.params.id;
+    const orderVarients = await Order.aggregate(
+        [
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(orderid) // orderid
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id : 1,
+                                fullname : 1,
+                                phone : 1,
+                                email: 1
+                            }
+                        }
+                    ]
+                },
+            },
+            {
+                $lookup: {
+                    from: "addresses",
+                    localField: "address",
+                    foreignField: "_id",
+                    as: "address",
+                    pipeline: [
+                        {
+                            
+                            $project: {
+                                type : 1,
+                                fullname: 1,
+                                phone: 1,
+                                street: 1,
+                                locality: 1,
+                                district: 1,
+                                state: 1,
+                                pincode: 1,
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$orderedItems"
+            },
+            {
+                $lookup: {
+                    from: "productvarients",
+                    localField: "orderedItems.productVarientId",
+                    foreignField: "_id",
+                    as: "productVarient",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "products",
+                                localField: "product_id",
+                                foreignField: "_id",
+                                as: "product",
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "categories",
+                                            localField: "category",
+                                            foreignField: "_id",
+                                            as: "category",
+                                            pipeline: [
+                                                {
+                                                    $project: {
+                                                        category : 1
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },                            
+                                    {                                       
+                                        $project: {
+                                            name : 1,
+                                            category: 1
+                                        }
+                                    },
+                                    {
+                                        $addFields: {
+                                            category: { $first: "$category" }
+                                        }
+                                    }                             
+                                ]
+                            }
+                        },
+                        {                        
+                            $project: {
+                                _id:1,
+                                product: 1,
+                                images:1,
+                                price:1
+                            }
+                        },
+                        {
+                            $addFields: {
+                                product: { $first: "$product" }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    productVarient: {
+                        $arrayElemAt: ["$productVarient", 0]
+                    },
+                    user: {
+                        $arrayElemAt: ["$user", 0]
+                    },
+                    address: {
+                        $arrayElemAt: ["$address", 0]
+                    }
+                }
+            }
+        ]);
+
+    const order = orderVarients[0];
+    let subTotal = 0;
+    orderVarients.forEach((order)=>{
+        subTotal = subTotal + (order.productVarient.price * order.orderedItems.quantity)
+    })
+
+    let total = subTotal + 100;    
+
+    res
+    .status(200)
+    .render("admin/orderdetails",{admin:true, title:"Urbane Wardrobe", order, orderVarients, subTotal, total});
+});
+
+const changeOrderStatus = asyncHandler( async(req,res)=>{
+    
+    const {orderId, status} = req.body;
+    console.log("this is order id and status", orderId, status);
+    const order = await Order.updateOne(
+        {
+            _id: orderId
+        },
+        {
+            $set: {
+                status
+            }
+        }
+    );
+
+    if(!order){
+        return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Something went wrong"));        
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, order, "Order status updated"));
 })
 
 
@@ -258,5 +459,9 @@ module.exports = {
     createUser,
     createUserPage,
     verifyEmailPassword,
-    renderLoginPage
+    renderLoginPage,
+    renderOrdersPage,
+    renderOrderDetailsPage,
+    changeOrderStatus
+    
 }

@@ -44,14 +44,23 @@ hbs.registerHelper('calculateTotal', function(total, discount, shipping) {
 });
 hbs.registerHelper('getImageSrc', function(imagesArray, index) {
   // Check if imagesArray is an array and index is within bounds
-  if (Array.isArray(imagesArray) && index >= 0 && index < imagesArray.length) {
-      // Return the image source at the specified index
+  if (Array.isArray(imagesArray) && index >= 0 && index < imagesArray.length) {      
       return imagesArray[index];
-  } else {
-      // Handle invalid input or out-of-bounds index
-      return ''; // Or provide a default image source
+  } else {      
+      return '';
   }
 });
+hbs.registerHelper('changeColor', function ( status) {
+  if(status == "pending"){
+    return "alert-warning";
+  }else if(status == "delivered"){
+    return "alert-success";
+  }else if(status == "cancelled"){
+    return "alert-danger";
+  }else if(status == "shipped"){
+    return "alert-success";
+  }  
+})
 // hbs.registerHelper('ifZero', function (value) {
 //   if(value == 0){
 //     return true
