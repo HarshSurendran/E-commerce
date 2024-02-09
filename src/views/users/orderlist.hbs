@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="card mb-4">
-                <header class="card-header">
+                <header style="background-color: #d8f1e5;" class="card-header">
                     <div class="row gx-3">
                         <div class="col-lg-4 col-md-6 me-auto">
                             <input type="text" placeholder="Search..." class="form-control" />
@@ -34,54 +34,11 @@
                         </div> --}}
                     </div>
                 </header>
-                <!-- card-header end// -->
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#ID</th>
-                                    <th scope="col">Ship to</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Total</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col" class="text-end">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{#each order}}
-                                {{#each orders.orderedItems}}
-                                <tr>
-                                    <td>{{this.images.[0]}}</td>
-                                    <td><b>{{this.product.name}}</b> <br> {{this.product.category}}</td>
-                                    <td>{{this.user.price}}</td>
-                                    <td>{{this.orderAmount}}</td>
-                                    <td><span class="badge rounded-pill {{changeColor order.[@index].status}}">{{this.status}}</span></td>
-                                    {{!-- <td>{{this.createdAt}}</td> --}}
-                                    {{!-- <td class="text-end"> --}}
-                                        {{!-- <div class="dropdown">
-                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="#">View detail</a>
-                                                <a class="dropdown-item" href="#">Edit info</a>
-                                                <a class="dropdown-item text-danger" href="#">Delete</a>
-                                            </div>
-                                        </div> --}}
-                                        <a href="/api/v1/admin/orderdetails/{{this._id}}" class="btn btn-md rounded font-sm">Detail</a>
-                                        <!-- dropdown //end -->
-                                    </td>
-                                </tr>
-                                {{/each}}   
-                                {{/each}}                            
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                
             </div>
             {{#each order}}
             <div class="card">
-                <div class="card-header">
+                <div style="background-color: #d8f1e5;" class="card-header">
                     <div class="row">
                         <div class="col-4">
                             OrderId: <b>{{this.orderId}}</b> <br> Date: <b>{{this.createdAt}}</b>
@@ -98,7 +55,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-2 ">
-                            <img src="{{this.images.[0]}}" width="40" height="40" class="img-xs" alt="Item" />
+                            <img src="{{this.images.[0]}}" width="80" height="80" class="img-md" alt="Item" />
                         </div>
                         <div class="col-lg-4">
                             <div class="row">
