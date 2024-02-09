@@ -45,7 +45,7 @@
                             {{!-- <div class="label">Sale</div> --}}
                             {{!-- <div class="label stockout">out of stock</div> --}}
                             <ul class="product__hover">                                
-                                <li><a href="{{this.images.[0]}}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a onclick="event.stopPropagation();" href="{{this.images.[0]}}" class="image-popup"><span class="arrow_expand"></span></a></li>
                                 <li id="wishlist" ><a href="#"><span class="icon_heart_alt"></span></a></li>
                                 <li id="addToCart" class="addToCart" data-id="{{this._id}}"><a href="#"><span class="icon_bag_alt"></span></a></li>
                                 {{!-- <li><a href="productdetails/{{this._id}}" class="" ><span class="icon_details" ></span></a></li> --}}

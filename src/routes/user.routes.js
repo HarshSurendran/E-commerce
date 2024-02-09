@@ -22,6 +22,9 @@ router.get("/otp", (req,res)=>{
 })
 
 
+router.get("/orders", auth.verifyUserJWT,  orderController.renderUserOrdersPage);
+
+
 
 
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);

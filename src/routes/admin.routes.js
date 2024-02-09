@@ -5,6 +5,7 @@ const productController = require("../controllers/product.controler.js");
 const categoryController = require("../controllers/category.controler.js");
 const colorController = require("../controllers/color.controler.js");
 const sizeController = require("../controllers/size.controler.js");
+const orderController = require("../controllers/order.controller.js");
 const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 
@@ -161,9 +162,9 @@ router.get("/test", async(req,res)=>{
 
 
 // order
-router.get("/orderdetails/:id", adminController.renderOrderDetailsPage);
-router.get("/orders", adminController.renderOrdersPage);
-router.post("/updateorderstatus", adminController.changeOrderStatus);
+router.get("/orderdetails/:id", orderController.renderOrderDetailsPage);
+router.get("/orders", orderController.renderOrdersPage);
+router.post("/updateorderstatus", orderController.changeOrderStatus);
 
 // login
 router.get("/", auth.checkAdminJWT , adminController.renderLoginPage);

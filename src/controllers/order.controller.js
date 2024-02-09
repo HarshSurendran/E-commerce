@@ -8,6 +8,8 @@ const Address = require("../models/address.models.js");
 const Cart = require("../models/cart.models.js");
 const Order = require("../models/order.models.js");
 
+const mongoose = require("mongoose");
+
 const state = [    
     { name: "Andhra Pradesh" },
     { name: "Arunachal Pradesh" },
@@ -302,10 +304,418 @@ const orderSuccessPage = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .render("users/successpage",{title:"Urbane Wardrobe", user: req.user, order, address})
-})
+});
+
+
+const renderOrdersPage = asyncHandler( async(req,res)=>{
+    const orders = await Order.aggregate(
+        [
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {
+                $addFields: {
+                    user: {
+                        $arrayElemAt: ["$user", 0]
+                    }
+                }
+            }
+        ]
+        )
+
+    orders.forEach((order)=>{
+        const formattedCreatedAt = order.createdAt.toISOString().split('T')[0];
+        order.createdAt = formattedCreatedAt;        
+    });
+
+    console.log("this is orders", orders);
+
+    res
+    .status(200)
+    .render("admin/orderlist",{admin:true, title:"Urbane Wardrobe", orders});
+});
+
+const renderOrderDetailsPage = asyncHandler( async(req,res)=>{
+    const orderid = req.params.id;
+    const orderVarients = await Order.aggregate(
+        [
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(orderid) // orderid
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id : 1,
+                                fullname : 1,
+                                phone : 1,
+                                email: 1
+                            }
+                        }
+                    ]
+                },
+            },
+            {
+                $lookup: {
+                    from: "addresses",
+                    localField: "address",
+                    foreignField: "_id",
+                    as: "address",
+                    pipeline: [
+                        {
+                            
+                            $project: {
+                                type : 1,
+                                fullname: 1,
+                                phone: 1,
+                                street: 1,
+                                locality: 1,
+                                district: 1,
+                                state: 1,
+                                pincode: 1,
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$orderedItems"
+            },
+            {
+                $lookup: {
+                    from: "productvarients",
+                    localField: "orderedItems.productVarientId",
+                    foreignField: "_id",
+                    as: "productVarient",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "products",
+                                localField: "product_id",
+                                foreignField: "_id",
+                                as: "product",
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "categories",
+                                            localField: "category",
+                                            foreignField: "_id",
+                                            as: "category",
+                                            pipeline: [
+                                                {
+                                                    $project: {
+                                                        category : 1
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },                            
+                                    {                                       
+                                        $project: {
+                                            name : 1,
+                                            category: 1
+                                        }
+                                    },
+                                    {
+                                        $addFields: {
+                                            category: { $first: "$category" }
+                                        }
+                                    }                             
+                                ]
+                            }
+                        },
+                        {                        
+                            $project: {
+                                _id:1,
+                                product: 1,
+                                images:1,
+                                price:1
+                            }
+                        },
+                        {
+                            $addFields: {
+                                product: { $first: "$product" }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    productVarient: {
+                        $arrayElemAt: ["$productVarient", 0]
+                    },
+                    user: {
+                        $arrayElemAt: ["$user", 0]
+                    },
+                    address: {
+                        $arrayElemAt: ["$address", 0]
+                    }
+                }
+            }
+        ]);
+
+    const order = orderVarients[0];
+    let subTotal = 0;
+    orderVarients.forEach((order)=>{
+        subTotal = subTotal + (order.productVarient.price * order.orderedItems.quantity)
+    })
+
+    let total = subTotal + 100;    
+
+    res
+    .status(200)
+    .render("admin/orderdetails",{admin:true, title:"Urbane Wardrobe", order, orderVarients, subTotal, total});
+});
+
+const changeOrderStatus = asyncHandler( async(req,res)=>{
+    
+    const {orderId, status} = req.body;
+    console.log("this is order id and status", orderId, status);
+    const order = await Order.updateOne(
+        {
+            _id: orderId
+        },
+        {
+            $set: {
+                status
+            }
+        }
+    );
+
+    if(!order){
+        return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Something went wrong"));        
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, order, "Order status updated"));
+});
+
+const renderUserOrdersPage = asyncHandler( async(req,res)=>{
+    
+    const userId = req.user._id;    
+
+    const order = await Order.aggregate([
+        {
+            $match: {
+                userId: new mongoose.Types.ObjectId(userId) // Assuming orderid is the variable containing the order _id
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            fullname: 1,
+                            phone: 1,
+                            email: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: "addresses",
+                localField: "address",
+                foreignField: "_id",
+                as: "address",
+                pipeline: [
+                    {
+                        $project: {
+                            type: 1,
+                            fullname: 1,
+                            phone: 1,
+                            street: 1,
+                            locality: 1,
+                            district: 1,
+                            state: 1,
+                            pincode: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$orderedItems"
+        },
+        {
+            $lookup: {
+                from: "productvarients",
+                localField: "orderedItems.productVarientId",
+                foreignField: "_id",
+                as: "productVarient",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "products",
+                            localField: "product_id",
+                            foreignField: "_id",
+                            as: "product",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "categories",
+                                        localField: "category",
+                                        foreignField: "_id",
+                                        as: "category",
+                                        pipeline: [
+                                            {
+                                                $project: {
+                                                    category: 1
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    $project: {
+                                        name: 1,
+                                        category: { $first: "$category.category" }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "sizes",
+                            localField: "size_id",
+                            foreignField: "_id",
+                            as: "size",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        size: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "colors",
+                            localField: "color_id",
+                            foreignField: "_id",
+                            as: "color",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        color: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            product: { $first: "$product" },
+                            images: 1,
+                            price: 1,
+                            size: { $first: "$size.size" },
+                            color: { $first: "$color.color" },
+                        }
+                    }
+                ]
+            }
+        },        
+        {
+            $addFields: {
+                productVarient: {
+                    $arrayElemAt: ["$productVarient", 0]
+                },
+                quantity: "$orderedItems.quantity",
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    userId: "$userId",
+                    _id: "$_id",
+                    user: "$user",
+                    address: "$address",
+                    status : "$status",
+                    orderId: "$orderId",
+                    orderAmount: "$orderAmount",
+                    paymentMethod: "$paymentMethod",
+                    createdAt: "$createdAt",
+                    size: "$orderedItems.size",
+                    color: "$orderedItems.color",
+                    quantity: "$quantity"
+                }, 
+                user: { $first: "$user" },
+                address: { $first: "$address" },            
+                orderedItems: { $push: "$productVarient" } // Consolidate productVariant fields into a single array
+            }
+        },
+        {
+            $project: {
+                _id: "$_id._id",
+                userId: "$_id.userId",
+                user: { $arrayElemAt: ["$user", 0] },
+                address: { $arrayElemAt: ["$address", 0] },
+                orderedItems: 1,
+                status: "$_id.status",
+                orderId: "$_id.orderId",
+                orderAmount: "$_id.orderAmount",
+                paymentMethod: "$_id.paymentMethod",
+                createdAt: "$_id.createdAt",
+                size: "$_id.size",
+                color: "$_id.color",
+                quantity: "$_id.quantity"
+            }
+        },
+        {
+            $sort: { createdAt: -1 }
+        }
+    ]);
+
+    //order is coming properly you have to render it to order details page
+    // res
+    // .status(200)
+    // .json( new ApiResponse( 200, order, "Orders fetched"));
+
+    order.forEach((order)=>{
+        const formattedCreatedAt = order.createdAt.toISOString().split('T')[0];
+        order.createdAt = formattedCreatedAt;        
+    });
+
+    console.log("this is orders", order);
+
+    res
+    .status(200)
+    .render("users/orderlist",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout"});
+});
+
+
 
 module.exports = {
     checkOutPage,
     createOrder,
-    orderSuccessPage
+    orderSuccessPage,
+    renderOrdersPage,
+    renderOrderDetailsPage,
+    changeOrderStatus,
+    renderUserOrdersPage
 }
