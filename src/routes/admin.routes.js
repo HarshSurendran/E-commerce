@@ -9,6 +9,7 @@ const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 
 
+
 // login
 router.get("/", auth.checkAdminJWT , adminController.renderLoginPage);
 router.post("/", adminController.adminlogin);
@@ -30,7 +31,25 @@ router.patch("/listunlist/:id", auth.verifyAdminJWT, productController.listUnlis
 
 router.get("/test",(req,res)=>{
     res.render("admin/userdetails",{admin:true});
-})
+});
+
+
+
+
+
+router.post("/updatephoto", upload.any(), productController.uploadImage)
+
+router.get("/editproductsvarient/:id", auth.verifyAdminJWT, productController.editProductVarientPage);
+router.post("/editproductvarient", auth.verifyAdminJWT, productController.editProductVarient);
+
+router.get("/productvarientdetails/:id", auth.verifyAdminJWT, productController.productVarientDetailsPage)
+
+
+
+
+
+
+
 
 //user handling
 router.patch("/blockunblock/:userId", auth.verifyAdminJWT, adminController.blockUnblockUser)

@@ -8,6 +8,8 @@ const Color = require("../models/color.model.js");
 const Size = require("../models/size.models.js");
 const Category = require("../models/category.models.js");
 const mongoose = require("mongoose");
+const fs = require("fs");
+const path = require("path");
 
 
 const addProductPage = asyncHandler( async (req,res)=>{
@@ -235,14 +237,16 @@ const addProductVarient = asyncHandler( async (req,res)=>{
     const sizeId = await Size.findOne({size:size}).select("-size -createdAt -updatedAt");    
 
     if(!(productId&&colorId&&sizeId)){
-        throw new ApiError(400,"The product size or color given is invalid")
+        //throw new ApiError(400,"The product size or color given is invalid");
+        console.log("error in finding product color and size");
+        return res.redirect("/api/v1/admin/products-varient")
     }
 
     //File Handling
     if(!req.files){
         throw new ApiError(400,"The image path is null")
     }
-    
+    console.log(req.files);
     let urls = [];
   
     for(file of req.files){
@@ -281,10 +285,73 @@ const addProductVarient = asyncHandler( async (req,res)=>{
     .redirect("products")
 });
 
-// const editProductVarient = asyncHandler( async (req,res)=>{
-//     //get datas name, about, category, islisted, 
-//     //check whether every pic is edited
-// });
+const editProductVarientPage = asyncHandler(async(req,res)=>{
+    const id = req.params.id;
+
+    const productVarientArray = await ProductVarient.aggregate([
+        {
+            $match: {
+                _id : new mongoose.Types.ObjectId(id) 
+            }
+        },
+        {
+            $lookup: {
+                from: "colors",
+                localField : "color_id",
+                foreignField : "_id",
+                as: "color"
+            } 
+        },
+        {
+            $lookup: {
+                from: "sizes",
+                localField : "size_id",
+                foreignField : "_id",
+                as: "size"
+            } 
+        },
+        {
+            $addFields : {               
+                color : { $first : "$color"},
+                size : { $first : "$size"}
+            }
+        },
+        {
+            $project : {                
+                color:1,
+                size:1,
+                images:1,
+                stock:1,
+                price:1,
+                cost:1
+            }
+        }
+    ]);
+
+    let productVarient = productVarientArray[0];
+
+    console.log("this is the product varient",productVarient);
+
+    const color = await Color.find({}).select("-createdAt -updatedAt -hex");    
+    const size = await Size.find({}).select("-createdAt -updatedAt ");
+
+    if(!(color || size)){
+        throw new ApiError(500,"server error while getting size and color")
+    }
+
+    res
+    .status(200)
+    .render("admin/editproductvarient",{admin:true, title:"Urbane Wardrobe", productVarient, color, size});
+
+})
+
+const editProductVarient = asyncHandler( async (req,res)=>{
+    //get datas name, about, category, islisted, 
+    //check whether every pic is edited
+    const {productname, color, size, stock, price, cost} = req.body
+    console.log("this is request body",req.body)
+    console.log("Thisi is req file", req.file)
+});
 
 const listProducts = asyncHandler( async(req,res)=>{
     console.log("This is the request");
@@ -493,7 +560,7 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
             $addFields : {
                 name : { $first : "$name"},
                 color : { $first : "$color"},
-                size : { $size : "$size"}
+                size : { $first : "$size"}
             }
         },
         {
@@ -891,7 +958,142 @@ const categoryListPage = asyncHandler( async(req,res)=>{
         .status(200)
         //.json( new ApiResponse(200, {mensProducts}, "fetched"))
         .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: categoryProducts});
+});
+
+const productVarientDetailsPage = asyncHandler( async(req,res)=>{        
+    productId = req.params.id;
+    console.log("this is product id",productId);
+
+    const productArray = await Product.aggregate([
+        { 
+            $match: { 
+                _id: new mongoose.Types.ObjectId(productId),
+            } 
+        },
+        {            
+            $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "category"
+            }
+        },
+        {
+            $addFields: {
+                category: { $first: "$category" }
+            }
+        }
+        
+    ]);
+    //const product = await Product.findOne({_id:productId}).populate("categories");
+
+    let product = productArray[0];
+
+    
+
+    const productVarient = await ProductVarient.aggregate([
+        {
+            $match: {
+                product_id : new mongoose.Types.ObjectId(productId) 
+            }
+        },
+        {
+            $lookup: {
+                from: "colors",
+                localField : "color_id",
+                foreignField : "_id",
+                as: "color"
+            } 
+        },
+        {
+            $lookup: {
+                from: "sizes",
+                localField : "size_id",
+                foreignField : "_id",
+                as: "size"
+            } 
+        },
+        {
+            $addFields : {               
+                color : { $first : "$color"},
+                size : { $first : "$size"}
+            }
+        },
+        {
+            $project : {                
+                color:1,
+                size:1,
+                images:1,
+                stock:1,
+                price:1
+            }
+        }
+    ]);
+
+    
+
+    res
+    .status(200)
+    .render("admin/productdetails",{admin:true, title:"Urbane Wardrobe", product, productVarient});
+
+
+});
+
+
+const uploadImage = asyncHandler( async(req,res)=>{
+    const {index,productId, cropedImage} = req.body;    
+    
+    console.log("this is index", index);
+    console.log("this is productId", productId);      
+
+    const imageBuffer = Buffer.from(cropedImage.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+    // Generate a unique filename for the image
+    const filename = `image_${Date.now()}.jpg`;
+    const imagePath = path.join(__dirname, '../../public/temp', filename);
+    console.log("this is image path", imagePath);
+
+    // Write the image buffer to a file
+    fs.writeFile(imagePath, imageBuffer, (err) => {
+        if (err) {
+            console.error('Error writing image file:', err);
+            //res.status(500).json('Error uploading image');
+        } else {
+            console.log('Image uploaded successfully:', filename);
+            //res.status(200).json('Image uploaded successfully');
+        }
+    });
+
+    
+    const uploadedToCloudinary = await uploadOnCloudinary(imagePath);
+    
+    if(!uploadedToCloudinary){
+        throw new ApiError(500,`Error in uploading file number ${index}`);
+    }
+
+    const prodUpdate = await ProductVarient.updateOne(
+        {
+            _id: new mongoose.Types.ObjectId(productId)
+        },
+        { 
+            $set : { 
+                [`images.${index}`] : uploadedToCloudinary.url 
+            }
+        }
+        )
+
+
+        if(prodUpdate){
+            res.status(200).json(uploadedToCloudinary.url);
+        }
+
+        res.status(500).json("Something went wrong");
+    
+
+    
 })
+
+
+
 
 
 
@@ -911,5 +1113,9 @@ module.exports = {
     // menslistPage,
     // womenslistPage,
     // kidslistPage,
-    categoryListPage
+    categoryListPage,
+    productVarientDetailsPage,
+    editProductVarientPage,
+    editProductVarient,
+    uploadImage
 }

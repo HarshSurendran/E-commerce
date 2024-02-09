@@ -8,27 +8,22 @@
         <div class="row">
             <div class="col-9">
                 <div class="content-header">
-                    <h2 class="content-title">Add Product varient</h2>                            
+                    <h2 class="content-title">Edit Product varient</h2>                            
                 </div>
             </div>
             <div id="target" class="col-lg-12">
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between ">
                         <h4>Basic</h4>
-                        {{!-- <button type="button" id="addForm" class="btn btn-md rounded font-sm hover-up">+</button> --}}
+                       
                     </div>
-                    <form method="post" action="products-varient" enctype="multipart/form-data">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col mb-3">
-                                    <label for="productname" class="form-label">Product Name (It should match with the Product submited)</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="productname" name="productname" required />
-                                </div>
-                            </div>                
+                    <form method="post" action="/api/v1/admin/editproductvarient" >
+                        <div class="card-body">                           
                             <div class="row">
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label">Color</label>
                                     <select id="color" class="form-select" name="color">
+                                        <option selected>{{productVarient.color.color}}</option>
                                         {{#each color}}
                                         <option>{{this.color}}</option>
                                         {{/each}}                                                
@@ -37,6 +32,7 @@
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label">Size</label>
                                     <select id="size" class="form-select" name="size">
+                                        <option selected>{{productVarient.size.size}}</option>
                                         {{#each size}}
                                         <option>{{this.size}}</option>
                                         {{/each}}                                                
@@ -46,15 +42,15 @@
                             <div class="row">
                                 <div class="col-sm-4 mb-3">
                                     <label for="price" class="form-label">Price</label>
-                                    <input type="number" placeholder="Type here" class="form-control" id="price" name="price" required />
+                                    <input type="number" value="{{productVarient.price}}" class="form-control" id="price" name="price" required />
                                 </div>
                                 <div class="col-sm-4 mb-3">
                                     <label for="cost" class="form-label">Cost</label>
-                                    <input type="number" placeholder="Type here" class="form-control" id="cost" name="cost" required />
+                                    <input type="number" value="{{productVarient.cost}}" class="form-control" id="cost" name="cost" required />
                                 </div>
                                 <div class="col-sm-4 mb-3">
                                     <label for="stock" class="form-label">Stock</label>
-                                    <input type="number" placeholder="Type here" class="form-control" id="stock" name="stock" required />
+                                    <input type="number" value="{{productVarient.stock}}" class="form-control" id="stock" name="stock" required />
                                 </div>                                        
                             </div>
                                 {{!-- Upload image with preview --}}
@@ -65,32 +61,32 @@
                                 <div class="row">
                                     <div class="card-body col-sm-3">
                                         <div class="input-upload">
-                                            <img id="image-preview1" src="/assets/imgs/theme/upload.svg" alt="" />
-                                            <input data-id="1" class="form-control" name="images" type="file" id="image-input-1" accept="image/*" onchange="previewImage(event)" required />
+                                            <img id="image-preview1" src=" {{getImageSrc productVarient.images 0}} " alt="" />
+                                            <input data-id="1" data-prod="{{productVarient._id}}" class="form-control inputImage" name="images0" type="file" id="image-input-1" accept="image/*" />
                                         </div>
                                     </div>
                                     <div class="card-body col-sm-3">
                                         <div class="input-upload">
-                                            <img id="image-preview2" src="/assets/imgs/theme/upload.svg" alt="" />
-                                            <input data-id="2" class="form-control" name="images" type="file" id="image-input-2" accept="image/*" onchange="previewImage(event)" required />
+                                            <img id="image-preview2" src="{{getImageSrc productVarient.images 1}}" alt="" />
+                                            <input data-id="2" data-prod="{{productVarient._id}}" class="form-control inputImage" name="images1" type="file" id="image-input-2" accept="image/*"   />
                                         </div>
                                     </div>
                                     <div class="card-body col-sm-3">
                                         <div class="input-upload">
-                                            <img id="image-preview3" src="/assets/imgs/theme/upload.svg" alt="" />
-                                            <input data-id="3" class="form-control" name="images" type="file" id="image-input-3" accept="image/*" onchange="previewImage(event)" required />
+                                            <img id="image-preview3" src="{{getImageSrc productVarient.images 2}}" alt="" />
+                                            <input data-id="3" data-prod="{{productVarient._id}}" class="form-control inputImage" name="images2" type="file" id="image-input-3" accept="image/*"  />
                                         </div>
                                     </div>
                                     <div class="card-body col-sm-3">
                                         <div class="input-upload">
-                                            <img id="image-preview4" src="/assets/imgs/theme/upload.svg" alt="" />
-                                            <input data-id="4" class="form-control" name="images" type="file" id="image-input-4" accept="image/*" onchange="previewImage(event)" required />
+                                            <img id="image-preview4" src="{{getImageSrc productVarient.images 3}}" alt="" />
+                                            <input data-id="4" data-prod="{{productVarient._id}}" class="form-control inputImage" name="images3" type="file" id="image-input-4" accept="image/*"  />
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> 
                             <div class="d-flex justify-content-center">
-                                <button type="submit" id="productVarientButton" class="btn btn-md rounded font-sm hover-up">Add product-Varient</button>
+                                <button type="submit" id="productVarientButton" class="btn btn-md rounded font-sm hover-up">Edit product-Varient</button>
                             </div>
                             <h3 id="varientAlert" class="text-center text-success"></h3>
                         </div>
@@ -194,27 +190,56 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-    
 
-    //preview image
+    function sendImage(cropedImage, id, productId){
+        const formdata = new FormData();
+        formdata.append("cropedImage",cropedImage);
+        formdata.append("index",id);
+        formdata.append("productId",productId);
+        console.log("proid",productId);
+        console.log("index",id);
+        console.log("formdata",formdata);
+
+        fetch("/api/v1/admin/updatephoto", {
+            method: "POST",                
+            body: formdata
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("Success:", data);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+    }
+
     let cropper;
+    const inputElem = document.querySelectorAll(".inputImage");
+    inputElem.forEach((element)=>{
+        element.addEventListener("change",(event)=>{
+            //event.preventDefault();
+            previewImage(event);
+        })            
+    })        
+
     function previewImage(event) {
         const input = event.target;
         console.log( "Entered preview image" ,input)
         let number = input.getAttribute("data-id");
+        let productId = input.getAttribute("data-prod");
         
         console.log(`image-preview${number}`);
         const preview = document.getElementById(`image-preview${number}`);  
         const imageElement = document.querySelector(`.imagecrop${number}`);    
-       
+    
+        console.log("This is input.files",input.files);
 
         if (input.files && input.files[0]) {
             const reader = new FileReader();
 
             reader.onload = function (e) {
-                //preview.src = e.target.result;
+                //preview.src = e.target.result;                    
                 
-                // Assuming you have jQuery
                 $(document).ready(function(){
                     $(`#imageModal${number}`).modal('show');
                 });                
@@ -226,9 +251,8 @@
 
                 //append this img tag to a modal
                 imageElement.appendChild(img);
-
                 //crop image
-                    cropper = new Cropper(img, {
+                cropper = new Cropper(img, {
                     aspectRatio: 0,
                     viewMode: 1,
                     dragMode: "move",
@@ -237,39 +261,32 @@
                     minCropBoxWidth: 400,
                     minCropBoxHeight: 400,
                     minCanvasHeight: 500,
-                    minCanvasWidth: 500,                    
-                    /*crop(event) {
-                        console.log(event.detail.x);
-                        console.log(event.detail.y);
-                        console.log(event.detail.width);
-                        console.log(event.detail.height);
-                        console.log(event.detail.rotate);
-                        console.log(event.detail.scaleX);
-                        console.log(event.detail.scaleY);
-                    },*/
+                    minCanvasWidth: 500,
                 });
 
             };
 
             reader.readAsDataURL(input.files[0]);
-        }
+        
 
-        const cropButton = document.getElementById(`cropButton${number}`);
-        cropButton.addEventListener("click",()=>{
-            console.log("Entered crop button")
-            let imgsrc = cropper.getCroppedCanvas().toDataURL("image/jpeg");
-            console.log(imgsrc);            
-            preview.src = imgsrc;
-            //input.value = imgsrc;
-            //close modal
-            var modal = document.getElementById(`imageModal${number}`);
-            console.log("This is modal", modal)
-            var bootstrapModal = bootstrap.Modal.getInstance(modal);
-            bootstrapModal.hide();
-        });     
-            
+            const cropButton = document.getElementById(`cropButton${number}`);
+            cropButton.addEventListener("click",()=>{
+                console.log("Entered crop button")
+                let imgsrc = cropper.getCroppedCanvas().toDataURL("image/jpeg");
+                            
+                preview.src = imgsrc;
+                
+                //sending data to server
+                sendImage(imgsrc, number-1, productId)            
+                
+                //close modal
+                var modal = document.getElementById(`imageModal${number}`);
+                var bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
+            });
+        }
     }
 
-    
 
- </script>
+
+</script>

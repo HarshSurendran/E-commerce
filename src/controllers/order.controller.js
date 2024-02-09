@@ -270,6 +270,8 @@ const createOrder = asyncHandler( async(req,res)=>{
             .json(new ApiError(500, "Order not placed server error"));
         }
 
+        await Cart.deleteMany({user_id: user._id});
+
         return res
         .status(200)
         .json( new ApiResponse(200, {orderConfirm}, "Order placed successfully"));

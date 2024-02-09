@@ -42,6 +42,16 @@ hbs.registerHelper('calculateTotal', function(total, discount, shipping) {
 
   return result;
 });
+hbs.registerHelper('getImageSrc', function(imagesArray, index) {
+  // Check if imagesArray is an array and index is within bounds
+  if (Array.isArray(imagesArray) && index >= 0 && index < imagesArray.length) {
+      // Return the image source at the specified index
+      return imagesArray[index];
+  } else {
+      // Handle invalid input or out-of-bounds index
+      return ''; // Or provide a default image source
+  }
+});
 // hbs.registerHelper('ifZero', function (value) {
 //   if(value == 0){
 //     return true
