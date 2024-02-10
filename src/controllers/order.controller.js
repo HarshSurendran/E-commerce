@@ -708,6 +708,43 @@ const renderUserOrdersPage = asyncHandler( async(req,res)=>{
     .render("users/orderlist",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout"});
 });
 
+const cancelOrder = asyncHandler( async(req,res)=>{
+    const orderId = req.body.orderId;
+    const order = await Order.updateOne(
+        {
+            _id: orderId
+        },
+        {
+            $set: {
+                status: "cancelled"
+            }
+        }
+    );
+    console.log("This is order",order);
+
+    if(!order){
+        return res
+        .status(400)
+        .json(new ApiResponse(400, "Something went wrong"));        
+    }
+    
+    res
+    .status(200)
+    .json(new ApiResponse(200, null, "Order cancelled successfully"));
+})
+
+const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
+    const orderId = req.params.id;
+    const order = await Order.findOne({ _id: orderId });
+    if(!order){
+        return res
+        .status(400)
+        .json(new ApiResponse(400, "Something went wrong"));
+    }
+    res
+    .status(200)
+    .render("users/orderdetails",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout"});
+})
 
 
 module.exports = {
@@ -717,5 +754,7 @@ module.exports = {
     renderOrdersPage,
     renderOrderDetailsPage,
     changeOrderStatus,
-    renderUserOrdersPage
+    renderUserOrdersPage,
+    cancelOrder,
+    renderUserOrderDetailsPage
 }

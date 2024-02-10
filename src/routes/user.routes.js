@@ -21,8 +21,10 @@ router.get("/otp", (req,res)=>{
     res.render("users/otpvalidation",{user:true});
 })
 
-
+//orders
 router.get("/orders", auth.verifyUserJWT,  orderController.renderUserOrdersPage);
+router.patch("/orders", auth.verifyUserJWT,  orderController.cancelOrder);
+router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
 
 
 

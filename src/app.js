@@ -61,6 +61,13 @@ hbs.registerHelper('changeColor', function ( status) {
     return "alert-success";
   }  
 })
+hbs.registerHelper('generateCancelButton', function(input1) {
+  if (input1 === "pending" || input1 === "shipped") {
+    return new hbs.SafeString('<a data-id="{{this._id}}" class="btn btn-danger cancelButton me-3 ">Cancel</a>');
+  } else if (input1 === "delivered") {
+    return new hbs.SafeString('<a data-id="{{this._id}}" class="btn btn-secondary cancelButton me-3 ">Return</a>');
+  }
+});
 // hbs.registerHelper('ifZero', function (value) {
 //   if(value == 0){
 //     return true

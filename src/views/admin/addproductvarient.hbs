@@ -23,6 +23,9 @@
                                 <div class="col mb-3">
                                     <label for="productname" class="form-label">Product Name (It should match with the Product submited)</label>
                                     <input type="text" placeholder="Type here" class="form-control" id="productname" name="productname" required />
+                                    {{#if error}}
+                                    <p class="text-danger text-center " >{{error}}</p>
+                                    {{/if}}
                                 </div>
                             </div>                
                             <div class="row">

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user.models");
 const Admin = require("../models/admin.models.js");
 const asyncHandler = require("../utils/asynchandler.js");
+const ProductVarient = require("../models/productvarient.models.js")
 
 const verifyUserJWT = asyncHandler( async(req,res,next)=>{
     try {
@@ -37,12 +38,81 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
             httpOnly:true,
             secure: true
         }
+
+        const productList = await ProductVarient.aggregate(
+            [   
+                {
+                    $lookup: {
+                        from: "products",
+                        localField : "product_id",
+                        foreignField : "_id",
+                        as: "name",
+                        pipeline: [
+                            {
+                                $match: {
+                                    islisted : true
+                                }
+                            },
+                            {
+                                $lookup: {
+                                    from: "categories",
+                                    localField: "category",
+                                    foreignField: "_id",
+                                    as: "category"
+                                }
+                            },
+                            {
+                                $addFields: {
+                                    category: { $first: "$category" }
+                                }
+                            }
+                        ]
+                    }        
+                },
+                {
+                    $lookup: {
+                        from: "colors",
+                        localField : "color_id",
+                        foreignField : "_id",
+                        as: "color"
+                    } 
+                },
+                {
+                    $lookup: {
+                        from: "sizes",
+                        localField : "size_id",
+                        foreignField : "_id",
+                        as: "size"
+                    } 
+                },
+                {            
+                    $addFields : {
+                        name : { $first: "$name" },
+                        color : { $first: "$color"},
+                        size : { $first: "$size" },
+                    }                       
+                },
+                {
+                    $project : {
+                        name:1,
+                        color:1,
+                        size:1,
+                        images:1,
+                        stock:1,
+                        price:1
+                    }
+                }
+            ]
+            );
+        
+        
         
         res
         .status(400)
         .clearCookie("accessToken", options)
         .clearCookie("RefreshToken", options)
-        .redirect("/api/v1");
+        //.redirect("/api/v1/");
+        .render("landingPage", {common:true , title: "Urbane Wardrobe" , products: productList, blocked : "This user is blocked"});
     }
 })
 

@@ -1,3 +1,21 @@
+<head>
+    <style>
+    /* Notification styles */
+    .notification {
+      display: none;
+      position: fixed;
+      top: 10px;
+      right: 40%;
+      background-color: #f51010;
+      color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    </style>
+</head>
+
+
 <body>
     <div class="screen-overlay"></div>        
     <main class="main-wrap">            
@@ -81,15 +99,69 @@
                         <div class="col-lg-4">
                             <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
                         </div>
-                        <div class="col-lg-2">
-                        <a href="#" class="btn btn-danger">Cancel</a>
-                        </div>
+                        {{!-- <div class="col-lg-2 d-flex d-column justify-content-center align-items-center">
+                        <a class="btn btn-danger cancelButton">Cancel</a>
+                        </div> --}}
                     </div>
                 </div>
                 {{/each}}
+                <div class="row  mb-3 ">
+                    <div class="col-lg-12 d-flex justify-content-center  ">
+                        {{generateCancelButton this.status "pending"}}
+                        <a href="/api/v1/users/orders/{{this._id}}" id="detailsButton" data-id="{{this._id}}" class="btn btn-success detailsButton">Details</a>
+                    </div>                    
+                </div>
             </div>
             {{/each}}
         </section>
+        <div id="notification" class="notification"></div>
     </main>
+    <script>
+
+        const showNotification = (message) => {
+            const notification = document.querySelector(".notification");
+            notification.classList.add("show");
+            notification.textContent = message;
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+        };
+
+        const cancelButton = document.querySelectorAll(".cancelButton");
+
+        cancelButton.forEach((element) => {
+            element.addEventListener("click", (event) => {
+               const conform = confirm("Are you sure you want to cancel this order?"); 
+               if(conform){
+                    const parentElement = event.target.closest('.row');                    
+                    const detailsButton = parentElement.querySelector('.detailsButton');                    
+                    const orderId = detailsButton.dataset.id;          
+                   console.log("this is the order id :", orderId)
+                   fetch("/api/v1/users/orders", {
+                       method: "PATCH",
+                       headers: {
+                           "content-type": "application/json"
+                       },
+                       body: JSON.stringify({
+                           orderId
+                       })
+                   })
+                   .then(response => response.json())
+                   .then((data) => {
+                       if (data.success) {
+                           showNotification("Order cancelled");
+                           location.reload();
+                           return
+                       }
+                       console.log(data);
+                       showNotification("Cancellation failed");
+                   })
+               }              
+                
+            })
+        })
+        
+        
+    </script>
 </body>
 

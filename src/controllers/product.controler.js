@@ -214,7 +214,7 @@ const deleteProduct = asyncHandler( async(req,res)=>{
     .redirect("/api/v1/admin/products");
 })
 
-const addProductVarientPage = asyncHandler( async(req,res)=>{
+const addProductVarientPage = asyncHandler( async(req,res)=>{    
     const color = await Color.find({}).select("-createdAt -updatedAt -hex");    
     const size = await Size.find({}).select("-createdAt -updatedAt ");
 
@@ -228,18 +228,20 @@ const addProductVarientPage = asyncHandler( async(req,res)=>{
 })
 
 const addProductVarient = asyncHandler( async (req,res)=>{
-    //get product details
-    const {productname, color, size, stock, price, cost} = req.body //add remaining parameters to add into product collection
-        
+        //get product details    
+    const {productname, color, size, stock, price, cost} = req.body //add remaining parameters to add into product collection    
     //collecting the _id from product,color and size 
     const productId = await Product.findOne({name:productname}).select("-name -about -category -islisted -createdAt -updatedAt");    
     const colorId = await Color.findOne({color:color}).select("-color -hex -createdAt -updatedAt");    
-    const sizeId = await Size.findOne({size:size}).select("-size -createdAt -updatedAt");    
+    const sizeId = await Size.findOne({size:size}).select("-size -createdAt -updatedAt");
 
     if(!(productId&&colorId&&sizeId)){
         //throw new ApiError(400,"The product size or color given is invalid");
-        console.log("error in finding product color and size");
-        return res.redirect("/api/v1/admin/products-varient")
+        console.log("Product name is not matching");       
+        
+        return res
+        .status(200)
+        .render("admin/addproductVarient",{admin:true, title:"Urbane Wardrobe", color, size, error:"Product name doesn't exist"});
     }
 
     //File Handling
@@ -947,8 +949,9 @@ const categoryListPage = asyncHandler( async(req,res)=>{
             }
         ]
         );
+        
         const categoryProducts = categoryProductList.filter((element)=>{
-            if(element.name.category){
+            if(element.name?.category){
                 return true
             }
             return false

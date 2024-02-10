@@ -97,7 +97,9 @@
                             <li>Subtotal <span id="subtotal">{{total}}</span></li>
                             <li id="total">Total <span id="grandtotal">{{total}}</span></li>
                         </ul>
+                        {{#if cart}}
                         <a href="/api/v1/users/checkout" class="primary-btn">Proceed to checkout</a>
+                        {{/if}}
                     </div>
                 </div>
             </div>
