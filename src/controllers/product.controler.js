@@ -350,9 +350,29 @@ const editProductVarientPage = asyncHandler(async(req,res)=>{
 const editProductVarient = asyncHandler( async (req,res)=>{
     //get datas name, about, category, islisted, 
     //check whether every pic is edited
-    const {productname, color, size, stock, price, cost} = req.body
+    const {prodId, color, size, stock, price, cost} = req.body
     console.log("this is request body",req.body)
     console.log("Thisi is req file", req.file)
+
+    const colorData = await Color.findOne({color:color}).select(" -hex -createdAt -updatedAt");
+    const sizeData = await Size.findOne({size:size}).select(" -createdAt -updatedAt");
+
+    const edited = await ProductVarient.updateOne(
+        {
+            _id : prodId 
+        },
+        {
+            $set : { color_id : colorData._id, size_id : sizeData._id, stock, price, cost}
+        });
+
+        if(!edited){
+            throw new ApiError(500, "Something went wrong while editing productvarient")
+        }
+
+        return res
+        .status(200)
+        .redirect("/api/v1/admin/products")
+
 });
 
 const listProducts = asyncHandler( async(req,res)=>{

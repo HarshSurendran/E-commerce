@@ -162,7 +162,7 @@ router.get("/test", async(req,res)=>{
 
 
 // order
-router.get("/orderdetails/:id", orderController.renderOrderDetailsPage);
+router.get("/orders/orderdetails/:id", orderController.renderOrderDetailsPage);
 router.get("/orders", orderController.renderOrdersPage);
 router.post("/updateorderstatus", orderController.changeOrderStatus);
 
@@ -175,19 +175,19 @@ router.get("/dashboard", auth.verifyAdminJWT, adminController.renderDashboard);
 
 // product handling 
 router.get("/Products", auth.verifyAdminJWT, productController.onlyProductsList);
-router.get("/addproduct", auth.verifyAdminJWT, productController.addProductPage);
+router.get("/products/addproduct", auth.verifyAdminJWT, productController.addProductPage);
 router.post("/addproduct", auth.verifyAdminJWT, productController.addProduct);
-router.get("/edit-product/:id", auth.verifyAdminJWT, productController.editProductPage);
+router.get("/products/edit-product/:id", auth.verifyAdminJWT, productController.editProductPage);
 router.post("/editProduct", auth.verifyAdminJWT, productController.editProduct);
 //router.get("/delete-product/:id", auth.verifyAdminJWT, productController.deleteProduct); delete product is not needed.
 router.get("/productlist", auth.verifyAdminJWT, productController.listProducts);
-router.get("/products-varient", auth.verifyAdminJWT, productController.addProductVarientPage);
+router.get("/products/products-varient", auth.verifyAdminJWT, productController.addProductVarientPage);
 router.post("/products-varient", auth.verifyAdminJWT, upload.array("images",4), productController.addProductVarient);
 router.patch("/listunlist/:id", auth.verifyAdminJWT, productController.listUnlistProduct);
 router.post("/updatephoto", upload.any(), productController.uploadImage);
-router.get("/editproductsvarient/:id", auth.verifyAdminJWT, productController.editProductVarientPage);
-router.post("/editproductvarient", auth.verifyAdminJWT, productController.editProductVarient);
-router.get("/productvarientdetails/:id", auth.verifyAdminJWT, productController.productVarientDetailsPage);
+router.get("/products/editproductsvarient/:id", auth.verifyAdminJWT, productController.editProductVarientPage);
+router.post("/products/editproductvarient", auth.verifyAdminJWT, productController.editProductVarient);
+router.get("/products/productvarientdetails/:id", auth.verifyAdminJWT, productController.productVarientDetailsPage);
 
 
 
@@ -195,7 +195,7 @@ router.get("/productvarientdetails/:id", auth.verifyAdminJWT, productController.
 router.patch("/blockunblock/:userId", auth.verifyAdminJWT, adminController.blockUnblockUser)
 router.get("/users", auth.verifyAdminJWT, adminController.userList);
 //router.get("/delete-user/:id", auth.verifyAdminJWT, adminController.deleteUser); Delete User is not necessary
-router.get("/createuser", auth.verifyAdminJWT, adminController.createUserPage);
+router.get("/users/createuser", auth.verifyAdminJWT, adminController.createUserPage);
 router.post("/createuser", auth.verifyAdminJWT, adminController.createUser); //we could have used insert user middleware
 
 //category handling

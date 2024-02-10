@@ -9,8 +9,8 @@
                     <div>
                         {{!-- <a href="#" class="btn btn-light rounded font-md">Export</a>
                         <a href="#" class="btn btn-light rounded font-md">Import</a> --}}
-                        <a href="addproduct" class="btn btn-primary btn-sm rounded">Add Product</a>
-                        <a href="products-varient" class="btn btn-primary btn-sm rounded">Add Product Varient</a>
+                        <a href="/api/v1/admin/products/addproduct" class="btn btn-primary btn-sm rounded">Add Product</a>
+                        <a href="/api/v1/admin/products/products-varient" class="btn btn-primary btn-sm rounded">Add Product Varient</a>
                     </div>
                 </div>
                 <div class="card mb-4">
@@ -75,8 +75,8 @@
                                     <span>{{this.date}}</span>
                                 </div>
                                 <div class="col-lg-3 col-sm-2 col-4 col-action text-end">
-                                    <a href="productvarientdetails/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> details </a>
-                                    <a href="edit-product/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> Edit </a>
+                                    <a href="/api/v1/admin/products/productvarientdetails/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> details </a>
+                                    <a href="/api/v1/admin/products/edit-product/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> Edit </a>
                                     {{!-- <a onclick=" return confirm('Are you sure to delete {{this.name}}')" href="delete-product/{{this._id}}"  class="btn btn-sm font-sm rounded btn-danger"><i class="material-icons md-delete_forever"></i>Delete</a> --}}
                                     {{#if this.islisted}}
                                         <button data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-danger unlistButton"> Unlist</button>

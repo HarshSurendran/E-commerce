@@ -11,31 +11,31 @@
             </div>
             <nav>
                 <ul class="menu-aside">
-                    <li class="menu-item active">
+                    <li class="menu-item dashboard ">
                         <a class="menu-link" href="/api/v1/admin/dashboard">
                             <i class="icon material-icons md-home"></i>
                             <span class="text">Dashboard</span>
                         </a>
                     </li>
-                    <li class="menu-item ">
+                    <li class="menu-item products">
                         <a class="menu-link" href="/api/v1/admin/products">
                             <i class="icon material-icons md-shopping_bag"></i>
                             <span class="text">Products</span>
                         </a>
                     </li>
-                    <li class="menu-item ">
+                    <li class="menu-item users ">
                         <a class="menu-link" href="/api/v1/admin/users">
                             <i class="icon material-icons md-shopping_bag"></i>
                             <span class="text">Users</span>
                         </a>
                     </li>
-                    <li class="menu-item ">
+                    <li class="menu-item cateogry">
                         <a class="menu-link" href="/api/v1/admin/category">
                             <i class="icon material-icons md-shopping_bag"></i>
                             <span class="text">Category</span>
                         </a>
                     </li>
-                    <li class="menu-item ">
+                    <li class="menu-item orders">
                         <a class="menu-link" href="/api/v1/admin/orders">
                             <i class="icon material-icons md-shopping_bag"></i>
                             <span class="text">Orders</span>
@@ -170,3 +170,21 @@
             </div>
         </header>
     </main>
+    <script>
+        /*const url = window.location.href;
+        console.log("This is current url", url);
+        const elem = document.querySelectorAll(".menu-item");
+        url.replace("http://localhost:4000/api/v1/admin/","")*/
+        document.addEventListener('DOMContentLoaded', function() {
+            var menuItems = document.querySelectorAll('.menu-item');
+            var currentURL = window.location.pathname;
+
+            menuItems.forEach(function(item) {
+                var itemURL = item.querySelector('a').getAttribute('href');
+                if (currentURL.startsWith(itemURL)) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+    </script>
