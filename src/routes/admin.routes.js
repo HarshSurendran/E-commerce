@@ -197,6 +197,10 @@ router.get("/users", auth.verifyAdminJWT, adminController.userList);
 //router.get("/delete-user/:id", auth.verifyAdminJWT, adminController.deleteUser); Delete User is not necessary
 router.get("/users/createuser", auth.verifyAdminJWT, adminController.createUserPage);
 router.post("/createuser", auth.verifyAdminJWT, adminController.createUser); //we could have used insert user middleware
+router.get("/users/details/:id",auth.verifyAdminJWT, adminController.userDetails);
+router.patch("/editdetails", auth.verifyAdminJWT, adminController.editUserDetails);
+
+
 
 //category handling
 router.get("/category", auth.verifyAdminJWT, categoryController.categoryPage);

@@ -249,6 +249,45 @@ const deleteUser = asyncHandler( async(req,res)=>{
     .redirect("/api/v1/admin/users");
 });
 
+const userDetails = asyncHandler( async(req,res)=>{
+    const id = req.params.id;
+    const user = await User.findOne({_id:id}).select("-password -isVerified -refreshToken");
+    if(!user){
+        throw new ApiError(500, "cannot find user")
+    }
+    return res
+    .status(200)
+    .render("admin/userdetails",{admin:true, title:"Urbane Wardrobe", userDetails: user});
+});
+
+const editUserDetails = asyncHandler( async(req,res)=>{
+    const {fullname, gender, phone, dateofbirth, userId} = req.body;
+    console.log(fullname," ",gender," ",phone, " ", dateofbirth);
+
+    
+    const user = await User.updateOne(
+        {
+            _id: userId
+        },
+        {
+            $set : {fullname:fullname, gender: gender, phone: phone, dateofbirth: dateofbirth}
+        },
+        {
+            new: true
+        }
+    ).select("-password");
+
+    console.log(user);
+    
+    return res
+    .status(200)
+    .json( new ApiResponse(
+        200,
+        user,
+        "User data updated successfully"
+    ));
+})
+
 
 
 module.exports = {
@@ -261,6 +300,8 @@ module.exports = {
     createUser,
     createUserPage,
     verifyEmailPassword,
-    renderLoginPage,    
+    renderLoginPage, 
+    userDetails,
+    editUserDetails 
     
 }
