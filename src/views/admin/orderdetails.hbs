@@ -17,6 +17,7 @@
                             <small class="text-muted">Order ID: {{order.orderId}}</small>
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                            <span class="badge rounded-pill me-2 {{changeColor order.status}}">{{order.status}}</span>
                             <select id="orderStatus" class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
                                 <option>Change status</option>
                                 <option value="cancelled">Cancel</option>
