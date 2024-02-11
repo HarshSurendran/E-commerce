@@ -111,7 +111,11 @@
                                     <input type="text" value="1">
                                 </div>
                             </div>
+                            {{#if cart}}
+                            <a id="alreadyInCart" style="background-color: #4CAF50 ;" data-id="{{product._id}}" href="/api/v1/users/cart" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Go to Cart</a>
+                            {{else}}
                             <button id="addtocartbutton" data-id="{{product._id}}" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Add to cart</button>
+                            {{/if}}
                             <ul>
                                 <li><a href="#"><span class="icon_heart_alt"></span></a></li>
                                 <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
@@ -387,9 +391,13 @@
                 return
             }
             console.log(res);
-            addToCartButton.disabled = true;
-            addToCartButton.innerText= "ADDED"
-            addToCartButton.style.backgroundColor = "green"
+            const goToCartHTML = `
+                <a id="alreadyInCart" style="background-color: #4CAF50;" data-id="${productId}" href="/api/v1/users/cart" class="cart-btn border-0">
+                    <span class="icon_bag_alt"></span> Go to Cart
+                </a>
+            `;
+            addToCartButton.insertAdjacentHTML('afterend', goToCartHTML);
+            addToCartButton.remove();
             showNotification("Product added to cart")
         })
     })

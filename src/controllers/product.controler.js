@@ -7,6 +7,7 @@ const Product = require("../models/product.models.js");
 const Color = require("../models/color.model.js");
 const Size = require("../models/size.models.js");
 const Category = require("../models/category.models.js");
+const Cart = require("../models/cart.models.js");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
@@ -526,6 +527,15 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
         .render("error")        
     }
 
+    const cartItem = await Cart.findOne({user_id : req.user._id , productVarient_id : prodId}).select(" -createdAt -updatedAt");
+    console.log("This is cart item ", cartItem);
+    let cart;
+    if(cartItem){
+        cart = true;
+    }else{
+        cart = '';
+    }
+
     const prodDetails = prod[0];
     console.log(prodDetails);
 
@@ -602,7 +612,7 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     
     res
     .status(200)
-    .render("proddetails", {user:req.user, title:"Urbane Wardrobe", product: prodDetails, prodVarients});
+    .render("proddetails", {user:req.user, title:"Urbane Wardrobe", product: prodDetails, prodVarients, cart});
 });
 
 const listUnlistProduct = asyncHandler( async(req,res)=>{

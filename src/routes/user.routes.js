@@ -16,6 +16,13 @@ const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 const getUserId = require("../middlewares/giveuserid.middleware.js");
 
+const Razorpay = require('razorpay');
+
+var instance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
 
 router.get("/otp", (req,res)=>{
     res.render("users/otpvalidation",{user:true});
