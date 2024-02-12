@@ -8,7 +8,15 @@ const Address = require("../models/address.models.js");
 const Cart = require("../models/cart.models.js");
 const Order = require("../models/order.models.js");
 
+const crypto = require("crypto")
+
 const mongoose = require("mongoose");
+const Razorpay = require('razorpay');
+
+var instance = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
 
 const state = [    
     { name: "Andhra Pradesh" },
@@ -48,6 +56,29 @@ const state = [
     { name: "Uttarakhand" },
     { name: "West Bengal" }
   ];
+
+function generateOrderId() {
+    let orderId = Math.floor(10000000 + Math.random() * 90000000);
+    return orderId;
+}
+
+function generateRazorpayOrder(orderid, total){
+    return new Promise((resolve, reject)=>{
+        var options = {
+            amount: total*100,  // amount in the smallest currency unit
+            currency: "INR",
+            receipt: ""+orderid
+        };
+        instance.orders.create(options, function(err, order){
+            if(err){
+                console.log(err);
+                reject(err);
+            }
+            console.log("This is your order  :",order);
+            resolve(order);
+        });
+    })
+}
 
 const checkOutPage = asyncHandler( async(req,res)=>{
     const user = req.user
@@ -151,16 +182,9 @@ const checkOutPage = asyncHandler( async(req,res)=>{
 const createOrder = asyncHandler( async(req,res)=>{
     try{
         const user = req.user;
-        const {paymentMethod, address} = req.body;
-        console.log(req.body);
-        
-        function generateOrderId() {
-            let orderId = Math.floor(10000000 + Math.random() * 90000000);
-            return orderId;
-        }
-        const orderId = generateOrderId();
-        console.log("This is generated order id",orderId);
+        const {paymentMethod, address} = req.body;      
 
+        const orderId = generateOrderId();
         let payment = paymentMethod.toLowerCase()
 
         const cart = await Cart.aggregate([
@@ -250,7 +274,7 @@ const createOrder = asyncHandler( async(req,res)=>{
             orderedItems.push({productVarientId : element.productVarient_id ,quantity: element.quantity})
             total = total + (element.quantity * element.product.price)
         });
-        console.log("this is orderItems field",orderedItems);
+        
 
         const order = await Order.create({
             userId: user._id,
@@ -260,30 +284,50 @@ const createOrder = asyncHandler( async(req,res)=>{
             orderedItems,
             orderId
         })
-        console.log("THis is order created", order);
 
         const orderConfirm = await Order.findOne({_id: order._id});
 
-        console.log("This is order confirmed",orderConfirm);
-
         if(!orderConfirm){
-            return res
-            .status(500)
-            .json(new ApiError(500, "Order not placed server error"));
+            // return res
+            // .status(500)
+            // .json(new ApiError(500, "Order not placed server error"));
+            throw new Error("Order not placed server error");
         }
 
         await Cart.deleteMany({user_id: user._id});
 
-        return res
-        .status(200)
-        .json( new ApiResponse(200, {orderConfirm}, "Order placed successfully"));
+        //check payment method 
+        if(payment==="cod"){
+            return res
+            .status(200)
+            .json( new ApiResponse(200, {orderConfirm , codpayment:true}, "Order placed successfully"));
+
+        }else{
+            generateRazorpayOrder(orderConfirm.orderId, total)
+            .then((razorpayOrder)=>{
+                return res
+                .status(200)
+                .json( new ApiResponse(200, {orderConfirm, razorpayOrder}, "Order placed successfully"));
+            })
+            .catch((error)=>{
+                console.log(error);
+                return res
+                .status(500)
+                .json( new ApiError(500, "Something went wrong", error));
+            })
+        }
+
+
+        // return res
+        // .status(200)
+        // .json( new ApiResponse(200, {orderConfirm}, "Order placed successfully"));
         
 
     } catch(error){
         console.log(error)
         res
         .status(400)
-        .json( new ApiError(400, "Something went wrong"))
+        .json( new ApiError(400, "Something went wrong", error))
     }
 });
 
@@ -744,6 +788,33 @@ const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .render("users/orderdetails",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout"});
+});
+
+const verifyPayment = asyncHandler( async(req,res)=>{
+    
+    const {response, order} = req.body;
+    let hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+
+    hmac.update(response.razorpay_order_id + "|" + response.razorpay_payment_id)
+    hmac = hmac.digest('hex');
+
+    if (hmac == response.razorpay_signature) {
+        let order1 = await  Order.updateOne({ _id: order._id }, {$set: { paymentStatus: "paid" }});
+        if(!order1){
+            return res
+            .status(400)
+            .json(new ApiError(400, "Couldnt update order database but payment is successful"));
+        }
+
+        res
+        .status(200)
+        .json(new ApiResponse(200, {order : order1}, "Payment verified successfully"));
+
+    } else {
+        res
+        .status(400)
+        .json(new ApiError(400, "Something went wrong"));        
+    }
 })
 
 
@@ -756,5 +827,6 @@ module.exports = {
     changeOrderStatus,
     renderUserOrdersPage,
     cancelOrder,
-    renderUserOrderDetailsPage
+    renderUserOrderDetailsPage,
+    verifyPayment
 }

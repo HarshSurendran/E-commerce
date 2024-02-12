@@ -16,22 +16,12 @@ const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 const getUserId = require("../middlewares/giveuserid.middleware.js");
 
-const Razorpay = require('razorpay');
 
-var instance = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
 
 
 router.get("/otp", (req,res)=>{
     res.render("users/otpvalidation",{user:true});
 })
-
-//orders
-router.get("/orders", auth.verifyUserJWT,  orderController.renderUserOrdersPage);
-router.patch("/orders", auth.verifyUserJWT,  orderController.cancelOrder);
-router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
 
 
 
@@ -81,10 +71,16 @@ router.get("/editaddress/:id", auth.verifyUserJWT, addressController.editAddress
 router.post("/editaddress", auth.verifyUserJWT, addressController.editAddress);
 router.post("/fetchaddaddress", auth.verifyUserJWT, addressController.fetchAddAddress);
 
+//orders
+router.get("/orders", auth.verifyUserJWT,  orderController.renderUserOrdersPage);
+router.patch("/orders", auth.verifyUserJWT,  orderController.cancelOrder);
+router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
+
 //checkout
 router.get("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
 router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);
 router.get("/ordersuccess/:id", auth.verifyUserJWT, orderController.orderSuccessPage);
+router.post("/verifyPayment", auth.verifyUserJWT, orderController.verifyPayment);
 
 
 

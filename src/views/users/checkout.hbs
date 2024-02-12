@@ -298,7 +298,7 @@
     <!-- Main Script -->
     <script src="/assets/js/main.js?v=1.1" type="text/javascript"></script>
 
-
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         function showNotification(message, color) {
             const notificationElement = document.getElementById('notification');
@@ -328,14 +328,65 @@
                 // This depends on how you're rendering your template
             });
         });*/
+        function verifyPayment(response, razorpayOrder, order){
+            console.log("Entered verify payment");
+            fetch("/api/v1/users/verifyPayment",{
+                method: "POST",
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    response,
+                    razorpayOrder,
+                    order
+                })
+            }).then(res => res.json())
+            .then(data => {
+                if(data.success){
+                    showNotification("Hurrey!order placed", "green");                    
+                    location.href = `/api/v1/users/ordersuccess/${order._id}`
+                }
+            })
+        }
+
+
+
+        function razorpayCheckout(razorpayOrder, order){        
+            console.log("Entered razorpay checkout and this is the amount", razorpayOrder.amount);    
+            var options = {
+                "key": "rzp_test_E4rvsz08Z54fM0", // Enter the Key ID generated from the Dashboard
+                "amount": razorpayOrder.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "INR",
+                "name": "Urbane Wardrobe", //your business name
+                "description": "Test Transaction",
+                "image": "https://example.com/your_logo",
+                "order_id": razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                "handler": function (response){                   
+                    verifyPayment(response, razorpayOrder, order);
+                },
+                "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                    "name": "Gaurav Kumar", //your customer's name
+                    "email": "gaurav.kumar@example.com", 
+                    "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
 
         const orderButton = document.getElementById('orderButton');
     //placing order 
         orderButton.addEventListener("click", ()=>{
             const checkedPaymentMethod = document.querySelector('input[name="paymentmethod"]:checked');
-            console.log("This is the checked patment method", checkedPaymentMethod);
+            console.log("This is the checked patment method", checkedPaymentMethod.value);
             const checkedAddress = document.querySelector('input[name="selectedAddress"]:checked');
-            console.log("This is the checked patment method", checkedAddress);
+            console.log("This is the checked patment address", checkedAddress);
             
             const paymentMethod = checkedPaymentMethod.value;
             const address = checkedAddress.value;
@@ -351,15 +402,24 @@
                 })                
             })
             .then(res => res.json())
-            .then(data => {
-                if(!data.success){
+            .then(res => {
+                console.log("this is res from orderplaced", res)
+                if(!res.success){
                     showNotification("Order not placed. Try again", "red");
                     return
-                }      
-                console.log(data)
-                let orderId = data.data.orderConfirm._id;         
-                location.href = `/api/v1/users/ordersuccess/${orderId}`;
-                return;
+                }else if(res.data.codpayment){
+                    const orderId = res.data.orderConfirm._id;
+                    location.href = `/api/v1/users/ordersuccess/${orderId}`
+                    return
+                }else{
+                    
+                    //orders are being created successfully
+                    const razorpayOrder = res.data.razorpayOrder;
+                    const order = res.data.orderConfirm;
+                    console.log("reached razorpay", razorpayOrder, order);
+                    razorpayCheckout(razorpayOrder, order);                    
+                }    
+               
             })
         })
         
