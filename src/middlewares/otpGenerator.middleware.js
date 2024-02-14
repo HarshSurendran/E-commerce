@@ -40,15 +40,7 @@ const otpGenerator = asyncHandler( async(req , _, next)=>{
     if(!generatedOtp){
         throw new ApiError(500,"Otp generation failed");
     }
-
     
-
-    // if(req.user._id){
-    //     console.lo
-    //     userid = req.user._id
-    //     console.log("Entered req.user._id :", userid);
-    // }
-
     const userid = req?.user?._id;
 
     const otp = await Otp.create({

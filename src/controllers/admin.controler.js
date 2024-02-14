@@ -7,21 +7,96 @@ const Admin = require("../models/admin.models.js");
 const User = require("../models/user.models.js");
 const Order = require("../models/order.models.js");
 const mongoose = require("mongoose");
+const cron = require("node-cron");
 
-const renderLoginPage =  asyncHandler( async(req,res)=>{
-    res
-    .status(200)
-    .render("admin/adminlogin", {title:"Urbane Wardrobe"})
-})
+//change order status through cron job
+async function changeStatusToShipped() {
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);   
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    const orders = await  Order.find({ 
+        createdAt: { 
+            $gt: fiveDaysAgo, // Greater than five days ago
+            $lt: twoDaysAgo   // Less than two days ago
+        } 
+    })
+
+    orders.forEach(element => {  
+        if (element.status == "pending") {
+            element.status = "shipped";
+            element.save({ validateBeforeSave:false });          
+        }
+    });
+
+    console.log("These are the orders", orders);
+}
+async function changeStatusToDelivered() {     
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    const orders = await  Order.find({ 
+        createdAt: { 
+            $lt: fiveDaysAgo, // Greater than five days ago            
+        } 
+    })
+
+    orders.forEach(element => {
+        if (element.status == "shipped") {
+            element.status = "delivered";
+            if(element.paymentMethod == "cod"){
+                element.paymentStatus = "paid";
+            }
+            element.returnPeriod = true;
+            element.paymentStatus = "paid";
+            element.save({ validateBeforeSave:false });          
+        }
+    });
+
+    console.log("These are the orders", orders);
+}
+async function changeStatusToReview() {     
+    const twentyDaysAgo = new Date();
+    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20);
+
+    const orders = await  Order.find({ 
+        createdAt: { 
+            $lt: twentyDaysAgo, // Greater than twenty days ago            
+        } 
+    })
+
+    orders.forEach(element => {
+        if (element.status == "delivered") {  
+            element.returnPeriod = false;
+            element.save({ validateBeforeSave:false });          
+        }
+    });
+
+    console.log("These are the orders", orders);
+}
+const task = cron.schedule('30 11 * * *', () => 
+    {   
+        changeStatusToShipped();
+        changeStatusToDelivered();
+        changeStatusToReview();
+    },
+    {
+        scheduled: true,
+        timezone: 'Asia/Kolkata' // Set the timezone according to your preference
+    }
+);
+task.start();
+
 
 const generateAccessAndRefreshToken = async (adminid)=>{
     try{
-    const admin = await Admin.findOne({_id:adminid});    
-    const accessToken = await admin.generateAccessToken();
-    const refreshToken = await admin.generateRefreshToken();    
-    
-    admin.refreshToken = refreshToken;
-    admin.save({ validateBeforeSave:false });
+        const admin = await Admin.findOne({_id:adminid});    
+        const accessToken = await admin.generateAccessToken();
+        const refreshToken = await admin.generateRefreshToken();    
+        
+        admin.refreshToken = refreshToken;
+        admin.save({ validateBeforeSave:false });
     
     return {accessToken, refreshToken}
 
@@ -29,6 +104,12 @@ const generateAccessAndRefreshToken = async (adminid)=>{
         throw new ApiError(500,"Something went wrong while creating Tokens")
     }
 }
+
+const renderLoginPage =  asyncHandler( async(req,res)=>{
+    res
+    .status(200)
+    .render("admin/adminlogin", {title:"Urbane Wardrobe"})
+});
 
 const verifyEmailPassword = asyncHandler( async(req,res)=>{
 
@@ -57,7 +138,7 @@ const verifyEmailPassword = asyncHandler( async(req,res)=>{
         .status(400)
         .json( new ApiError( 400, "Invalid Credentials"))
     }
-})
+});
 
 const adminlogin = asyncHandler( async(req,res)=>{
     try{
@@ -157,7 +238,7 @@ const createUserPage = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .render("admin/addUser", {admin:true, title:"Urbane Wardrobe"})
-})
+});
 
 const createUser = asyncHandler( async(req,res)=>{        
     console.log(req.body);
@@ -204,7 +285,7 @@ const createUser = asyncHandler( async(req,res)=>{
         return res
         .status(201)
         .redirect("users");
-})
+});
 
 const blockUnblockUser = asyncHandler( async(req,res)=>{
     const id = req.params.userId;
@@ -286,7 +367,7 @@ const editUserDetails = asyncHandler( async(req,res)=>{
         user,
         "User data updated successfully"
     ));
-})
+});
 
 
 

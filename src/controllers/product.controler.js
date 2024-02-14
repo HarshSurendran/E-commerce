@@ -1077,7 +1077,7 @@ const uploadImage = asyncHandler( async(req,res)=>{
     const {index,productId, cropedImage} = req.body;    
     
     console.log("this is index", index);
-    console.log("this is productId", productId);      
+    console.log("this is productId", productId);    
 
     const imageBuffer = Buffer.from(cropedImage.replace(/^data:image\/\w+;base64,/, ''), 'base64');
     // Generate a unique filename for the image

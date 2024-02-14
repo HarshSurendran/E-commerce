@@ -23,7 +23,7 @@ const orderSchema = mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['pending', 'shipped', 'delivered', 'canceled'],
+        enum: ['pending', 'shipped', 'delivered', 'canceled', 'returned'],
         default: "pending"
     },
     orderedItems: [{
@@ -50,6 +50,10 @@ const orderSchema = mongoose.Schema({
         type: String,
         default: "pending",
         enum : ['pending', 'paid', 'failed']
+    },
+    returnPeriod: {
+        type: Boolean,
+        default: false,        
     }
 },
 {

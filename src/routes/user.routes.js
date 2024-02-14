@@ -7,6 +7,7 @@ const userController = require("../controllers/user.controler.js");
 const productController = require("../controllers/product.controler.js");
 const cartController = require("../controllers/cart.controller.js");
 const orderController = require("../controllers/order.controller.js");
+const walletController = require("../controllers/wallet.controller.js");
 
 //require middlewares
 const upload = require("../middlewares/multer.middleware.js");
@@ -22,6 +23,7 @@ const getUserId = require("../middlewares/giveuserid.middleware.js");
 router.get("/otp", (req,res)=>{
     res.render("users/otpvalidation",{user:true});
 })
+
 
 
 
@@ -73,7 +75,8 @@ router.post("/fetchaddaddress", auth.verifyUserJWT, addressController.fetchAddAd
 
 //orders
 router.get("/orders", auth.verifyUserJWT,  orderController.renderUserOrdersPage);
-router.patch("/orders", auth.verifyUserJWT,  orderController.cancelOrder);
+router.patch("/orders", auth.verifyUserJWT, walletController.updateWallet,  orderController.cancelOrder);
+router.patch("/returnorders", auth.verifyUserJWT,  orderController.returnOrder);
 router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
 
 //checkout
@@ -82,7 +85,8 @@ router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);
 router.get("/ordersuccess/:id", auth.verifyUserJWT, orderController.orderSuccessPage);
 router.post("/verifyPayment", auth.verifyUserJWT, orderController.verifyPayment);
 
-
+//wallet
+router.get("/wallet", auth.verifyUserJWT, walletController.renderWalletPage);
 
 
 

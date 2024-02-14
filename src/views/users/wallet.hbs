@@ -1,0 +1,89 @@
+<body>
+    <div class="screen-overlay"></div>   
+    <main class="main-wrap">       
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Wallet</h2>
+                    <p>Manage your wallet here.</p>
+                </div>
+                
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-9">
+                           <div class="card" >
+                                <div style="background-color: #d8f1e5;" class="card-header text-center  ">
+                                   <i class="fa-solid fa-wallet"></i> Wallet Balance
+                                </div>
+                                <ul class="list-group list-group-flush text-center  ">
+                                    <li class="list-group-item">₹ {{wallet.balance}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div style="background-color: #d8f1e5;" class="card-header text-center ">
+                                    Add Amount
+                                </div>
+                                <form>
+                                    <div class="mb-3 p-2 ">
+                                        <label for="amount" class="form-label mt-3 mb-2">Enter Amount</label>
+                                        <input type="number" class="form-control" id="amount" >
+                                    </div>
+                                    <div class="d-flex justify-content-center mb-2  ">
+                                        <button type="submit" class="btn btn-primary">Add</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- .col// -->
+                    </div>
+                    <!-- .row // -->
+                </div>
+                <!-- card body .// -->
+            </div>
+            <!-- card .// -->
+
+
+
+
+
+
+
+
+
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                       <div class="accordion" id="accordionExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                <button style="background-color: #d8f1e5;" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#one" aria-expanded="true" aria-controls="collapseOne">
+                                    Transaction History
+                                </button>
+                                </h2>
+                                <div id="one" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        {{#each wallet.transaction}}
+                                        
+                                        {{/each}}                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            </div>
+                            </div>
+                        <!-- .col// -->
+                    </div>
+                    <!-- .row // -->
+                </div>
+                <!-- card body .// -->
+            </div>
+        </section>        
+        <!-- content-main end// -->            
+    </main>
+</body>
+

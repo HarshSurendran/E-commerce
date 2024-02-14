@@ -7,6 +7,7 @@ const User = require("../models/user.models.js");
 const Address = require("../models/address.models.js");
 const Cart = require("../models/cart.models.js");
 const Order = require("../models/order.models.js");
+const Wallet = require("../models/wallet.models.js");
 
 const crypto = require("crypto")
 
@@ -349,7 +350,6 @@ const orderSuccessPage = asyncHandler( async(req,res)=>{
     .status(200)
     .render("users/successpage",{title:"Urbane Wardrobe", user: req.user, order, address})
 });
-
 
 const renderOrdersPage = asyncHandler( async(req,res)=>{
     const orders = await Order.aggregate(
@@ -706,7 +706,8 @@ const renderUserOrdersPage = asyncHandler( async(req,res)=>{
                     createdAt: "$createdAt",
                     size: "$orderedItems.size",
                     color: "$orderedItems.color",
-                    quantity: "$quantity"
+                    quantity: "$quantity",
+                    returnPeriod: "$returnPeriod"
                 }, 
                 user: { $first: "$user" },
                 address: { $first: "$address" },            
@@ -727,7 +728,8 @@ const renderUserOrdersPage = asyncHandler( async(req,res)=>{
                 createdAt: "$_id.createdAt",
                 size: "$_id.size",
                 color: "$_id.color",
-                quantity: "$_id.quantity"
+                quantity: "$_id.quantity",
+                returnPeriod: "$_id.returnPeriod"
             }
         },
         {
@@ -775,7 +777,7 @@ const cancelOrder = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .json(new ApiResponse(200, null, "Order cancelled successfully"));
-})
+});
 
 const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
     const orderId = req.params.id;
@@ -815,8 +817,57 @@ const verifyPayment = asyncHandler( async(req,res)=>{
         .status(400)
         .json(new ApiError(400, "Something went wrong"));        
     }
-})
+});
 
+const returnOrder = asyncHandler( async(req,res)=>{
+    const orderId = req.body.orderId;
+    console.log("Entered return wiht order id", orderId);
+    // const order = await Order.updateOne(
+    //     {
+    //         _id: orderId
+    //     },
+    //     {
+    //         $set: {
+    //             returnPeriod: false,
+    //             status: "returned"
+    //         }
+    //     }        
+    // );
+    const order = await Order.findOne({ _id: orderId });
+    if(!order){
+        return res
+        .status(400)
+        .json(new ApiError(400, "Cant find the order"));
+    }
+    order.returnPeriod = false;
+    order.status = "returned";
+    await order.save();
+    console.log("asdfjklashdfjkhfjk :",order);
+    //put the amount to wallet
+    if (order.paymentStatus === "paid") {        
+        const wallet = await Wallet.updateOne(
+            {
+                userId: order.userId
+            },
+            {
+                $inc: {
+                    balance: order.orderAmount
+                }
+            },
+            {
+                upsert: true
+            }
+        )
+        console.log("this is wallet", wallet);
+        // if (wallet.modifiedCount === 0) {
+        //     return res
+        //     .status(400)
+        //     .json(new ApiError(400, "Couldnt add amount to wallet"));        
+        // }
+    }
+    return res.status(200).json(new ApiResponse(200, null, "Order returned successfully"));        
+    
+})
 
 module.exports = {
     checkOutPage,
@@ -828,5 +879,6 @@ module.exports = {
     renderUserOrdersPage,
     cancelOrder,
     renderUserOrderDetailsPage,
-    verifyPayment
+    verifyPayment,
+    returnOrder
 }
