@@ -216,18 +216,15 @@
 
             reader.onload = function (e) {
                 //preview.src = e.target.result;
-                
-                // Assuming you have jQuery
+                                
                 $(document).ready(function(){
                     $(`#imageModal${number}`).modal('show');
-                });                
-                
+                });     
 
                 let img = document.createElement("img");
                 img.id = `image`; 
                 img.src = e.target.result;
-
-                //append this img tag to a modal
+                
                 imageElement.appendChild(img);
 
                 //crop image
@@ -269,10 +266,6 @@
             console.log("This is modal", modal)
             var bootstrapModal = bootstrap.Modal.getInstance(modal);
             bootstrapModal.hide();
-        });     
-            
+        });
     }
-
-    
-
  </script>

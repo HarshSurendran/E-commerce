@@ -16,9 +16,7 @@ const addToCart = asyncHandler( async(req, res)=>{
 
     console.log( user_id,"userid and proid", productVarient_id);
 
-    const cartAlreadyExist = await Cart.find({ user_id, productVarient_id})
-    console.log("this  is cart a;ready exist",cartAlreadyExist)
-    console.log("the length ", cartAlreadyExist.length);
+    const cartAlreadyExist = await Cart.find({ user_id, productVarient_id})    
 
     if(!(cartAlreadyExist.length === 0)){
         throw new ApiError(400,"Product already in cart");

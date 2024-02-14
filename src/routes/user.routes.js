@@ -28,6 +28,8 @@ router.get("/otp", (req,res)=>{
 
 
 
+
+
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
 router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
 router.post("/resendotp", otpGenerator, userController.resendotpsender);
@@ -46,7 +48,11 @@ router.get("/home", auth.verifyUserJWT, userController.homePageRender);
 router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage);
 router.post("/cart", auth.verifyUserJWT, cartController.addToCart);
 router.delete("/cart", auth.verifyUserJWT, cartController.deleteCart);
-router.patch("/cart", auth.verifyUserJWT, cartController.addQuantity)
+router.patch("/cart", auth.verifyUserJWT, cartController.addQuantity);
+
+//wishlist
+router.post("/wishlist", auth.verifyUserJWT, userController.addToWishlist);
+router.get("/wishlist", auth.verifyUserJWT, userController.renderWishlist);
 
 //secured route
 router.get("/logout", auth.verifyUserJWT, userController.logoutUser);
@@ -65,7 +71,7 @@ router.get("/delete-user/:id", auth.verifyUserJWT, userController.deleteUser);
 router.patch("/details", auth.verifyUserJWT, userController.updateUserDetails);
 router.post("/profilepicture", auth.verifyAdminJWT, upload.single("avatar",1), userController.addProfilepicture);
 
-// user address
+//user address
 router.get("/address", auth.verifyUserJWT, addressController.addressPage);
 router.post("/address", auth.verifyUserJWT, addressController.addAddress);
 router.get("/addaddress", auth.verifyUserJWT, addressController.addAddressPage);

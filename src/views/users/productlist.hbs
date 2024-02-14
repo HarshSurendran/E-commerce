@@ -46,7 +46,11 @@
                             {{!-- <div class="label stockout">out of stock</div> --}}
                             <ul class="product__hover">                                
                                 <li><a onclick="event.stopPropagation();" href="{{this.images.[0]}}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                <li id="wishlist" ><a href="#"><span class="icon_heart_alt"></span></a></li>
+                                {{#if this.isWishlisted}}
+                                <li id="wishlist" class="wishlist" data-id="{{this._id}}" ><a href="#" style="background-color: red; color:white"><span class="icon_heart_alt"></span></a></li>
+                                {{else}}
+                                 <li id="wishlist" class="wishlist" data-id="{{this._id}}" ><a href="#" ><span class="icon_heart_alt"></span></a></li>
+                                {{/if}}
                                 <li id="addToCart" class="addToCart" data-id="{{this._id}}"><a href="#"><span class="icon_bag_alt"></span></a></li>
                                 {{!-- <li><a href="productdetails/{{this._id}}" class="" ><span class="icon_details" ></span></a></li> --}}
                             </ul>
@@ -106,7 +110,7 @@
                 })
             }).then( (res)=> {
                 if(!res.ok){
-                console.log("Something went wrong while fetching");
+                console.log("Something went wrong while fetching",res);
                 showNotification("Item already in Cart")
                 return
                 }
@@ -141,4 +145,43 @@
         })
     })
 
+    //wishlist
+    const wishlistButton = document.querySelectorAll(".wishlist");
+
+    wishlistButton.forEach((element)=>{
+        element.addEventListener("click", function addWishlist(event){
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const productId = element.getAttribute("data-id");
+            console.log("this is productid",productId);
+            fetch("/api/v1/users/wishlist",{
+                method : "POST",
+                headers : {
+                    "content-type" : "application/json"
+                },
+                body : JSON.stringify({
+                    productId
+                })
+            }).then( res=> res.json())
+            .then((data)=>{
+                if(data.success){
+                    console.log("added to wishlist");
+                    console.log(event.target.tagName);
+                    if(event.target.tagName == 'A'){
+                        event.target.style.backgroundColor = "red";
+                        event.target.style.color = "white";                        
+                    }else if(event.target.tagName == 'SPAN'){
+                        console.log("this is span")
+                        event.target.parentElement.style.backgroundColor = "red";
+                        event.target.parentElement.style.color = "white";                        
+                    }
+                    showNotification("Item added to Wishlist");
+                    return
+                }
+                 console.log("This is the erespomse from wishlist",data);
+                 showNotification("Item already in wishlist")
+            })
+        })
+    })
 </script>

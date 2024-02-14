@@ -5,10 +5,12 @@ const ApiResponse = require("../utils/ApiResponse.js");
 //models
 const User = require("../models/user.models.js");
 const ProductVarient = require("../models/productvarient.models.js");
+const Wishlist = require("../models/wishlist.models.js"); 
 
 
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const { default: mongoose } = require("mongoose");
 
 
 //Functions for use inside this file
@@ -636,6 +638,115 @@ const deleteUser = asyncHandler( async(req,res)=>{
     .redirect("/api/v1");
 })
 
+const addToWishlist = asyncHandler( async(req,res)=>{
+    const {productId} = req.body;    
+    try {
+        const checkProduct = await Wishlist.findOne(
+            {
+                userId:  req.user._id,           
+                productsId : new mongoose.Types.ObjectId(productId)
+            }
+        );        
+        if(!checkProduct){            
+            const wishlist = await Wishlist.updateOne(
+                {
+                    userId:  req.user._id
+                },
+                { $push: { productsId: new mongoose.Types.ObjectId(productId) } },
+                {
+                    upsert: true
+                }
+            );        
+            if(wishlist){
+                res
+                .status(200)
+                .json( new ApiResponse(200,{wishlist},"Product added to wishlist"));
+            } else {
+                res
+                .status(400)
+                .json( new ApiError(400,"Failed to add product to wishlist"));
+            }
+        } else {
+            res
+            .status(400)
+            .json( new ApiError(400,"Product already exists in wishlist"));
+        }
+    } catch (error) {
+        console.log("Error while adding product to wishlist", error);
+        res.json( new ApiError(500, "Error while adding product to wishlist", error.message));
+    }
+
+    
+})
+
+const renderWishlist = asyncHandler( async(req,res)=>{
+    //const wishlist = await Wishlist.findOne({userId: req.user._id})
+    //.populate("productsId productsId.product_id")
+    
+
+    const wishlist = await Wishlist.aggregate([
+        {
+            $match: {
+                userId: req.user._id
+            }
+        },
+        {
+            $unwind: "$productsId"
+        },
+        {
+            $lookup : {
+                from : "productvarients",
+                localField : "productsId",
+                foreignField : "_id",
+                as : "productsId",
+                pipeline : [
+                    {
+                        $lookup : {
+                            from : "products",
+                            localField : "product_id",
+                            foreignField : "_id",
+                            as : "product_id",
+                            pipeline : [
+                                {
+                                    $lookup: {
+                                        from: "categories",
+                                        localField: "category",
+                                        foreignField: "_id",
+                                        as: "category"
+                                    }
+                                },
+                                {
+                                    $addFields: {
+                                        category: { $first: "$category" }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            product_id: { $first: "$product_id" }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                productsId: { $first: "$productsId" }
+            }
+        }
+    ]);
+
+    
+    
+    console.log("this is wishlist",wishlist);
+    //res.json(new ApiResponse(200, {wishlist}));
+    res
+    .status(200)
+    .render("users/wishlist", {wishlist, title: "Urbane Wardrobe", user:req.user});
+})
+
 
 module.exports = {    
     loginUser,
@@ -652,5 +763,7 @@ module.exports = {
     resendotpsender,
     forgotPassOtpSender,
     changePassFromOtp,
-    deleteUser
+    deleteUser,
+    addToWishlist,
+    renderWishlist
 }

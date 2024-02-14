@@ -2,12 +2,17 @@ const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
 const asyncHandler = require("../utils/asynchandler");
 const uploadOnCloudinary = require("../utils/cloudinary");
+
+
 const ProductVarient = require("../models/productvarient.models");
 const Product = require("../models/product.models.js");
 const Color = require("../models/color.model.js");
 const Size = require("../models/size.models.js");
 const Category = require("../models/category.models.js");
 const Cart = require("../models/cart.models.js");
+const Wishlist = require("../models/wishlist.models.js");
+
+
 const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
@@ -378,7 +383,7 @@ const editProductVarient = asyncHandler( async (req,res)=>{
 
 const listProducts = asyncHandler( async(req,res)=>{
     console.log("This is the request");
-    const productList = await ProductVarient.aggregate(
+    const productList1 = await ProductVarient.aggregate(
     [   
         {
             $lookup: {
@@ -442,13 +447,33 @@ const listProducts = asyncHandler( async(req,res)=>{
             }
         }
     ]
-    );
+    );    
 
-    console.log("This is the product list",productList);
+    // const productList = await productList1.map(async element => {
+    //     const isWishlisted = await Wishlist.findOne({userId: req.user._id, productsId: element._id});
+    //     console.log("isWishlisted",isWishlisted);
+    //     if(isWishlisted){
+    //         element.isWishlisted = true
+    //     }else{
+    //         element.isWishlisted = false
+    //     }
+    // });
+    const productList = await Promise.all(productList1.map(async (element) => {
+        const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
+        console.log("isWishlisted", isWishlisted);
+        if (isWishlisted) {
+            element.isWishlisted = true;
+        } else {
+            element.isWishlisted = false;
+        }
+        return element; // Return the modified element
+    }));
+
+    console.log("This is the product list asdsad",productList);
 
     res
     .status(200)
-    .render("users/productlist",{user:req.user, products: productList});
+    .render("users/productlist",{user:req.user, products: productList, title: "Urbane Wardrobe"});
 });
 
 const productDetailsPage = asyncHandler( async(req,res)=>{
@@ -609,6 +634,7 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     //lookupthe color and size etc
     console.log("Thisi s the prodvarients",prodVarients);
 
+    //add size logic here
     
     res
     .status(200)
