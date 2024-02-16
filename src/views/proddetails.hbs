@@ -117,7 +117,11 @@
                             <button id="addtocartbutton" data-id="{{product._id}}" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Add to cart</button>
                             {{/if}}
                             <ul>
-                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
+                                {{#if this.isWishlisted}}
+                                <li id="wishlist" class="wishlist" data-id="{{this._id}}" ><a href="#" style="background-color: red; color:white"><span class="icon_heart_alt"></span></a></li>
+                                {{else}}
+                                 <li id="wishlist" class="wishlist" data-id="{{this._id}}" ><a href="#" ><span class="icon_heart_alt"></span></a></li>
+                                {{/if}}
                                 <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
                             </ul>
                         </div>
@@ -138,8 +142,8 @@
                                     <div class="color__checkbox">
                                         {{#each prodVarients}}
                                         <label for="{{this.color.color}}">
-                                            <a href="/api/v1/products/productdetails/{{this._id}}"><input type="radio" name="color__radio" id="{{this.color.color}}" checked>
-                                            <span style="background-color: {{this.color.color}}" class="checkmark {{this.color.color}}-bg"></span></a>
+                                            <a href="/api/v1/products/productdetails/{{this._id}}"><input type="radio" name="color__radio" id="{{this.color.color}}">
+                                            <span style="background-color: {{this.color.color}}; border: 1px solid black; " class="checkmark {{this.color.color}}-bg"></span></a>
                                         </label>
                                         {{/each}}
                                         {{!-- <label for="black">
@@ -402,4 +406,41 @@
         })
     })
 
+    const wishlistButton = document.querySelectorAll(".wishlist");
+    wishlistButton.forEach((element)=>{
+        element.addEventListener("click", function addWishlist(event){
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const productId = element.getAttribute("data-id");
+            console.log("this is productid",productId);
+            fetch("/api/v1/users/wishlist",{
+                method : "POST",
+                headers : {
+                    "content-type" : "application/json"
+                },
+                body : JSON.stringify({
+                    productId
+                })
+            }).then( res=> res.json())
+            .then((data)=>{
+                if(data.success){
+                    console.log("added to wishlist");
+                    console.log(event.target.tagName);
+                    if(event.target.tagName == 'A'){
+                        event.target.style.backgroundColor = "red";
+                        event.target.style.color = "white";                        
+                    }else if(event.target.tagName == 'SPAN'){
+                        console.log("this is span")
+                        event.target.parentElement.style.backgroundColor = "red";
+                        event.target.parentElement.style.color = "white";                        
+                    }
+                    showNotification("Item added to Wishlist");
+                    return
+                }
+                 console.log("This is the erespomse from wishlist",data);
+                 showNotification("Item already in wishlist")
+            })
+        })
+    })
 </script>

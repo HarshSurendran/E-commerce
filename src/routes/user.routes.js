@@ -51,8 +51,9 @@ router.delete("/cart", auth.verifyUserJWT, cartController.deleteCart);
 router.patch("/cart", auth.verifyUserJWT, cartController.addQuantity);
 
 //wishlist
-router.post("/wishlist", auth.verifyUserJWT, userController.addToWishlist);
 router.get("/wishlist", auth.verifyUserJWT, userController.renderWishlist);
+router.post("/wishlist", auth.verifyUserJWT, userController.addToWishlist);
+router.delete("/wishlist", auth.verifyUserJWT, userController.deleteWishlist);
 
 //secured route
 router.get("/logout", auth.verifyUserJWT, userController.logoutUser);

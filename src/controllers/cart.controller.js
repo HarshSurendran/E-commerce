@@ -8,6 +8,8 @@ const ProductVarient = require("../models/productvarient.models.js");
 const User = require("../models/user.models.js");
 const { default: mongoose } = require("mongoose");
 const { json } = require("express");
+const Category = require("../models/category.models.js");
+const Wishlist = require("../models/wishlist.models.js");
 
 const addToCart = asyncHandler( async(req, res)=>{
     const user_id = req.user._id;
@@ -43,6 +45,19 @@ const addToCart = asyncHandler( async(req, res)=>{
 const renderCartPage = asyncHandler( async(req,res)=>{
     const user = req.user;
     console.log(user);
+
+    //layout data
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+
     const cart = await Cart.aggregate([
         {
           $match: {
@@ -134,7 +149,7 @@ const renderCartPage = asyncHandler( async(req,res)=>{
     
     res
     .status(200)
-    .render("users/cartpage",{user: user , title:"Urbane Wardrobe", cart, total})
+    .render("users/cartpage",{user: user , title:"Urbane Wardrobe", cart, total, categorylayout, wishlistCountlayout, cartCountlayout}); 
         
 });
 

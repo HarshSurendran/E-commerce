@@ -5,7 +5,9 @@ const ApiResponse = require("../utils/ApiResponse.js");
 //models
 const User = require("../models/user.models.js");
 const ProductVarient = require("../models/productvarient.models.js");
-const Wishlist = require("../models/wishlist.models.js"); 
+const Wishlist = require("../models/wishlist.models.js");
+const Category = require("../models/category.models.js");
+const Cart = require("../models/cart.models.js");
 
 
 const jwt = require("jsonwebtoken");
@@ -227,8 +229,19 @@ const loginUser = asyncHandler( async (req,res)=>{
 })
 
 const homePageRender = asyncHandler( async(req,res)=>{
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+    
 
-    const productList = await ProductVarient.aggregate(
+    const productList1 = await ProductVarient.aggregate(
         [   
             {
                 $lookup: {
@@ -293,10 +306,21 @@ const homePageRender = asyncHandler( async(req,res)=>{
             }
         ]
         );
+    
+    const productList = await Promise.all(productList1.map(async (element) => {
+        const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
+        console.log("isWishlisted", isWishlisted);
+        if (isWishlisted) {
+            element.isWishlisted = true;
+        } else {
+            element.isWishlisted = false;
+        }
+        return element; // Return the modified element
+    }));
 
     res
     .status(200)
-    .render("users/userhome", {user:req.user , title: "Urbane Wardrobe", products:productList})
+    .render("users/userhome", {user:req.user , title: "Urbane Wardrobe", products:productList, categorylayout, wishlistCountlayout, cartCountlayout});
 
 });
 
@@ -682,6 +706,16 @@ const addToWishlist = asyncHandler( async(req,res)=>{
 const renderWishlist = asyncHandler( async(req,res)=>{
     //const wishlist = await Wishlist.findOne({userId: req.user._id})
     //.populate("productsId productsId.product_id")
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
     
 
     const wishlist = await Wishlist.aggregate([
@@ -744,7 +778,28 @@ const renderWishlist = asyncHandler( async(req,res)=>{
     //res.json(new ApiResponse(200, {wishlist}));
     res
     .status(200)
-    .render("users/wishlist", {wishlist, title: "Urbane Wardrobe", user:req.user});
+    .render("users/wishlist", {wishlist, title: "Urbane Wardrobe", user:req.user, wishlistCountlayout, categorylayout, cartCountlayout});
+});
+
+const deleteWishlist = asyncHandler( async(req,res)=>{
+    const {productId} = req.body;    
+    const wishlist = await Wishlist.updateOne(
+        {
+            userId:  req.user._id
+        },
+        { 
+            $pull: { productsId: new mongoose.Types.ObjectId(productId) } 
+        }
+    );
+    if (!wishlist) {
+        res
+        .status(400)
+        .json( new ApiError(400,"Failed to delete product from wishlist"));
+        
+    }
+    res
+    .status(200)
+    .json( new ApiResponse(200,{},"Product deleted from wishlist"));
 })
 
 
@@ -765,5 +820,6 @@ module.exports = {
     changePassFromOtp,
     deleteUser,
     addToWishlist,
-    renderWishlist
+    renderWishlist,
+    deleteWishlist
 }

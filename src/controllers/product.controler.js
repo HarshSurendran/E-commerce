@@ -383,6 +383,19 @@ const editProductVarient = asyncHandler( async (req,res)=>{
 
 const listProducts = asyncHandler( async(req,res)=>{
     console.log("This is the request");
+
+    //data for layout
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+
     const productList1 = await ProductVarient.aggregate(
     [   
         {
@@ -449,15 +462,6 @@ const listProducts = asyncHandler( async(req,res)=>{
     ]
     );    
 
-    // const productList = await productList1.map(async element => {
-    //     const isWishlisted = await Wishlist.findOne({userId: req.user._id, productsId: element._id});
-    //     console.log("isWishlisted",isWishlisted);
-    //     if(isWishlisted){
-    //         element.isWishlisted = true
-    //     }else{
-    //         element.isWishlisted = false
-    //     }
-    // });
     const productList = await Promise.all(productList1.map(async (element) => {
         const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
         console.log("isWishlisted", isWishlisted);
@@ -473,7 +477,7 @@ const listProducts = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    .render("users/productlist",{user:req.user, products: productList, title: "Urbane Wardrobe"});
+    .render("users/productlist",{user:req.user, products: productList, title: "Urbane Wardrobe", categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
 const productDetailsPage = asyncHandler( async(req,res)=>{
@@ -932,7 +936,19 @@ const listUnlistProduct = asyncHandler( async(req,res)=>{
 
 const categoryListPage = asyncHandler( async(req,res)=>{
     const category = req.params.category;
-    
+
+    //data for layout
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+
     const categoryProductList = await ProductVarient.aggregate(
         [   
             {
@@ -1006,17 +1022,29 @@ const categoryListPage = asyncHandler( async(req,res)=>{
         ]
         );
         
-        const categoryProducts = categoryProductList.filter((element)=>{
+        const categoryProducts1 = categoryProductList.filter((element)=>{
             if(element.name?.category){
                 return true
             }
             return false
-        })
-        
+        });
+
+        const categoryProducts = await Promise.all(categoryProducts1.map(async (element) => {
+            const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
+            console.log("isWishlisted", isWishlisted);
+            if (isWishlisted) {
+                element.isWishlisted = true;
+            } else {
+                element.isWishlisted = false;
+            }
+            return element; // Return the modified element
+        }));
+
+
         res
         .status(200)
         //.json( new ApiResponse(200, {mensProducts}, "fetched"))
-        .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: true, products: categoryProducts});
+        .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: req.user, products: categoryProducts , categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
 const productVarientDetailsPage = asyncHandler( async(req,res)=>{        
@@ -1149,10 +1177,7 @@ const uploadImage = asyncHandler( async(req,res)=>{
     
 
     
-})
-
-
-
+});
 
 
 

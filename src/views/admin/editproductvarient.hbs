@@ -114,7 +114,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="closeButton1" class="btn btn-secondary" data-bs-dismiss="modal" >Close</button>
                     <button type="button" id="cropButton1" class="btn btn-primary">Crop</button>
                 </div>
             </div>
@@ -136,7 +136,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="closeButton2" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="cropButton2" class="btn btn-primary">Crop</button>
                 </div>
             </div>
@@ -158,7 +158,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="closeButton3" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="cropButton3" class="btn btn-primary">Crop</button>
                 </div>
             </div>
@@ -180,7 +180,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button"  id="closeButton4" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="cropButton4" class="btn btn-primary">Crop</button>
                 </div>
             </div>
@@ -254,7 +254,7 @@
                 imageElement.appendChild(img);
                 //crop image
                 cropper = new Cropper(img, {
-                    aspectRatio: 0,
+                    aspectRatio: 18/18,
                     viewMode: 1,
                     dragMode: "move",
                     minContainerWidth: 450,
@@ -284,6 +284,21 @@
                 var bootstrapModal = bootstrap.Modal.getInstance(modal);
                 bootstrapModal.hide();
             });
+
+           /*const cancelButton = document.getElementById(`closeButton${number}`);
+            cancelButton.addEventListener("click",()=>{
+                console.log("entered cancel button")
+                image = document.getElementById('image');
+                console.log(image)
+                imageElement.remove();
+                $(`#imageModal${number}`).modal('hide');
+            });*/
+
+           /* function removeImage(){
+                image = document.getElementById('image');
+                image.remove();
+                return true
+            }*/
         }
     }
 

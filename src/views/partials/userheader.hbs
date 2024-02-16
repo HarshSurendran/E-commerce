@@ -23,20 +23,27 @@
       <div class="navbar-nav">
         <a class="nav-link active" aria-current="page" href="/api/v1/users/home">Home</a>
         <a class="nav-link" href="/api/v1/products/list/all">Shop</a>
-        <a class="nav-link" href="/api/v1/products/Mens">Mens</a>
+        {{#each categorylayout}}
+        <a class="nav-link" href="/api/v1/products/{{this.category}}">{{this.category}}</a>
+        {{/each}}
+        {{!-- <a class="nav-link" href="/api/v1/products/Mens">Mens</a>
         <a class="nav-link" href="/api/v1/products/Womens">Womens</a>
-        <a class="nav-link" href="/api/v1/products/Kids">Kids</a> 
+        <a class="nav-link" href="/api/v1/products/Kids">Kids</a>  --}}
         <a class="nav-link" href="#">Contact</a>         
       </div>
     </div>
     <div>
       <ul class="header__right__widget">
         <li><span class="icon_search search-switch  "></span></li>
-        <li><a href="#"><span class="icon_heart_alt  "></span>
-          <div class="tip">2</div>
+        <li><a href="/api/v1/users/wishlist"><span class="icon_heart_alt  "></span>
+        {{#if wishlistCountlayout}}
+          <div class="tip">{{wishlistCountlayout}}</div>
+        {{/if}}
         </a></li>
         <li><a href="/api/v1/users/cart"><span class="icon_bag_alt "></span>
-          <div class="tip">2</div>
+        {{#if cartCountlayout}}
+          <div class="tip">{{cartCountlayout}}</div>
+        {{/if}}
         </a></li>
         <li class="dropdown nav-item mt-4 ">
           <a class="dropdown-toggle" data-bs-toggle="dropdown" data-bs-target="#dropdown-menu" href="#" id="dropdownAccount" aria-expanded="false">  <i class="fa-regular fa-user"></i></a>

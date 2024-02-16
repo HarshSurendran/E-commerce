@@ -122,32 +122,18 @@
 
 
     //redirecting to prodetails page
-
     const prodDetailDiv = document.querySelectorAll(".prodDetailsDiv");
-
-    console.log(prodDetailDiv)
-
     prodDetailDiv.forEach((element)=>{
-
         element.addEventListener("click", function renderProdDetails(event){
             event.preventDefault();
             console.log(element);
             const prodId = element.getAttribute("data-prodid");
-
             window.location.href =`/api/v1/products/productdetails/${prodId}`;
-
-            /* fetch("api/v1/users/productdetails",{
-                method : "POST",
-
-
-            })*/
-            
         })
-    })
+    });
 
     //wishlist
     const wishlistButton = document.querySelectorAll(".wishlist");
-
     wishlistButton.forEach((element)=>{
         element.addEventListener("click", function addWishlist(event){
             event.preventDefault();

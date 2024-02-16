@@ -6,7 +6,7 @@ const productController = require("../controllers/product.controler.js");
 const auth = require("../middlewares/auth.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");
 
-router.get("/:category", productController.categoryListPage);
+router.get("/:category", auth.verifyUserJWT, productController.categoryListPage);
 
 // router.get("/Mens", productController.menslistPage);
 

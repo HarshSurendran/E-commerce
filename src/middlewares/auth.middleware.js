@@ -6,11 +6,14 @@ const asyncHandler = require("../utils/asynchandler.js");
 const ProductVarient = require("../models/productvarient.models.js")
 
 const verifyUserJWT = asyncHandler( async(req,res,next)=>{
+    let blocked;
     try {
+        
         //getting token from request
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
         if(!token){
+            blocked = null
             throw new ApiError(401,"Unauthorised request");
         }
 
@@ -20,11 +23,12 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
         const user = await User.findOne({_id: decodedtoken._id}).select("-password -refreshToken");
         
         if(!user){
+            blocked= null
             throw new ApiError(401,"Invalid access token");
         }
 
         if(user.isBlocked){
-            
+            blocked = "This user is blocked. Please contact with admin."            
             throw new ApiError(400, "The user is blocked");
         }
        
@@ -112,7 +116,7 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
         .clearCookie("accessToken", options)
         .clearCookie("RefreshToken", options)
         //.redirect("/api/v1/");
-        .render("landingPage", {common:true , title: "Urbane Wardrobe" , products: productList, blocked : "This user is blocked"});
+        .render("landingPage", {common:true , title: "Urbane Wardrobe" , products: productList, blocked });
     }
 })
 

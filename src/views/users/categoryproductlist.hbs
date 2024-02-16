@@ -35,37 +35,45 @@
                 </div> --}}
             </div>
             <div class="row property__gallery">
-                {{#each products}}
-                {{#if this.name}}
-                <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.name.category.category}} prodDetailsDiv" data-prodid="{{this._id}}">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="{{this.images.[0]}}">
-                        {{!-- label above the image --}}
-                            {{!-- <div class="label new">New</div> --}}
-                            {{!-- <div class="label">Sale</div> --}}
-                            {{!-- <div class="label stockout">out of stock</div> --}}
-                            <ul class="product__hover">                                
-                                <li><a onclick="event.stopPropagation();" href="{{this.images.[0]}}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                <li id="wishlist" ><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                <li id="addToCart" class="addToCart" data-id="{{this._id}}"><a href="#"><span class="icon_bag_alt"></span></a></li>
-                                {{!-- <li><a href="productdetails/{{this._id}}" class="" ><span class="icon_details" ></span></a></li> --}}
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">{{this.name.name}}</a></h6>
-                            <div class="rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
+                {{#if products}}
+                    {{#each products}}
+                    {{#if this.name}}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.name.category.category}} prodDetailsDiv" data-prodid="{{this._id}}">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{this.images.[0]}}">
+                            {{!-- label above the image --}}
+                                {{!-- <div class="label new">New</div> --}}
+                                {{!-- <div class="label">Sale</div> --}}
+                                {{!-- <div class="label stockout">out of stock</div> --}}
+                                <ul class="product__hover">                                
+                                    <li><a onclick="event.stopPropagation();" href="{{this.images.[0]}}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                    {{#if this.isWishlisted}}
+                                    <li id="wishlist" class="wishlist" data-id="{{this._id}}" ><a href="#" style="background-color: red; color:white"><span class="icon_heart_alt"></span></a></li>
+                                    {{else}}
+                                    <li id="wishlist" class="wishlist" data-id="{{this._id}}" ><a href="#" ><span class="icon_heart_alt"></span></a></li>
+                                    {{/if}}
+                                    <li id="addToCart" class="addToCart" data-id="{{this._id}}"><a href="#"><span class="icon_bag_alt"></span></a></li>
+                                    {{!-- <li><a href="productdetails/{{this._id}}" class="" ><span class="icon_details" ></span></a></li> --}}
+                                </ul>
                             </div>
-                            <div class="product__price">{{this.price}}</div>
+                            <div class="product__item__text">
+                                <h6><a href="#">{{this.name.name}}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">{{this.price}}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    {{/if}}
+                    {{/each}}
+                {{else}}
+                <h4 class="text-center text-danger ">Unfortunately, there are no products right now. We will update the products soon.</h4>
                 {{/if}}
-                {{/each}}
             </div>
         </div>
         <div id="notification" class="notification"></div>
@@ -87,7 +95,7 @@
         notificationElement.style.display = 'none';
         }, 2000);
     }
-
+    
     addToCart.forEach((element)=>{
 
         element.addEventListener("click",function addCart(event){
@@ -116,28 +124,53 @@
         });
     });
 
-
     //redirecting to prodetails page
-
     const prodDetailDiv = document.querySelectorAll(".prodDetailsDiv");
-
-    console.log(prodDetailDiv)
-
     prodDetailDiv.forEach((element)=>{
-
         element.addEventListener("click", function renderProdDetails(event){
             event.preventDefault();
             console.log(element);
             const prodId = element.getAttribute("data-prodid");
-
             window.location.href =`/api/v1/products/productdetails/${prodId}`;
+        })
+    })
 
-            /* fetch("api/v1/users/productdetails",{
-                method : "POST",
-
-
-            })*/
+    //wishlist
+    const wishlistButton = document.querySelectorAll(".wishlist");
+    wishlistButton.forEach((element)=>{
+        element.addEventListener("click", function addWishlist(event){
+            event.preventDefault();
+            event.stopPropagation();
             
+            const productId = element.getAttribute("data-id");
+            console.log("this is productid",productId);
+            fetch("/api/v1/users/wishlist",{
+                method : "POST",
+                headers : {
+                    "content-type" : "application/json"
+                },
+                body : JSON.stringify({
+                    productId
+                })
+            }).then( res=> res.json())
+            .then((data)=>{
+                if(data.success){
+                    console.log("added to wishlist");
+                    console.log(event.target.tagName);
+                    if(event.target.tagName == 'A'){
+                        event.target.style.backgroundColor = "red";
+                        event.target.style.color = "white";                        
+                    }else if(event.target.tagName == 'SPAN'){
+                        console.log("this is span")
+                        event.target.parentElement.style.backgroundColor = "red";
+                        event.target.parentElement.style.color = "white";                        
+                    }
+                    showNotification("Item added to Wishlist");
+                    return
+                }
+                 console.log("This is the erespomse from wishlist",data);
+                 showNotification("Item already in wishlist")
+            })
         })
     })
 
