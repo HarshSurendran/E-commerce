@@ -570,6 +570,17 @@ const changeOrderStatus = asyncHandler( async(req,res)=>{
 const renderUserOrdersPage = asyncHandler( async(req,res)=>{
     
     const userId = req.user._id;    
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id});
+    console.log("This is wishlist",wishlistlayout);
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout?.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
 
     const order = await Order.aggregate([
         {
@@ -768,7 +779,7 @@ const renderUserOrdersPage = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    .render("users/orderlist",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout"});
+    .render("users/orderlist",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});
 });
 
 const cancelOrder = asyncHandler( async(req,res)=>{

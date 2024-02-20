@@ -6,6 +6,10 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/admin.models.js");
 const User = require("../models/user.models.js");
 const Order = require("../models/order.models.js");
+const Product = require("../models/product.models.js");
+const Category = require("../models/category.models.js");
+
+
 const mongoose = require("mongoose");
 const cron = require("node-cron");
 
@@ -186,10 +190,43 @@ const adminlogin = asyncHandler( async(req,res)=>{
 
 const renderDashboard = asyncHandler( async(req,res)=>{
     const adminDetails = req.admin;
+    let sales = await Order.aggregate([
+        {
+            $group: {
+                _id: "Sales",
+                total : { $sum : "$orderAmount" }
+            }
+        }
+    ]);
+    let orders = await Order.countDocuments({});
+    sales = sales[0].total
+    let products = await Product.countDocuments({});
+    let category = await Category.countDocuments({});
+    const currentDate = new Date();
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);    
+    let salesData = await Order.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: startOfMonth,
+                    $lte: endOfMonth
+                }
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                OrderAmount: { $sum: "$orderAmount" } 
+            }
+        }
+    ]);
+    salesData = salesData[0].OrderAmount
+    console.log("This is sales", sales, orders, products, category, salesData);
 
     res
     .status(200)
-    .render("admin/dashboard",{admin:adminDetails, title: "Urbane wardrobe" , adminDetails})
+    .render("admin/dashboard",{admin:adminDetails, title: "Urbane wardrobe" , adminDetails, sales, orders, products, category, salesData});
 });
 
 const logout = asyncHandler( async(req,res)=>{

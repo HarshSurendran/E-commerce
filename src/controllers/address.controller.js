@@ -5,6 +5,9 @@ const asyncHandler = require("../utils/asynchandler.js");
 const Admin = require("../models/admin.models.js");
 const User = require("../models/user.models.js");
 const Address = require("../models/address.models.js");
+const Category = require("../models/category.models.js");
+const Wishlist = require("../models/wishlist.models.js");
+const Cart = require("../models/cart.models.js");
 
 
 const stateNames = [    
@@ -48,11 +51,22 @@ const stateNames = [
   
 const addressPage = asyncHandler( async(req,res)=>{
     const user = req.user
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id});
+    console.log("This is wishlist",wishlistlayout);
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout?.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
     const address = await Address.find({userid: user._id })
     console.log(address);
     res
     .status(200)
-    .render("users/address",{title:"Urbane Wardrobe", user, address, layout: "userprofilelayout"})
+    .render("users/address",{title:"Urbane Wardrobe", user, address, layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});
 })
 
 

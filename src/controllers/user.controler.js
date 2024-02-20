@@ -807,6 +807,21 @@ const deleteWishlist = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .json( new ApiResponse(200,{},"Product deleted from wishlist"));
+});
+
+const renderProfilePage = asyncHandler( async(req,res)=>{
+    console.log(req.user);
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id});
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout?.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+    res.render("users/profile",{user:req.user, layout:"userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});
 })
 
 
@@ -828,5 +843,6 @@ module.exports = {
     deleteUser,
     addToWishlist,
     renderWishlist,
-    deleteWishlist
+    deleteWishlist,
+    renderProfilePage
 }

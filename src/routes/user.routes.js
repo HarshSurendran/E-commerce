@@ -64,10 +64,7 @@ router.get('/getuser', auth.verifyUserJWT, userController.getCurrentUser);
 
 
 //user profile
-router.get("/profile", auth.verifyUserJWT, (req,res)=>{
-    console.log(req.user);   
-    res.render("users/profile",{user:req.user, layout:"userprofilelayout"});
-});
+router.get("/profile", auth.verifyUserJWT, userController.renderProfilePage);
 router.get("/delete-user/:id", auth.verifyUserJWT, userController.deleteUser);
 router.patch("/details", auth.verifyUserJWT, userController.updateUserDetails);
 router.post("/profilepicture", auth.verifyAdminJWT, upload.single("avatar",1), userController.addProfilepicture);
