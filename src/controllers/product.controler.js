@@ -1136,8 +1136,7 @@ const uploadImage = asyncHandler( async(req,res)=>{
     // Generate a unique filename for the image
     const filename = `image_${Date.now()}.jpg`;
     const imagePath = path.join(__dirname, '../../public/temp', filename);
-    console.log("this is image path", imagePath);
-
+    
     // Write the image buffer to a file
     fs.writeFile(imagePath, imageBuffer, (err) => {
         if (err) {

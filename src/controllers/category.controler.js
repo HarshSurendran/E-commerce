@@ -14,16 +14,10 @@ const categoryPage = asyncHandler( async(req,res)=>{
         // Provided date string
         console.log(element)
         const dateString = element.createdAt;
-        console.log(dateString);
-        // Create a new Date object from the provided string
         const dateObject = new Date(dateString);
-  
-        // Get day, month, and year
         const day = dateObject.getDate();
         const month = dateObject.getMonth() + 1; // Months are zero-indexed, so we add 1
         const year = dateObject.getFullYear();
-  
-        // Format the date components
         const formattedDate = `${day}/${month}/${year}`;
         console.log(formattedDate);
         

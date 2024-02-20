@@ -1,11 +1,14 @@
 const express = require("express");
 const router = express.Router();
+
 const adminController = require("../controllers/admin.controler.js")
 const productController = require("../controllers/product.controler.js");
 const categoryController = require("../controllers/category.controler.js");
 const colorController = require("../controllers/color.controler.js");
 const sizeController = require("../controllers/size.controler.js");
 const orderController = require("../controllers/order.controller.js");
+const couponController = require("../controllers/coupon.controller.js");
+
 const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 
@@ -149,15 +152,12 @@ router.get("/test", async(req,res)=>{
     res.json( new ApiResponse( 200, order, "Order details"))
 })
 
+//coupons
+router.get("/coupons", auth.verifyAdminJWT, couponController.renderCouponPage);
+router.post("/coupons", auth.verifyAdminJWT, couponController.addCoupon);
 
-//did some graph logic here
+//graph
 router.post("/graphData", auth.verifyAdminJWT, adminController.graphData);
-
-
-// router.get("/test",(req,res)=>{
-//     res.render("admin/userdetails",{admin:true});
-// });
-
 
 // order
 router.get("/orders/orderdetails/:id", orderController.renderOrderDetailsPage);
