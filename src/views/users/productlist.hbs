@@ -93,7 +93,6 @@
     }
 
     addToCart.forEach((element)=>{
-
         element.addEventListener("click",function addCart(event){
             event.preventDefault();
             event.stopPropagation();
@@ -114,7 +113,12 @@
                 showNotification("Item already in Cart")
                 return
                 }
-                console.log("fetch successfull")
+                return res.json()
+            }).then((data)=> {                
+                console.log("fetch successfull",data)
+                const cartTip = document.getElementById('cart-tip');
+                console.log("cartTip",cartTip);
+                cartTip.innerHTML = data.data.cartCount;                
                 showNotification("Item added to Cart");
             })
         });
@@ -152,7 +156,7 @@
             }).then( res=> res.json())
             .then((data)=>{
                 if(data.success){
-                    console.log("added to wishlist");
+                    console.log("added to wishlist",data);
                     console.log(event.target.tagName);
                     if(event.target.tagName == 'A'){
                         event.target.style.backgroundColor = "red";
@@ -162,11 +166,15 @@
                         event.target.parentElement.style.backgroundColor = "red";
                         event.target.parentElement.style.color = "white";                        
                     }
+                    const wishlistTip = document.getElementById('wishlist-tip');
+                    console.log("wishlisttp",wishlistTip);
+                    console.log(data.data.wishlistCount);
+                    wishlistTip.innerHTML = data.data.wishlistCount;
                     showNotification("Item added to Wishlist");
                     return
                 }
-                 console.log("This is the erespomse from wishlist",data);
-                 showNotification("Item already in wishlist")
+                console.log("This is the erespomse from wishlist",data);
+                showNotification("Item already in wishlist")
             })
         })
     })

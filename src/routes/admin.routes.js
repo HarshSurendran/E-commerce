@@ -152,114 +152,112 @@ router.get("/test", async(req,res)=>{
 
 //did some graph logic here
 
-router.post("/salesData", async (req,res)=>{
-    const { filter, time } = req.body
-    if (filter === "weekly") {
-        salesData.labels = ["week1", "week2", "week3", "week4", "week5"];
-        const sales = await Order.aggregate([
-            {
-                $match: {
-                    $month: time
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                            $month: "$createdAt"
-                    },
-                    revenueData: {
-                        $sum: 1
-                    }
-                }
-            }
-        ])
-        console.log(sales);
-    }else if(filter === "monthly"){
-        salesData.labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const contraints = {
-            $gte: new Date(`${time-1}-01-01T00:00:00.000Z`),
-            $lte: new Date(`${time}-12-31T00:00:00.000Z`)            
-        }
-        const sales = await Order.aggregate([
-            {
-                $match: {
-                    createdAt: contraints
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                            $month: "$createdAt"
-                    },
-                    revenueData: {
-                        $sum: "$orderAmount"
-                    },
-                    salesData: {
-                        $sum: 1
-                    }
-                }
-            },
-            {
-                $sort: {
-                    createdAt: {
-                        $month: 1
-                    }
-                }
-            }
-        ])
-        console.log(sales);
-    }else{
-        salesData.labels = [`${time-10}`, `${time-9}`, `${time-8}`, `${time-7}`, `${time-6}`, `${time-5}`, `${time-4}`, `${time-3}`, `${time-2}`, `${time-1}`, `${time}`];
-        const contraints = {
-            $gte: new Date(`${time-10}-01-01T00:00:00.000Z`),
-            $lte: new Date(`${time}-12-31T00:00:00.000Z`)            
-        }
-        const sales = await Order.aggregate([
-            {
-                $match: {
-                    createdAt: contraints
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        $month: "$createdAt"
-                    },
-                    revenueData: {
-                        $sum: "$orderAmount"
-                    },
-                    salesData: {
-                        $sum: 1
-                    }
-                }
-            },
-            {
-                $sort: {
-                    createdAt: {
-                        $year: 1
-                    }
-                }
-            }
-        ])
-        console.log(sales);
-    }
+// router.post("/salesData", async (req,res)=>{
+//     let salesData = 
+//         {
+//             "labels": ["Jan", "Feb", "Mar", "Apr"],
+//             "salesData": [18, 17, 4, 3, 2, 20, 25, 31, 25, 22, 20, 9],
+//             "revenueData": [40, 20, 17, 9, 23, 35, 39, 30, 34, 25, 27, 17],
+//             "productsData": [30, 10, 27, 19, 33, 15, 19, 20, 24, 15, 37, 6]
+//         }
     
+//     const { filter, time } = req.body
+//     if (filter === "weekly") {
+//         salesData.labels = ["week1", "week2", "week3", "week4", "week5"];
+//         const sales = await Order.aggregate([
+//             {
+//                 $match: {
+//                     $month: time
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: {
+//                             $month: "$createdAt"
+//                     },
+//                     revenueData: {
+//                         $sum: 1
+//                     }
+//                 }
+//             }
+//         ])
+//         console.log(sales);
+//     }else if(filter === "monthly"){
+//         salesData.labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+//         const contraints = {
+//             $gte: new Date(`${time-1}-01-01T00:00:00.000Z`),
+//             $lte: new Date(`${time}-12-31T00:00:00.000Z`)            
+//         }
+//         const sales = await Order.aggregate([
+//             {
+//                 $match: {
+//                     createdAt: contraints
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: {
+//                             $month: "$createdAt"
+//                     },
+//                     revenueData: {
+//                         $sum: "$orderAmount"
+//                     },
+//                     salesData: {
+//                         $sum: 1
+//                     }
+//                 }
+//             },
+//             {
+//                 $sort: {
+//                     createdAt: {
+//                         $month: 1
+//                     }
+//                 }
+//             }
+//         ])
+//         console.log(sales);
+//     }else{
+//         salesData.labels = [`${time-10}`, `${time-9}`, `${time-8}`, `${time-7}`, `${time-6}`, `${time-5}`, `${time-4}`, `${time-3}`, `${time-2}`, `${time-1}`, `${time}`];
+//         const contraints = {
+//             $gte: new Date(`${time-10}-01-01T00:00:00.000Z`),
+//             $lte: new Date(`${time}-12-31T00:00:00.000Z`)            
+//         }
+//         const sales = await Order.aggregate([
+//             {
+//                 $match: {
+//                     createdAt: contraints
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: {
+//                         $month: "$createdAt"
+//                     },
+//                     revenueData: {
+//                         $sum: "$orderAmount"
+//                     },
+//                     salesData: {
+//                         $sum: 1
+//                     }
+//                 }
+//             },
+//             {
+//                 $sort: {
+//                     createdAt: {
+//                         $year: 1
+//                     }
+//                 }
+//             }
+//         ])
+//         console.log(sales);
+//     }
     
+//     // const salesData1 = await Order.find({createdAt: {$gte: new Date("2024-02-11T00:00:00.000Z"), $lte: new Date("2024-02-12T00:00:00.000Z")}})
+//     // console.log("This is salesrepotty for ", salesData1);
 
-   
-    // const salesData1 = await Order.find({createdAt: {$gte: new Date("2024-02-11T00:00:00.000Z"), $lte: new Date("2024-02-12T00:00:00.000Z")}})
-    // console.log("This is salesrepotty for ", salesData1);
-
-    let salesData = 
-        {
-            "labels": ["Jan", "Feb", "Mar", "Apr"],
-            "salesData": [18, 17, 4, 3, 2, 20, 25, 31, 25, 22, 20, 9],
-            "revenueData": [40, 20, 17, 9, 23, 35, 39, 30, 34, 25, 27, 17],
-            "productsData": [30, 10, 27, 19, 33, 15, 19, 20, 24, 15, 37, 6]
-        }
     
-    res.json(salesData)
-})
+//     res.json(salesData)
+// })
 
 
 

@@ -368,6 +368,11 @@ const renderOrdersPage = asyncHandler( async(req,res)=>{
                         $arrayElemAt: ["$user", 0]
                     }
                 }
+            },
+            {
+                $sort: {
+                    createdAt: -1
+                }
             }
         ]
         )

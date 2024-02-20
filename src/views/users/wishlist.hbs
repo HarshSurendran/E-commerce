@@ -12,6 +12,17 @@
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
+
+    /*.property__gallery {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+   
+    .wishlist-item {
+        flex: 1;
+    }*/
     </style>
 </head>
 
@@ -26,7 +37,7 @@
         </div>
         <div class="row property__gallery">
             {{#each wishlist}}
-                <div class="col-lg-3 col-md-6 col-sm-12 text-center mb-4 ">
+                <div class="col-lg-3 col-md-6 col-sm-12 text-center mb-4 wishlist-item ">
                     <div class="card" style="width: 18rem; height: 32rem">
                         <img style="width: 17rem; height: 20rem" src="{{this.productsId.images.[0]}}" class="card-img-top p-1 m-auto  " alt="...">
                        
@@ -43,6 +54,9 @@
                     </div>
                 </div>
             {{/each}}
+            {{#if message}}
+                <h4 class="text-center text-danger ">{{message}}</h4>
+            {{/if}}
         </div>
     </div>
     <div id="notification" class="notification"></div>
@@ -84,6 +98,7 @@
                 return
                 }
                 console.log("fetch successfull",res)
+                element.parentElement.parentElement.parentElement.parentElement.remove();
                 showNotification("Item added to Cart");
             })
         });

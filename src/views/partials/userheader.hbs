@@ -36,14 +36,10 @@
       <ul class="header__right__widget">
         <li><span class="icon_search search-switch  "></span></li>
         <li><a href="/api/v1/users/wishlist"><span class="icon_heart_alt  "></span>
-        {{#if wishlistCountlayout}}
-          <div class="tip">{{wishlistCountlayout}}</div>
-        {{/if}}
+        <div class="tip" id="wishlist-tip">{{wishlistCountlayout}}</div>
         </a></li>
         <li><a href="/api/v1/users/cart"><span class="icon_bag_alt "></span>
-        {{#if cartCountlayout}}
-          <div class="tip">{{cartCountlayout}}</div>
-        {{/if}}
+        <div class="tip " id="cart-tip">{{cartCountlayout}}</div>
         </a></li>
         <li class="dropdown nav-item mt-4 ">
           <a class="dropdown-toggle" data-bs-toggle="dropdown" data-bs-target="#dropdown-menu" href="#" id="dropdownAccount" aria-expanded="false">  <i class="fa-regular fa-user"></i></a>

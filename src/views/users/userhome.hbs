@@ -663,7 +663,6 @@
     }
 
     addToCart.forEach((element)=>{
-
         element.addEventListener("click",function addCart(event){
             event.preventDefault();
             event.stopPropagation();
@@ -678,16 +677,19 @@
                 body : JSON.stringify({
                     productId
                 })
-            }).then( (res)=> {
-                if(!res.ok){
-                showNotification("Product already in cart.")
-                return
-                }
-                console.log("fetch successfull")
+            }).then( res=> {   
+                    if(!res.ok){
+                    showNotification("Product already in cart.")
+                    return 
+                    }
+                return res.json()
+            }).then((data)=> {
+                console.log("fetch successfull",data)
+                const cartTip = document.getElementById('cart-tip');
+                cartTip.innerHTML = data.data.cartCount;
                 showNotification("Item added to Cart");
             })
         });
-
     });
     
     //redirecting to prodetails page
@@ -732,6 +734,10 @@
                         event.target.parentElement.style.backgroundColor = "red";
                         event.target.parentElement.style.color = "white";                        
                     }
+                    const wishlistTip = document.getElementById('wishlist-tip');
+                    console.log("wishlisttp",wishlistTip);
+                    console.log(data.data.wishlistCount);
+                    wishlistTip.innerHTML = data.data.wishlistCount;
                     showNotification("Item added to Wishlist");
                     return
                 }

@@ -383,13 +383,12 @@ const editProductVarient = asyncHandler( async (req,res)=>{
 
 const listProducts = asyncHandler( async(req,res)=>{
     console.log("This is the request");
-
     //data for layout
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
     let wishlistlayout = await Wishlist.find({userId: req.user._id})
     wishlistlayout = wishlistlayout[0];
-    if (wishlistlayout.productsId.length) {
+    if (wishlistlayout?.productsId.length) {
         wishlistlayout.productsId.forEach(element => {
             wishlistCountlayout++;
         });        
@@ -942,7 +941,7 @@ const categoryListPage = asyncHandler( async(req,res)=>{
     let wishlistCountlayout = 0;
     let wishlistlayout = await Wishlist.find({userId: req.user._id})
     wishlistlayout = wishlistlayout[0];
-    if (wishlistlayout.productsId.length) {
+    if (wishlistlayout?.productsId.length) {
         wishlistlayout.productsId.forEach(element => {
             wishlistCountlayout++;
         });        

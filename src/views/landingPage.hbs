@@ -635,25 +635,20 @@
     const picexpand = document.querySelectorAll("picexpand");
 
     addToCart.forEach((element)=>{
-
         element.addEventListener("click",function addCart(event){
             event.preventDefault();
             event.stopPropagation();
             console.log(element);
             window.location.href = "/api/v1/login";
         });
-
     });
 
     prodDetailDiv.forEach((element)=>{
-
         element.addEventListener("click", function renderProdDetails(event){
             event.preventDefault();
             console.log(element);
             const prodId = element.getAttribute("data-prodid");
-
             window.location.href =`/api/v1/productdetails/${prodId}`;
-
         });
     });
 
@@ -661,9 +656,7 @@
         element.addEventListener("click",function picexpand(event){
             event.preventDefault();
             event.stopPropagation();
-           
         });
-
     });
 
 </script>

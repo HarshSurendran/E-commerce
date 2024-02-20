@@ -231,9 +231,10 @@ const loginUser = asyncHandler( async (req,res)=>{
 const homePageRender = asyncHandler( async(req,res)=>{
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
-    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    let wishlistlayout = await Wishlist.find({userId: req.user._id});
+    console.log("This is wishlist",wishlistlayout);
     wishlistlayout = wishlistlayout[0];
-    if (wishlistlayout.productsId.length) {
+    if (wishlistlayout?.productsId.length) {
         wishlistlayout.productsId.forEach(element => {
             wishlistCountlayout++;
         });        
@@ -680,11 +681,14 @@ const addToWishlist = asyncHandler( async(req,res)=>{
                 {
                     upsert: true
                 }
-            );        
+            );
+            let wishlist1 = await Wishlist.find({userId: req.user._id});    
+            console.log("this is the wishlist count", wishlist1[0]);
+            let wishlistCount = wishlist1[0]?.productsId.length;
             if(wishlist){
                 res
                 .status(200)
-                .json( new ApiResponse(200,{wishlist},"Product added to wishlist"));
+                .json( new ApiResponse(200,{wishlist, wishlistCount},"Product added to wishlist"));
             } else {
                 res
                 .status(400)
@@ -710,13 +714,12 @@ const renderWishlist = asyncHandler( async(req,res)=>{
     let wishlistCountlayout = 0;
     let wishlistlayout = await Wishlist.find({userId: req.user._id})
     wishlistlayout = wishlistlayout[0];
-    if (wishlistlayout.productsId.length) {
+    if (wishlistlayout?.productsId.length) {
         wishlistlayout.productsId.forEach(element => {
             wishlistCountlayout++;
         });        
     }
-    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
-    
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();    
 
     const wishlist = await Wishlist.aggregate([
         {
@@ -775,10 +778,14 @@ const renderWishlist = asyncHandler( async(req,res)=>{
     
     
     console.log("this is wishlist",wishlist);
+    let message = "";
+    if (wishlist.length === 0) {
+        message = "Wishlist is empty, add some products";        
+    }
     //res.json(new ApiResponse(200, {wishlist}));
     res
     .status(200)
-    .render("users/wishlist", {wishlist, title: "Urbane Wardrobe", user:req.user, wishlistCountlayout, categorylayout, cartCountlayout});
+    .render("users/wishlist", {wishlist, title: "Urbane Wardrobe", user:req.user, wishlistCountlayout, categorylayout, cartCountlayout, message});
 });
 
 const deleteWishlist = asyncHandler( async(req,res)=>{

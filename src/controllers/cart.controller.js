@@ -32,13 +32,16 @@ const addToCart = asyncHandler( async(req, res)=>{
 
     console.log(cart);
 
+    const cartCount = await Cart.find({user_id}).count();
+    console.log("This is cart count ",cartCount);
+    
     if(!cart){
         throw new ApiError(500,"Something went wrong while adding to cart")
     }
 
     res
     .status(200)
-    .json( new ApiResponse(200,{}, "Added to cart successfully"))
+    .json( new ApiResponse(200,{cartCount}, "Added to cart successfully"))
 
 });
 
@@ -51,7 +54,7 @@ const renderCartPage = asyncHandler( async(req,res)=>{
     let wishlistCountlayout = 0;
     let wishlistlayout = await Wishlist.find({userId: req.user._id})
     wishlistlayout = wishlistlayout[0];
-    if (wishlistlayout.productsId.length) {
+    if (wishlistlayout?.productsId.length) {
         wishlistlayout.productsId.forEach(element => {
             wishlistCountlayout++;
         });        
