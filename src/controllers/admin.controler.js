@@ -406,6 +406,133 @@ const editUserDetails = asyncHandler( async(req,res)=>{
     ));
 });
 
+const graphData = asyncHandler( async (req,res)=>{
+    let salesData =
+        {
+            "labels": [],
+            "salesData": [],
+            "revenueData": [],
+            "productsData": []
+        }
+    const { filter, time } = req.body
+
+    if (filter === "weekly") {
+        salesData.labels = ["week1", "week2", "week3", "week4", "week5"];
+        const sales = await Order.aggregate([
+            {
+                $match: {
+                    $month: time
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                            $month: "$createdAt"
+                    },
+                    revenueData: {
+                        $sum: 1
+                    }
+                }
+            }
+        ])
+        console.log(sales);
+    }else if(filter === "monthly"){
+        salesData.labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const contraints = {
+            $gte: new Date(`${time}-01-01T00:00:00.000Z`),
+            $lte: new Date(`${time}-12-31T00:00:00.000Z`)            
+        }
+        const sales = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: contraints
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $month: "$createdAt"
+                    },
+                    revenueData: {
+                        $sum: "$orderAmount"
+                    },
+                    salesData: {
+                        $sum: 1
+                    }
+                }
+            },
+            {
+                $sort: {
+                    "_id": 1 // Sort by month in ascending order
+                }
+            }
+        ])
+        const products = await Product.aggregate([
+            {
+                $match: {
+                    createdAt: contraints
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $month: "$createdAt"
+                    },
+                    productsData: {
+                        $sum: 1
+                    }
+                }
+            },
+            {
+                $sort: {
+                    "_id": 1 // Sort by month in ascending order
+                }
+            }
+        ])
+        salesData.salesData = sales.map((item) => item.salesData);
+        salesData.revenueData = sales.map((item) => item.revenueData/1000);
+        salesData.productsData = products.map((item) => item.productsData);
+
+        console.log("this is sales data ",sales, products);
+    }else{
+        salesData.labels = [`${time-10}`, `${time-9}`, `${time-8}`, `${time-7}`, `${time-6}`, `${time-5}`, `${time-4}`, `${time-3}`, `${time-2}`, `${time-1}`, `${time}`];
+        const contraints = {
+            $gte: new Date(`${time-10}-01-01T00:00:00.000Z`),
+            $lte: new Date(`${time}-12-31T00:00:00.000Z`)            
+        }
+        const sales = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: contraints
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $month: "$createdAt"
+                    },
+                    revenueData: {
+                        $sum: "$orderAmount"
+                    },
+                    salesData: {
+                        $sum: 1
+                    }
+                }
+            },
+            {
+                $sort: {
+                    createdAt: {
+                        $year: 1
+                    }
+                }
+            }
+        ])
+        console.log(sales);
+    }
+    
+    res.json(salesData)
+});
+
 
 
 module.exports = {
@@ -420,6 +547,7 @@ module.exports = {
     verifyEmailPassword,
     renderLoginPage, 
     userDetails,
-    editUserDetails 
+    editUserDetails,
+    graphData
     
 }

@@ -202,7 +202,7 @@
         console.log("formdata",formdata);
 
         fetch("/api/v1/admin/updatephoto", {
-            method: "POST",                
+            method: "POST",              
             body: formdata
         })
         .then((response) => response.json())

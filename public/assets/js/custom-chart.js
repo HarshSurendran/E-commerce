@@ -52,9 +52,10 @@
 
     /*Sale statistics Chart*/
     function fetchDataAndUpdateChart(filter,time) {
+        console.log("its in the fetch data")
         // Make AJAX request to fetch data from backend
         $.ajax({
-            url: '/api/v1/admin/salesdata',
+            url: '/api/v1/admin/graphdata',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(
@@ -65,6 +66,7 @@
             ),
             success: function(response) {
                 console.log("This is response",response);
+              
                 // Update chart with new data
                 chart.data.labels = response.labels;
                 chart.data.datasets[0].data = response.salesData;
@@ -83,8 +85,7 @@
     // Check if chart element exists
     if ($('#myChart').length) {
         var ctx = document.getElementById('myChart').getContext('2d');
-        var chart = new Chart(ctx, {
-                    // The type of chart we want to create
+        var chart = new Chart(ctx, {                   
                     type: 'line',
                     
                     // The data for our dataset
@@ -129,10 +130,11 @@
                 });
     
         // Fetch data and update chart
-        let filter = 'monthly';
-        let time = 2024;
-        fetchDataAndUpdateChart(filter,time);
     }
+
+    let filter = 'monthly';
+    let time = 2024;
+    fetchDataAndUpdateChart(filter,time);
 
 
 
