@@ -143,7 +143,6 @@ const renderCartPage = asyncHandler( async(req,res)=>{
 
     let total = 0;
     cart.forEach(element => {
-
         total = total + (element.quantity * element.product.price)
     });
     

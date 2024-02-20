@@ -8,6 +8,8 @@ const Address = require("../models/address.models.js");
 const Cart = require("../models/cart.models.js");
 const Order = require("../models/order.models.js");
 const Wallet = require("../models/wallet.models.js");
+const Category = require("../models/category.models.js");
+const Wishlist = require("../models/wishlist.models.js");
 
 const crypto = require("crypto")
 
@@ -345,10 +347,20 @@ const orderSuccessPage = asyncHandler( async(req,res)=>{
     }
 
     console.log("This is order",order);
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout?.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
 
     res
     .status(200)
-    .render("users/successpage",{title:"Urbane Wardrobe", user: req.user, order, address})
+    .render("users/successpage",{title:"Urbane Wardrobe", user: req.user, order, address, categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
 const renderOrdersPage = asyncHandler( async(req,res)=>{
