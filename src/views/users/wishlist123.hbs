@@ -1,0 +1,73 @@
+<head>
+    <style>
+    /* Notification styles */
+    .notification {
+      display: none;
+      position: fixed;
+      top: 10px;
+      right: 40%;
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .wishlist-item {
+        flex: 1;
+        max-width: 100%; /* Ensure all items have the same width */
+    }
+
+    .wishlist-item .card {
+        height: 100%;
+    }
+
+    .wishlist-item .card-img-top {
+        object-fit: cover; /* Make sure the image fills the entire space */
+        height: 100%;
+    }
+
+    .wishlist-item .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+    </style>
+</head>
+
+<section class="product spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div style="background-color: #e5aa3b;" class="section-title p-2 ">
+                    <h4>Wishlist</h4>
+                </div>
+            </div>                
+        </div>
+        <div class="row property__gallery">
+            {{#each wishlist}}
+                <div class="col-lg-3 col-md-6 col-sm-12 text-center mb-4 wishlist-item ">
+                    <div class="card">
+                        <img src="{{this.productsId.images.[0]}}" class="card-img-top p-1 m-auto" alt="...">
+                       
+                        <div class="card-body">
+                            <h5 class="card-title">{{this.productsId.product_id.name}}</h5>
+                            <p class="card-text">{{this.productsId.price}}</p>
+                            <div class="row">
+                                <div class="col-12">
+                                    <a href="#" data-id="{{this.productsId._id}}" class="btn btn-success btn-sm  addToCart">Add to cart</a>
+                                    <a href="#" data-id="{{this.productsId._id}}" class="btn btn-danger removeWishlist btn-sm">X</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/each}}
+            {{#if message}}
+                <h4 class="text-center text-danger ">{{message}}</h4>
+            {{/if}}
+        </div>
+    </div>
+    <div id="notification" class="notification"></div>
+</section>

@@ -20,5 +20,6 @@ router.get("/productdetails/:id", auth.verifyUserJWT, productController.productD
 
 
 
+router.get("/addproduct", auth.verifyAdminJWT, productController.addProductPage);
 
 module.exports = router

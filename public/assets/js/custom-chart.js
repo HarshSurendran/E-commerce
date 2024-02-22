@@ -138,10 +138,6 @@
 
 
 
-
-
-
-
     /*Sale statistics Chart*/
     if ($('#myChart2').length) {
         var ctx = document.getElementById("myChart2");

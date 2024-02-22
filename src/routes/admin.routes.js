@@ -152,6 +152,9 @@ router.get("/test", async(req,res)=>{
     res.json( new ApiResponse( 200, order, "Order details"))
 })
 
+//sales Report
+router.get("/salesreport", auth.verifyAdminJWT, adminController.renderSalesReportPage);
+
 //coupons
 router.get("/coupons", auth.verifyAdminJWT, couponController.renderCouponPage);
 router.post("/coupons", auth.verifyAdminJWT, couponController.addCoupon);

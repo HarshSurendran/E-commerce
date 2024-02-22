@@ -785,7 +785,7 @@ const renderWishlist = asyncHandler( async(req,res)=>{
     //res.json(new ApiResponse(200, {wishlist}));
     res
     .status(200)
-    .render("users/wishlist", {wishlist, title: "Urbane Wardrobe", user:req.user, wishlistCountlayout, categorylayout, cartCountlayout, message});
+    .render("users/wishlist123", {wishlist, title: "Urbane Wardrobe", user:req.user, wishlistCountlayout, categorylayout, cartCountlayout, message});
 });
 
 const deleteWishlist = asyncHandler( async(req,res)=>{

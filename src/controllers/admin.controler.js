@@ -12,6 +12,7 @@ const Category = require("../models/category.models.js");
 
 const mongoose = require("mongoose");
 const cron = require("node-cron");
+const moment = require("moment");
 
 //change order status through cron job
 async function changeStatusToShipped() {
@@ -408,13 +409,14 @@ const editUserDetails = asyncHandler( async(req,res)=>{
 
 const graphData = asyncHandler( async (req,res)=>{
     let salesData =
-        {
-            "labels": [],
-            "salesData": [],
-            "revenueData": [],
-            "productsData": []
-        }
+    {
+        "labels": [],
+        "salesData": [],
+        "revenueData": [],
+        "productsData": []
+    }
     const { filter, time } = req.body
+    console.log("this is filter and time", filter, time);
 
     if (filter === "weekly") {
         salesData.labels = ["week1", "week2", "week3", "week4", "week5"];
@@ -430,6 +432,9 @@ const graphData = asyncHandler( async (req,res)=>{
                             $month: "$createdAt"
                     },
                     revenueData: {
+                        $sum: "$orderAmount"
+                    },
+                    salesData: {
                         $sum: 1
                     }
                 }
@@ -495,6 +500,7 @@ const graphData = asyncHandler( async (req,res)=>{
 
         console.log("this is sales data ",sales, products);
     }else{
+        console.log("Entered else condition");
         salesData.labels = [`${time-10}`, `${time-9}`, `${time-8}`, `${time-7}`, `${time-6}`, `${time-5}`, `${time-4}`, `${time-3}`, `${time-2}`, `${time-1}`, `${time}`];
         const contraints = {
             $gte: new Date(`${time-10}-01-01T00:00:00.000Z`),
@@ -509,7 +515,7 @@ const graphData = asyncHandler( async (req,res)=>{
             {
                 $group: {
                     _id: {
-                        $month: "$createdAt"
+                        $year: "$createdAt"
                     },
                     revenueData: {
                         $sum: "$orderAmount"
@@ -521,16 +527,61 @@ const graphData = asyncHandler( async (req,res)=>{
             },
             {
                 $sort: {
-                    createdAt: {
-                        $year: 1
+                    "_id": 1
+                }
+            }
+        ])
+        const products = await Product.aggregate([
+            {
+                $match: {
+                    createdAt: contraints
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $year: "$createdAt"
+                    },
+                    productsData: {
+                        $sum: 1
                     }
+                }
+            },
+            {
+                $sort: {
+                    "_id": 1 
                 }
             }
         ])
         console.log(sales);
+        let array;
+        sales.forEach((item) => {
+            salesData.labels.forEach((salesData) => {
+                console.log("sales data",salesData)
+                if (item._id == salesData ) {
+                   console.log("Entered if condidtion",item._id)
+                  array.push(item.salesData)
+                }else{
+                   array.push(0)
+                }
+            })
+        });
+        console.log(array)
+        salesData.revenueData = sales.map((item) => item.revenueData/1000);
+        salesData.productsData = products.map((item) => item.productsData);
+        console.log("thisafdfafa",salesData.revenueData, salesData.productsData);
     }
     
     res.json(salesData)
+});
+
+const renderSalesReportPage = asyncHandler(async (req, res) => {
+    let orders = await Order.find({status:"delivered"}).populate("userId");
+    orders.forEach(order => {
+        order.createdAt = moment(order.createdAt).format('YYYY-MM-DD');
+    });
+    console.log("this is orders", orders);
+    res.render("admin/salesReport",{admin:true, orders});
 });
 
 
@@ -548,6 +599,6 @@ module.exports = {
     renderLoginPage, 
     userDetails,
     editUserDetails,
-    graphData
-    
+    graphData,
+    renderSalesReportPage
 }

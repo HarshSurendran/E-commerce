@@ -234,7 +234,8 @@ const addProductVarientPage = asyncHandler( async(req,res)=>{
 })
 
 const addProductVarient = asyncHandler( async (req,res)=>{
-        //get product details    
+        //get product details   
+        console.log("reached add products varient") 
     const {productname, color, size, stock, price, cost} = req.body //add remaining parameters to add into product collection    
     //collecting the _id from product,color and size 
     const productId = await Product.findOne({name:productname}).select("-name -about -category -islisted -createdAt -updatedAt");    

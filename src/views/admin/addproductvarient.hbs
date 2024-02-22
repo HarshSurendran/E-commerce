@@ -17,7 +17,7 @@
                         <h4>Basic</h4>
                         {{!-- <button type="button" id="addForm" class="btn btn-md rounded font-sm hover-up">+</button> --}}
                     </div>
-                    <form method="post" action="products-varient" enctype="multipart/form-data">
+                    <form method="post" onsubmit="return validateForm()" action="/api/v1/admin/products-varient" enctype="multipart/form-data">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col mb-3">
@@ -50,6 +50,7 @@
                                 <div class="col-sm-4 mb-3">
                                     <label for="price" class="form-label">Price</label>
                                     <input type="number" placeholder="Type here" class="form-control" id="price" name="price" required />
+                                    <p id="alertPrice" class="text-danger text-center " ></p>
                                 </div>
                                 <div class="col-sm-4 mb-3">
                                     <label for="cost" class="form-label">Cost</label>
@@ -58,6 +59,7 @@
                                 <div class="col-sm-4 mb-3">
                                     <label for="stock" class="form-label">Stock</label>
                                     <input type="number" placeholder="Type here" class="form-control" id="stock" name="stock" required />
+                                    <p id="alertStock" class="text-danger text-center " ></p>
                                 </div>                                        
                             </div>
                                 {{!-- Upload image with preview --}}
@@ -197,7 +199,31 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-    
+    //validation
+    function validateForm() {
+        console.log("validate form")
+        const alertPrice = document.getElementById("alertPrice");
+        const alertStock = document.getElementById("alertStock");
+        alertPrice.innerHTML = "";
+        alertStock.innerHTML = "";
+        const price = document.getElementById("price").value;
+        const cost = document.getElementById("cost").value;
+        const stock = document.getElementById("stock").value;
+        console.log("price", price, "cost", cost, "stock", stock)
+
+        if(cost <= 0){
+            alertPrice.innerHTML = "Cost cannot be less than or equal to 0";
+            return false;
+        }
+        if(price < cost){
+            alertPrice.innerHTML = "Price cannot be less than cost";
+            return false;
+        }
+        if(stock <= 0){
+            alertStock.innerHTML = "Stock cannot be less than or equal to 0";
+            return false;
+        }
+    }
 
     //preview image
     let cropper;

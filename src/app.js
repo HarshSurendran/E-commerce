@@ -59,7 +59,9 @@ hbs.registerHelper('changeColor', function ( status) {
     return "alert-danger";
   }else if(status == "shipped"){
     return "alert-success";
-  }  
+  }else if(status == "returned"){
+    return "alert-danger";    
+  }
 });
 hbs.registerHelper('generateCancelButton', function(input1) {
   if (input1 === "pending") {

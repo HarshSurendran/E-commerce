@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const orderSchema = mongoose.Schema({    
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
+        ref: "User",
         required: true
     },
     orderId:{
@@ -17,7 +17,7 @@ const orderSchema = mongoose.Schema({
     },
     address: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "addresses",
+        ref: "Address",
         required: true
     },
     status: {
