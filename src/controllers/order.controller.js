@@ -10,6 +10,7 @@ const Order = require("../models/order.models.js");
 const Wallet = require("../models/wallet.models.js");
 const Category = require("../models/category.models.js");
 const Wishlist = require("../models/wishlist.models.js");
+const ProductVarient = require("../models/productvarient.models.js");
 
 const crypto = require("crypto")
 
@@ -272,11 +273,27 @@ const createOrder = asyncHandler( async(req,res)=>{
 
         let total = 0;
         let orderedItems = [];
-        cart.forEach(element => {
-            //push the product varient and quantitty to orderItems array
-            orderedItems.push({productVarientId : element.productVarient_id ,quantity: element.quantity})
-            total = total + (element.quantity * element.product.price)
+        // await cart.forEach(async element => {
+        //     const productVarientUpdate = await ProductVarient.updateOne({_id: element.productVarient_id} , {$inc : {stock : -element.quantity}});
+        //     console.log("tjos is decreasing the stock after order placed", productVarientUpdate);
+        //     //push the product varient and quantitty to orderItems array
+        //     orderedItems.push({productVarientId : element.productVarient_id ,quantity: element.quantity})
+        //     total = total + (element.quantity * element.product.price)
+        //     console.log(orderedItems,"foreaxh");
+        //     console.log(total,"foreaxh");
+        // });
+        const promises = cart.map(async (element) => {
+            const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
+            console.log("This is decreasing the stock after order placed", productVarientUpdate);
+            // Push the product variant and quantity to orderedItems array
+            orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
+            total = total + (element.quantity * element.product.price);
+            console.log(orderedItems, "forEach");
+            console.log(total, "forEach");
         });
+    
+        // Wait for all promises to resolve
+        await Promise.all(promises);
         
 
         const order = await Order.create({

@@ -132,9 +132,9 @@
         // Fetch data and update chart
     }
 
-    let filter = 'monthly';
-    let time = 2024;
-    fetchDataAndUpdateChart(filter,time);
+    // let filter = 'monthly';
+    // let time = 2024;
+    // fetchDataAndUpdateChart(filter,time);
 
 
 

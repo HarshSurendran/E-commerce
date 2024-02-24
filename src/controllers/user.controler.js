@@ -8,6 +8,7 @@ const ProductVarient = require("../models/productvarient.models.js");
 const Wishlist = require("../models/wishlist.models.js");
 const Category = require("../models/category.models.js");
 const Cart = require("../models/cart.models.js");
+const Coupon = require("../models/coupon.models.js");
 
 
 const jwt = require("jsonwebtoken");
@@ -785,7 +786,7 @@ const renderWishlist = asyncHandler( async(req,res)=>{
     //res.json(new ApiResponse(200, {wishlist}));
     res
     .status(200)
-    .render("users/wishlist123", {wishlist, title: "Urbane Wardrobe", user:req.user, wishlistCountlayout, categorylayout, cartCountlayout, message});
+    .render("users/wishlist", {wishlist, title: "Urbane Wardrobe", user:req.user, wishlistCountlayout, categorylayout, cartCountlayout, message});
 });
 
 const deleteWishlist = asyncHandler( async(req,res)=>{
@@ -822,6 +823,16 @@ const renderProfilePage = asyncHandler( async(req,res)=>{
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
     res.render("users/profile",{user:req.user, layout:"userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});
+});
+
+const availableCoupons = asyncHandler( async(req,res)=>{
+    const coupons = await Coupon.find({}).select(" -_id -createdAt -updatedAt -__v -userlimit -minamount ");
+    console.log("this is coupokms",coupons);
+    
+
+    res
+    .status(200)
+    .json( new ApiResponse(200,{coupons}));
 })
 
 
@@ -844,5 +855,7 @@ module.exports = {
     addToWishlist,
     renderWishlist,
     deleteWishlist,
-    renderProfilePage
+    renderProfilePage,
+    availableCoupons
+    
 }

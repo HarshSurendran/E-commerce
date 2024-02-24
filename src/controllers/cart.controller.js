@@ -170,6 +170,16 @@ const deleteCart = asyncHandler( async(req,res)=>{
 const addQuantity = asyncHandler( async(req,res)=>{
     const {id, quantity} = req.body;
     console.log(req.body);
+    const cart = await Cart.findOne({_id: id}).populate("productVarient_id");
+    console.log("this is cart", cart);
+    if (cart.productVarient_id.stock < quantity) {
+        console.log("Entered stock limit")
+        res
+        .status(500)
+        .json( new ApiResponse(500,"Stock exceeded. Try with lesser quantity"));
+    }
+    cart.productVarient_id.stock = cart.productVarient_id.stock - quantity
+
     const updateCart = await Cart.updateOne(
         {
             _id: id
@@ -189,7 +199,7 @@ const addQuantity = asyncHandler( async(req,res)=>{
         console.log("entered error");
         res
         .status(500)
-        .json( new ApiError(500,"Server couldn't update cart"))
+        .json( new ApiResponse(500,"Server couldn't update cart"))
     }
     console.log("return succes");
     res
