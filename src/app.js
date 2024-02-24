@@ -68,6 +68,15 @@ hbs.registerHelper('generateCancelButton', function(input1) {
     return new hbs.SafeString('<a data-id="{{this._id}}" class="btn btn-danger cancelButton me-3 ">Cancel</a>');
   }
 });
+
+hbs.registerHelper('formatDate', function(isoDate) {
+      const date = new Date(isoDate);
+      const day = ('0' + date.getDate()).slice(-2);
+      const month = ('0' + (date.getMonth() + 1)).slice(-2);
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    });
+
 // hbs.registerHelper('ifZero', function (value) {
 //   if(value == 0){
 //     return true

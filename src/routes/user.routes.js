@@ -81,7 +81,7 @@ router.post("/fetchaddaddress", auth.verifyUserJWT, addressController.fetchAddAd
 
 //orders
 router.get("/orders", auth.verifyUserJWT,  orderController.renderUserOrdersPage);
-router.patch("/orders", auth.verifyUserJWT, walletController.updateWallet,  orderController.cancelOrder);
+router.patch("/orders", auth.verifyUserJWT, walletController.updateWallet, orderController.cancelOrder);
 router.patch("/returnorders", auth.verifyUserJWT,  orderController.returnOrder);
 router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
 
