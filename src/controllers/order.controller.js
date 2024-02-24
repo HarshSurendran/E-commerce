@@ -584,13 +584,11 @@ const changeOrderStatus = asyncHandler( async(req,res)=>{
     .json(new ApiResponse(200, order, "Order status updated"));
 });
 
-const renderUserOrdersPage = asyncHandler( async(req,res)=>{
-    
+const renderUserOrdersPage = asyncHandler( async(req,res)=>{    
     const userId = req.user._id;    
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
-    let wishlistlayout = await Wishlist.find({userId: req.user._id});
-    console.log("This is wishlist",wishlistlayout);
+    let wishlistlayout = await Wishlist.find({userId: req.user._id});    
     wishlistlayout = wishlistlayout[0];
     if (wishlistlayout?.productsId.length) {
         wishlistlayout.productsId.forEach(element => {
@@ -792,8 +790,6 @@ const renderUserOrdersPage = asyncHandler( async(req,res)=>{
         order.createdAt = formattedCreatedAt;        
     });
 
-    console.log("this is orders", order);
-
     res
     .status(200)
     .render("users/orderlist",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});
@@ -811,7 +807,7 @@ const cancelOrder = asyncHandler( async(req,res)=>{
             }
         }
     );
-    console.log("This is order",order);
+    
 
     if(!order){
         return res

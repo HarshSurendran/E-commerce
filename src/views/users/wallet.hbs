@@ -18,7 +18,12 @@
                                    <i class="fa-solid fa-wallet"></i> Wallet Balance
                                 </div>
                                 <ul class="list-group list-group-flush text-center  ">
+                                    {{#if wallet}}
                                     <li class="list-group-item">₹ {{wallet.balance}}</li>
+                                    {{else}}
+                                    <li class="list-group-item">₹ 0</li>
+                                    <li class="list-group-item text-danger ">Your wallet is empty.</li>
+                                    {{/if}} 
                                 </ul>
                             </div>
                         </div>
@@ -61,21 +66,48 @@
                        <div class="accordion" id="accordionExample">
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
-                                <button style="background-color: #d8f1e5;" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#one" aria-expanded="true" aria-controls="collapseOne">
-                                    Transaction History
-                                </button>
+                                    <button style="background-color: #d8f1e5;" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#one" aria-expanded="true" aria-controls="collapseOne">
+                                        Transaction History
+                                    </button>
                                 </h2>
                                 <div id="one" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
-                                        {{#each wallet.transaction}}
-                                        
-                                        {{/each}}                                        
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        {{!-- <th>Transaction ID</th> --}}
+                                                        <th>Amount</th>
+                                                        <th>Method</th>
+                                                        <th>Date</th>
+                                                        {{!-- <th class="text-end">Action</th> --}}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {{#each wallet.transactions}}
+                                                    <tr>
+                                                        {{!-- <td><b>{{this.transactionId}}</b></td> --}}
+                                                        <td>{{this.amount}}</td>
+                                                        {{!-- <td>
+                                                            <div class="icontext">
+                                                                <img class="icon border" src="assets/imgs/card-brands/1.png" alt="Payment" />
+                                                                <span class="text text-muted">Amex</span>
+                                                            </div>
+                                                        </td> --}}
+                                                        <td>{{this.type}}</td>
+                                                        <td>{{this.date}}</td>
+                                                        {{!-- <td class="text-end">
+                                                            <a href="#" class="btn btn-sm btn-light font-sm rounded">Details</a>
+                                                        </td> --}}
+                                                    </tr>
+                                                     {{/each}}    
+                                                </tbody>
+                                            </table>
+                                        </div> 
                                     </div>
                                 </div>
                             </div>
                         </div>
-                            </div>
-                            </div>
                         <!-- .col// -->
                     </div>
                     <!-- .row // -->

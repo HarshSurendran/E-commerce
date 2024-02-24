@@ -7,6 +7,8 @@ const Category = require("../models/category.models.js");
 const Wishlist = require("../models/wishlist.models.js");
 const Cart = require("../models/cart.models.js");
 
+const moment = require("moment");
+
 const renderWalletPage = asyncHandler(async (req, res) => {
     const user = req.user;
     const categorylayout = await Category.find({});
@@ -23,11 +25,17 @@ const renderWalletPage = asyncHandler(async (req, res) => {
 
     const wallet = await Wallet.findOne({ userId: user._id });
     console.log("This is wallet : ",wallet);
-
+    
     if (!wallet) {
-        throw new ApiError(400, "Wallet not found");        
+        res
+        .status(200)
+        .render("users/wallet", {user, title:"Urbane Wardrobe", layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});       
     }
 
+    wallet.transactions = wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    console.log(wallet);
+    
     res
     .status(200)
     .render("users/wallet", {user, title:"Urbane Wardrobe", wallet, layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});
@@ -36,6 +44,7 @@ const renderWalletPage = asyncHandler(async (req, res) => {
 const updateWallet = asyncHandler(async (req, res, next) => {
     const { orderId } = req.body;
     const order = await Order.findOne({ _id : orderId });
+    
     const wallet = await Wallet.updateOne(
         {
             userId: req.user._id
@@ -43,14 +52,18 @@ const updateWallet = asyncHandler(async (req, res, next) => {
         {
             $inc: {
                 balance: order.orderAmount
+            },
+            $push: {
+                transactions: { amount: order.orderAmount , type: "deposit", date: Date.now() }
             }
         },
         {
             upsert: true
         }
-    )
+    )    
     console.log("this is wallet", wallet);
-    if (wallet.modifiedCount===0) {
+
+    if (wallet.modifiedCount===0 && wallet.upsertedCount===0) {
         throw new ApiError(500, "Failed to update wallet");        
     }
     next();

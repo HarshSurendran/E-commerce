@@ -10,7 +10,7 @@ const walletSchema = mongoose.Schema({
             type: Number,
             default: 0
         },
-        transaction:[
+        transactions:[
             {
                 amount:{
                     type: Number,
