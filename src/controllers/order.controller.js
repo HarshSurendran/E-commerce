@@ -302,8 +302,9 @@ const createOrder = asyncHandler( async(req,res)=>{
             console.log(total, "forEach");
         });
         await Promise.all(promises);
+        let coupon
         if(couponCode){
-            const coupon = await Coupon.findOne({code: couponCode});
+            coupon = await Coupon.findOne({code: couponCode});
             if(coupon){
                 coupon.userlimit = coupon.userlimit - 1;
                 await coupon.save();
@@ -317,7 +318,8 @@ const createOrder = asyncHandler( async(req,res)=>{
             orderAmount: total,
             orderedItems,
             orderId,
-            couponCode
+            couponCode,
+            couponDiscount: coupon.discount
         })
 
         const orderConfirm = await Order.findOne({_id: order._id});
@@ -572,12 +574,16 @@ const renderOrderDetailsPage = asyncHandler( async(req,res)=>{
     orderVarients.forEach((order)=>{
         subTotal = subTotal + (order.productVarient.price * order.orderedItems.quantity)
     })
+    const coupon = await Coupon.findOne({code: order.couponCode});
 
-    let total = subTotal + 100;    
-
+    let total = parseInt(subTotal);
+    if (coupon) {
+        total = parseInt(subTotal) - parseInt(coupon.discount); 
+    }
+    
     res
     .status(200)
-    .render("admin/orderdetails",{admin:true, title:"Urbane Wardrobe", order, orderVarients, subTotal, total});
+    .render("admin/orderdetails",{admin:true, title:"Urbane Wardrobe", order, orderVarients, subTotal, total, coupon});
 });
 
 const changeOrderStatus = asyncHandler( async(req,res)=>{

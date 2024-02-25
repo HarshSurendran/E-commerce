@@ -1,165 +1,257 @@
-
-    <body>
-        <div class="screen-overlay"></div>
-        
-        <main class="main-wrap">
-            <section class="content-main">
-                <div class="content-header">
-                    <div>
-                        <h2 class="content-title card-title">Sales Report</h2>
-                        <p>Whole data about your business is here</p>
-                    </div>
+<body>
+    <div class="screen-overlay"></div>
+    
+    <main class="main-wrap">
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Sales Report</h2>
+                    <p>Whole data about your business is here</p>
                 </div>
-                <div class="row">
-                    <div class="col-md-9">
-                        <div class="card mb-4">
-                            <header class="card-header">
-                                <div class="row gx-3">
-                                    <div class="col-lg-4 col-md-6 me-auto">
-                                        <input type="text" placeholder="Search..." class="form-control" />
-                                    </div>
-                                    {{!-- <div class="col-lg-2 col-md-3 col-6">
-                                        <select class="form-select">
-                                            <option>Status</option>
-                                            <option>Active</option>
-                                            <option>Disabled</option>
-                                            <option>Show all</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-2 col-md-3 col-6">
-                                        <select class="form-select">
-                                            <option>Show 20</option>
-                                            <option>Show 30</option>
-                                            <option>Show 40</option>
-                                        </select>
-                                    </div> --}}
+            </div>
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="card mb-4">
+                        <header class="card-header">
+                            <div class="row gx-3">
+                                <div class="col-lg-4 col-md-6 me-auto">
+                                    <input type="text" placeholder="Search..." class="form-control" />
                                 </div>
-                            </header>
-                            <!-- card-header end// -->
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Order ID</th>
-                                                <th>Customer name</th>
-                                                <th>Price</th>
-                                                <th>Date</th>
-                                                <th>Status</th>
-                                                <th class="text-end">Payment Mode</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {{#each orders}}
-                                            <tr>
-                                                <td>{{this.orderId}}</td>
-                                                <td><b>{{this.userId.fullname}}</b></td>
-                                                <td>{{this.orderAmount}}</td>
-                                                <td>{{this.createdAt}}</td>
-                                                <td><span class="badge rounded-pill alert-success">{{this.status}}</span></td>
-                                                <td class="text-center">{{this.paymentMethod}}</td>
-                                                {{!-- <td class="text-end">
-                                                    <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                                    <div class="dropdown">
-                                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item" href="#">View detail</a>
-                                                            <a class="dropdown-item" href="#">Edit info</a>
-                                                            <a class="dropdown-item text-danger" href="#">Delete</a>
-                                                        </div>
+                                {{!-- <div class="col-lg-2 col-md-3 col-6">
+                                    <select class="form-select">
+                                        <option>Status</option>
+                                        <option>Active</option>
+                                        <option>Disabled</option>
+                                        <option>Show all</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-6">
+                                    <select class="form-select">
+                                        <option>Show 20</option>
+                                        <option>Show 30</option>
+                                        <option>Show 40</option>
+                                    </select>
+                                </div> --}}
+                            </div>
+                        </header>
+                        <!-- card-header end// -->
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer name</th>
+                                            <th>Price</th>
+                                            <th>Coupon</th>
+                                            <th>Discount</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Payment Mode</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                        {{#each orders}}
+                                        <tr>
+                                            <td>{{this.orderId}}</td>
+                                            <td><b>{{this.userId.fullname}}</b></td>
+                                            <td>{{this.orderAmount}}</td>
+                                            <td>{{this.couponCode}}</td>
+                                            <td>{{this.couponDiscount}}</td>
+                                            <td>{{formatDate this.createdAt}}</td>
+                                            <td><span class="badge rounded-pill alert-success">{{this.status}}</span></td>
+                                            <td class="text-center">{{this.paymentMethod}}</td>
+                                            {{!-- <td class="text-end">
+                                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
+                                                <div class="dropdown">
+                                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#">View detail</a>
+                                                        <a class="dropdown-item" href="#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="#">Delete</a>
                                                     </div>
-                                                    <!-- dropdown //end -->
-                                                </td> --}}
-                                            </tr>
-                                            {{/each}}
-                                        </tbody>
-                                    </table>
+                                                </div>
+                                                <!-- dropdown //end -->
+                                            </td> --}}
+                                        </tr>
+                                        {{/each}}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="2" class="text-end"><b>Total</b></td>
+                                            <td id="totalAmount"><b></b></td>
+                                            <td class="text-end"><b>Total discount</b></td>
+                                            <td id="totalDiscount"><b></b></td>
+                                            <td colspan="2" class="text-end"><b>Total Sales</b></td>
+                                            <td id="totalSalesCount"><b></b></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <!-- table-responsive //end -->
+                        </div>
+                        <!-- card-body end// -->
+                    </div>
+                    <!-- card end// -->
+                </div>
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="mb-3">Filter by</h5>
+                            <form>
+                                {{!-- <div class="mb-4">
+                                    <label for="order_id" class="form-label">Order ID</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="order_id" />
+                                </div> --}}
+                                <div class="mb-4">
+                                    <label for="order_customer" class="form-label">From</label>
+                                    <input type="date" placeholder="Type here" class="form-control" id="fromDate" />
+                                    <p id="fromDateAlert" class="text-danger"></p>
                                 </div>
-                                <!-- table-responsive //end -->
-                            </div>
-                            <!-- card-body end// -->
+                                <div class="mb-4">
+                                    <label for="order_customer" class="form-label">To</label>
+                                    <input type="date" placeholder="Type here" class="form-control" id="toDate" />
+                                    <p id="toDateAlert" class="text-danger"></p>
+                                </div>
+                                <div class="mb-2 text-center ">
+                                <button id="searchBtn" class="btn btn-primary" >Search</button>
+                                </div>
+                            </form>
                         </div>
-                        <!-- card end// -->
                     </div>
-                    <div class="col-md-3">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="mb-3">Filter by</h5>
-                                <form>
-                                    {{!-- <div class="mb-4">
-                                        <label for="order_id" class="form-label">Order ID</label>
-                                        <input type="text" placeholder="Type here" class="form-control" id="order_id" />
-                                    </div> --}}
-                                    <div class="mb-4">
-                                        <label for="order_customer" class="form-label">From</label>
-                                        <input type="date" placeholder="Type here" class="form-control" id="order_customer" />
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="order_customer" class="form-label">To</label>
-                                        <input type="date" placeholder="Type here" class="form-control" id="order_customer" />
-                                    </div>
-                                    <div class="mb-2 text-center ">
-                                    <button class="btn btn-primary" >Search</button>
-                                    </div>
-                                    {{!--<div class="mb-4">
-                                        <label class="form-label">Order Status</label>
-                                        <select class="form-select">
-                                            <option>Published</option>
-                                            <option>Draft</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="order_total" class="form-label">Total</label>
-                                        <input type="text" placeholder="Type here" class="form-control" id="order_total" />
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="order_created_date" class="form-label">Date Added</label>
-                                        <input type="text" placeholder="Type here" class="form-control" id="order_created_date" />
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="order_modified_date" class="form-label">Date Modified</label>
-                                        <input type="text" placeholder="Type here" class="form-control" id="order_modified_date" />
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="order_customer_1" class="form-label">Customer</label>
-                                        <input type="text" placeholder="Type here" class="form-control" id="order_customer_1" />
-                                    </div> --}}
-                                </form>
-                            </div>
-                        </div>
-                        <!-- card end// -->
-                    </div>
+                    <!-- card end// -->
                 </div>
-                <div class="pagination-area mt-15 mb-50">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination justify-content-start">
-                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                            <li class="page-item"><a class="page-link" href="#">02</a></li>
-                            <li class="page-item"><a class="page-link" href="#">03</a></li>
-                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                            <li class="page-item"><a class="page-link" href="#">16</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </section>
-            <!-- content-main end// -->
-            <footer class="main-footer font-xs">
-                <div class="row pb-30 pt-15">
-                    <div class="col-sm-6">
-                        <script>
-                            document.write(new Date().getFullYear());
-                        </script>
-                        &copy; Nest - HTML Ecommerce Template .
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="text-sm-end">All rights reserved</div>
-                    </div>
-                </div>
-            </footer>
-        </main>
-       
-    </body>
-</html>
+            </div>
+            <div class="pagination-area mt-15 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                        <li class="page-item"><a class="page-link" href="#">02</a></li>
+                        <li class="page-item"><a class="page-link" href="#">03</a></li>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        <li class="page-item"><a class="page-link" href="#">16</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+        <!-- content-main end// -->
+        
+    </main>
+    <script>
+        /*function calculateTotal() {            
+            let totalAmount = 0;
+            const table = document.getElementById('myTable');
+            const rows = table.getElementsByTagName('tr');
+            for (let i = 1; i < rows.length - 1; i++) { // Exclude header and footer rows
+                const cells = rows[i].getElementsByTagName('td');
+                const amount = parseFloat(cells[2].textContent); // Assuming amount is in the third column (index 2)
+                if (!isNaN(amount)) {
+                    totalAmount += amount;
+                }
+            }
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2); // Display total amount
+        }*/
+        function calculateTotal() {
+            const orders = document.querySelectorAll('#tableBody tr');
+            let totalAmount = 0;
+            let totalDiscount = 0;
+            let totalSalesCount = orders.length;
+
+            orders.forEach(order => {
+                const price = parseFloat(order.cells[2].textContent);
+                const discount = parseFloat(order.cells[4].textContent);
+
+                totalAmount += price;
+                totalDiscount += discount;
+            });
+
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+            document.getElementById('totalDiscount').textContent = totalDiscount.toFixed(2);
+            document.getElementById('totalSalesCount').textContent = totalSalesCount;
+        }
+        
+        calculateTotal();
+
+        function formatDate(isoDate) {
+            const date = new Date(isoDate);
+            const day = ('0' + date.getDate()).slice(-2);
+            const month = ('0' + (date.getMonth() + 1)).slice(-2);
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        //logic to update the table
+        function updateTable(orders) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.orderId}</td>
+                    <td><b>${order.userId.fullname}</b></td>
+                    <td>${order.orderAmount}</td>                    
+                    <td>${order.couponCode}</td> 
+                    <td>${order.couponDiscount}</td>
+                    <td>${formatDate(order.createdAt)}</td>
+                    <td><span class="badge rounded-pill alert-success">${order.status}</span></td>
+                    <td class="text-center">${order.paymentMethod}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+            setTimeout(() => {
+                calculateTotal();
+            },100)
+        }
+
+        const searchBtn = document.getElementById("searchBtn");
+        searchBtn.addEventListener("click", function(event){
+            event.preventDefault();
+            //validation
+            const fromDate = document.getElementById("fromDate").value;
+            const toDate = document.getElementById("toDate").value;
+                const fromDateAlert = document.getElementById("fromDateAlert");
+                const toDateAlert = document.getElementById("toDateAlert");
+                fromDateAlert.innerText = "";
+                toDateAlert.innerText = "";
+            if(fromDate == "" ){
+                fromDateAlert.innerText = "From date can't be empty";
+                return
+            }else if(toDate == ""){
+                toDateAlert.innerText = "To date can't be empty";
+                return
+            }else if(fromDate > toDate){
+                fromDateAlert.innerText = "From date can't be greater than To date";
+                return
+            }
+            //validation end
+
+            //search logic
+            fetch("/api/v1/admin/salesreport",{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    fromDate,
+                    toDate
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(!data.success){
+                    fromDateAlert.innerText = "Couldn't fetch data. Please try again"
+                }
+                console.log(data);
+                updateTable(data.data);
+            })
+        })
+
+
+    </script>
+</body>
+
+

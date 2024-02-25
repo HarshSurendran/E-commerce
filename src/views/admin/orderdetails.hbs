@@ -122,7 +122,7 @@
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Shipping cost:</dt>
-                                                        <dd>₹100.00</dd>
+                                                        <dd>₹ 0.00</dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Grand total:</dt>
@@ -153,7 +153,16 @@
                                     Phone: +1 (800) 555-154-52
                                 </p> --}}
                                 <p>
-                                    {{order.paymentMethod}}
+                                    METHOD : <b>{{order.paymentMethod}}</b>
+                                </p>
+                            </div>
+                            <div class="box shadow-sm bg-light">
+                                <h6 class="mb-15">Discount info</h6>
+                                <p>
+                                    COUPON CODE : <b>{{coupon.code}}</b>
+                                </p>
+                                <p>
+                                    DISCOUNT : ₹ <b>{{coupon.discount}}</b>
                                 </p>
                             </div>
                             

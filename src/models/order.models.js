@@ -58,6 +58,10 @@ const orderSchema = mongoose.Schema({
     couponCode: {
         type: String,
         default: ""
+    },
+    couponDiscount: {
+        type: Number,
+        default: 0
     }
 },
 {

@@ -576,13 +576,35 @@ const graphData = asyncHandler( async (req,res)=>{
 });
 
 const renderSalesReportPage = asyncHandler(async (req, res) => {
-    let orders = await Order.find({status:"delivered"}).populate("userId");
-    orders.forEach(order => {
-        order.createdAt = moment(order.createdAt).format('YYYY-MM-DD');
-    });
+    let orders = await Order.find({status:"delivered"}).populate("userId").sort({createdAt: -1});
+    
+
+    if (!orders) {
+        res
+        .status(400)
+        .json( new ApiError(400, null, "Could not find orders"))
+    }
+    
+   
     console.log("this is orders", orders);
     res.render("admin/salesReport",{admin:true, orders});
 });
+
+const getSalesReport = asyncHandler(async (req, res) => {
+    const {fromDate, toDate} = req.body;
+    console.log(fromDate, toDate);
+    let orders = await Order.find({createdAt: {$gte: new Date(fromDate), $lte: new Date(toDate)},  status: "delivered"}).populate("userId").sort({createdAt: -1});
+
+    if (!orders) {
+        res
+        .status(400)
+        .json( new ApiError(400, null, "Could not find orders"))        
+    }
+
+    res
+    .status(200)
+    .json( new ApiResponse(200, orders, "Orders fetched successfully."));
+})
 
 
 
@@ -600,5 +622,6 @@ module.exports = {
     userDetails,
     editUserDetails,
     graphData,
-    renderSalesReportPage
+    renderSalesReportPage,
+    getSalesReport
 }

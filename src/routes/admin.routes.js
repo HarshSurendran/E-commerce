@@ -154,6 +154,7 @@ router.get("/test", async(req,res)=>{
 
 //sales Report
 router.get("/salesreport", auth.verifyAdminJWT, adminController.renderSalesReportPage);
+router.post("/salesreport", auth.verifyAdminJWT, adminController.getSalesReport);
 
 //coupons
 router.get("/coupons", auth.verifyAdminJWT, couponController.renderCouponPage);
