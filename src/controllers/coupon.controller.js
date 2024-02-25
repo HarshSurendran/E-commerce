@@ -31,6 +31,7 @@ const renderCouponPage = asyncHandler( async(req,res)=>{
 
 const addCoupon = asyncHandler( async(req,res)=>{
     const { name, code, description, userlimit, expiryDate, discount, minamount} = req.body;
+    console.log("this is expery date", expiryDate);
     const nameExist = await Coupon.findOne({ name: { $regex: `^${name}$`, $options: 'i' } });
     if (nameExist) {
         throw new ApiError(400,"Coupon name already exist");
@@ -41,6 +42,17 @@ const addCoupon = asyncHandler( async(req,res)=>{
     }
     if (userlimit<20) {
         throw new ApiError(400,"User limit should be greater than 20");
+    }
+    if (minamount>discount){
+        throw new ApiError(400,"Discount should be less than min amount");
+    }
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0'); 
+    const currentDay = String(currentDate.getDate()).padStart(2, '0');
+    const formattedCurrentDate = `${currentYear}-${currentMonth}-${currentDay}`;
+    if (expiryDate < formattedCurrentDate){        
+        throw new ApiError(400,"Expiry date should be greater than current date");
     }
 
     const coupon = await Coupon.create({
