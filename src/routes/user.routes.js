@@ -19,17 +19,6 @@ const getUserId = require("../middlewares/giveuserid.middleware.js");
 
 
 
-
-router.get("/otp", (req,res)=>{
-    res.render("users/otpvalidation",{user:true});
-})
-
-
-
-
-
-
-
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
 router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
 router.post("/resendotp", otpGenerator, userController.resendotpsender);
@@ -90,6 +79,10 @@ router.post("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
 router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);
 router.get("/ordersuccess/:id", auth.verifyUserJWT, orderController.orderSuccessPage);
 router.post("/verifyPayment", auth.verifyUserJWT, orderController.verifyPayment);
+
+//invoice
+router.get("/invoice/:id", auth.verifyUserJWT, orderController.renderInvoice);
+
 
 //wallet
 router.get("/wallet", auth.verifyUserJWT, walletController.renderWalletPage);

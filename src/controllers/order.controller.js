@@ -936,6 +936,99 @@ const returnOrder = asyncHandler( async(req,res)=>{
     }
     return res.status(200).json(new ApiResponse(200, null, "Order returned successfully"));        
     
+});
+
+const renderInvoice = asyncHandler( async(req,res)=>{
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id});    
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout?.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+
+
+    const orderId = req.params.id;
+    const order = await Order.findOne({ orderId: orderId }).populate("userId").populate("address");
+    if(!order){
+        return res
+        .status(400)
+        .json(new ApiError(400, "Cant find the order"));
+    }
+    const products = await Order.aggregate([
+        {
+            $match: {
+                _id: order._id
+            }
+        },
+        {
+            $unwind: "$orderedItems"
+        },
+        {
+            $project: {
+                "orderedItems": 1
+            }
+        },
+        {
+            $lookup: {
+                from: "productvarients",
+                localField: "orderedItems.productVarientId",
+                foreignField: "_id",
+                as: "productvarient",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "products",
+                            localField: "product_id",
+                            foreignField: "_id",
+                            as: "product",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "categories",
+                                        localField: "category",
+                                        foreignField: "_id",
+                                        as: "category"
+                                    }
+                                },
+                                {
+                                    $addFields: {
+                                        category: {
+                                            $arrayElemAt: [ "$category", 0 ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            product: {
+                                $arrayElemAt: [ "$product", 0 ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+            {
+                    
+                $addFields: {
+                            productvarient: {
+                                $arrayElemAt: [ "$productvarient", 0 ]
+                        }
+            }
+        }
+    
+    ]);
+
+    console.log("invboice page  prodcuts", products)
+    res
+    .status(200)
+    .render("users/invoice",{user: req.user, title:"Urbane Wardrobe", order, products, wishlistCountlayout, categorylayout, cartCountlayout});
 })
 
 module.exports = {
@@ -949,5 +1042,6 @@ module.exports = {
     cancelOrder,
     renderUserOrderDetailsPage,
     verifyPayment,
-    returnOrder
+    returnOrder,
+    renderInvoice
 }

@@ -77,6 +77,12 @@ hbs.registerHelper('formatDate', function(isoDate) {
       return `${day}/${month}/${year}`;
     });
 
+  hbs.registerHelper('add', function(value1, value2) {
+    value1 = parseInt(value1);
+    value2 = parseInt(value2);
+    return value1+value2;
+  });
+
 // hbs.registerHelper('ifZero', function (value) {
 //   if(value == 0){
 //     return true
