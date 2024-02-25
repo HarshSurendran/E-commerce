@@ -86,7 +86,7 @@ router.patch("/returnorders", auth.verifyUserJWT,  orderController.returnOrder);
 router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
 
 //checkout
-router.get("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
+router.post("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
 router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);
 router.get("/ordersuccess/:id", auth.verifyUserJWT, orderController.orderSuccessPage);
 router.post("/verifyPayment", auth.verifyUserJWT, orderController.verifyPayment);

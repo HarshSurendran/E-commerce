@@ -11,6 +11,7 @@ const Wallet = require("../models/wallet.models.js");
 const Category = require("../models/category.models.js");
 const Wishlist = require("../models/wishlist.models.js");
 const ProductVarient = require("../models/productvarient.models.js");
+const Coupon = require("../models/coupon.models.js");
 
 const crypto = require("crypto")
 
@@ -85,6 +86,8 @@ function generateRazorpayOrder(orderid, total){
 }
 
 const checkOutPage = asyncHandler( async(req,res)=>{
+    const couponCode = req.body.couponCode;
+    console.log("this is the coupon code", couponCode);
     const user = req.user
     const address = await Address.find({userid: user._id })
     console.log(address);
@@ -175,18 +178,34 @@ const checkOutPage = asyncHandler( async(req,res)=>{
 
     // discount and shipping logic
     let discount = 0;
-    let shipping = 100;
+    if (couponCode) {
+        const coupon = await Coupon.findOne({code: couponCode});
+        console.log(coupon);
+        if (coupon) {
+            if (coupon.minamount > total) {
+                discount = 0;
+                alert("Minimum amount should be greater than " + coupon.minamount);
+            }
+            if(coupon.userlimit<= 0){
+                discount = 0;
+                alert("Coupon is expired");
+            }
+            discount = coupon.discount
+        }
+    }
+    let shipping = 0;
     
 
     res
     .status(200)
-    .render("users/checkout",{title:"Urbane Wardrobe", address, total, discount, shipping , state})
+    .render("users/checkout",{title:"Urbane Wardrobe", address, total, discount, shipping , state, couponCode})
 });
 
 const createOrder = asyncHandler( async(req,res)=>{
     try{
         const user = req.user;
-        const {paymentMethod, address} = req.body;      
+        const {paymentMethod, address, couponCode} = req.body;      
+        console.log("reqbody",paymentMethod, address, couponCode);
 
         const orderId = generateOrderId();
         let payment = paymentMethod.toLowerCase()
@@ -273,15 +292,6 @@ const createOrder = asyncHandler( async(req,res)=>{
 
         let total = 0;
         let orderedItems = [];
-        // await cart.forEach(async element => {
-        //     const productVarientUpdate = await ProductVarient.updateOne({_id: element.productVarient_id} , {$inc : {stock : -element.quantity}});
-        //     console.log("tjos is decreasing the stock after order placed", productVarientUpdate);
-        //     //push the product varient and quantitty to orderItems array
-        //     orderedItems.push({productVarientId : element.productVarient_id ,quantity: element.quantity})
-        //     total = total + (element.quantity * element.product.price)
-        //     console.log(orderedItems,"foreaxh");
-        //     console.log(total,"foreaxh");
-        // });
         const promises = cart.map(async (element) => {
             const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
             console.log("This is decreasing the stock after order placed", productVarientUpdate);
@@ -291,18 +301,23 @@ const createOrder = asyncHandler( async(req,res)=>{
             console.log(orderedItems, "forEach");
             console.log(total, "forEach");
         });
-    
-        // Wait for all promises to resolve
         await Promise.all(promises);
-        
-
+        if(couponCode){
+            const coupon = await Coupon.findOne({code: couponCode});
+            if(coupon){
+                coupon.userlimit = coupon.userlimit - 1;
+                await coupon.save();
+                total = total - coupon.discount;
+            }
+        }
         const order = await Order.create({
             userId: user._id,
             address,
             paymentMethod : payment,
             orderAmount: total,
             orderedItems,
-            orderId
+            orderId,
+            couponCode
         })
 
         const orderConfirm = await Order.findOne({_id: order._id});
@@ -352,18 +367,7 @@ const createOrder = asyncHandler( async(req,res)=>{
 });
 
 const orderSuccessPage = asyncHandler( async(req,res)=>{
-    const id = req.params.id;
-    const order = await Order.findOne({_id: id});
-    const addressArray = await Address.find({_id: order.address });
-    const address = addressArray[0]
-
-    console.log("This is address ", address);
-
-    if(!order){
-        throw new ApiError(404, "Order not found")
-    }
-
-    console.log("This is order",order);
+    //forlayout
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
     let wishlistlayout = await Wishlist.find({userId: req.user._id})
@@ -375,9 +379,27 @@ const orderSuccessPage = asyncHandler( async(req,res)=>{
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
 
+
+    const id = req.params.id;
+    const order = await Order.findOne({_id: id});
+    const addressArray = await Address.find({_id: order.address });
+    const address = addressArray[0]
+    let discount = 0;
+    let totalAmount = order.orderAmount;
+    if(order.couponCode){
+        const coupon = await Coupon.findOne({code: order.couponCode});
+        discount = coupon.discount
+        totalAmount = order.orderAmount + discount;
+    }
+
+    if(!order){
+        throw new ApiError(404, "Order not found")
+    }
+    
+
     res
     .status(200)
-    .render("users/successpage",{title:"Urbane Wardrobe", user: req.user, order, address, categorylayout, wishlistCountlayout, cartCountlayout});
+    .render("users/successpage",{title:"Urbane Wardrobe", user: req.user, order, address, discount, totalAmount, categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
 const renderOrdersPage = asyncHandler( async(req,res)=>{

@@ -54,6 +54,10 @@ const orderSchema = mongoose.Schema({
     returnPeriod: {
         type: Boolean,
         default: false,        
+    },
+    couponCode: {
+        type: String,
+        default: ""
     }
 },
 {

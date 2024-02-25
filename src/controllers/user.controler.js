@@ -826,10 +826,8 @@ const renderProfilePage = asyncHandler( async(req,res)=>{
 });
 
 const availableCoupons = asyncHandler( async(req,res)=>{
-    const coupons = await Coupon.find({}).select(" -_id -createdAt -updatedAt -__v -userlimit -minamount ");
-    console.log("this is coupokms",coupons);
+    const coupons = await Coupon.find({}).select(" -_id -createdAt -updatedAt -__v ");
     
-
     res
     .status(200)
     .json( new ApiResponse(200,{coupons}));

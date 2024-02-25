@@ -165,8 +165,13 @@ const checkUserJWT = asyncHandler( async(req,res,next)=>{
 
     } catch(error) {
         console.log(error);
+        if (error.name === 'TokenExpiredError') {            
+            res.redirect("/api/v1");
+        } else {            
+            console.log(error);
+            next(error);
+        }
     }
-
 });
 
 const checkAdminJWT = asyncHandler( async(req,res,next)=>{

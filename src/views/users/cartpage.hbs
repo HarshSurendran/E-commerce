@@ -119,10 +119,14 @@
                         <h6 class="text-center ">Cart total</h6>
                         <ul>
                             <li>Subtotal <span id="subtotal">{{total}}</span></li>
+                            <li>Total discount <span id="discount">0</span></li>
                             <li id="total">Total <span id="grandtotal">{{total}}</span></li>
                         </ul>
                         {{#if cart}}
-                        <a href="/api/v1/users/checkout" class="primary-btn">Proceed to checkout</a>
+                        <form action="/api/v1/users/checkout" method="post">
+                        <input type="hidden" id="couponForProceedToPayment" name="couponCode" value="">
+                        <button type="submit" class="primary-btn border-0 w-100">Proceed to checkout</button>
+                        </form>
                         {{/if}}
                     </div>
                 </div>
@@ -133,6 +137,54 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
 <script>
+    let coupons
+
+    //apply coupon function
+    async function applyCoupon(couponCode) {
+        console.log("this is coupon code from asdadfasdfasdf", couponCode);
+            for (const coupon of coupons) {
+                if (coupon.code === couponCode) {
+                    const subTotal = parseInt(document.getElementById("subtotal").innerText);
+                    if (coupon.minamount > subTotal || coupon.userlimit <= 0) {
+                        console.log("Entered coupon invalid condition");
+                        return false;
+                    }
+                    console.log("this is totalprice before applying coupon and discount price", subTotal, coupon.discount);
+                    const couponForProceedToPayment = document.getElementById("couponForProceedToPayment");
+                    couponForProceedToPayment.value = couponCode;
+                    console.log("This is coupon input", couponForProceedToPayment.value);
+                    const totaldiscount = document.getElementById("discount");
+                    totaldiscount.textContent = coupon.discount;
+                    const totalPrice = subTotal - coupon.discount;
+                    console.log("this is totalprice after applying coupon", totalPrice);
+                    const grandTotal = document.getElementById("grandtotal");
+                    grandTotal.textContent = totalPrice;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    //proceed to payment
+    /*const proceedToCheckoutButton = document.getElementById("proceedToCheckoutButton");
+    proceedToCheckoutButton.addEventListener("click", (event)=>{
+        event.preventDefault();
+        const couponInput = document.getElementById("couponInput");
+        const couponCode = couponInput.value;
+        console.log("this is coupon code", couponCode);
+        
+        fetch("/api/v1/users/checkout",{
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                couponCode,
+                
+            })
+        })
+    })*/
+
     //Delete item from cart
     document.addEventListener("DOMContentLoaded",()=>{
         const deleteButton = document.querySelectorAll(".deleteCartBut");
@@ -165,18 +217,32 @@
     })
 
     //Total amount calculations
-    function grandTotal(){
+    async function grandTotal(){
         let totalPrice=0;
         const cartTotal = document.querySelectorAll(".cart_total");
         console.log("this isc carttotal", cartTotal);
         cartTotal.forEach((price)=>{
             totalPrice = totalPrice+ parseInt(price.textContent);
         })
-        console.log("this is totalpricce", totalPrice);
         const subTotal = document.getElementById("subtotal");
         subTotal.textContent = totalPrice;
-        const grandTotal = document.getElementById("grandtotal");
-        grandTotal.textContent = totalPrice;
+        const couponInput = document.getElementById('couponInput');
+        if(couponInput.value){
+            const validCoupon = await applyCoupon(couponInput.value);
+            console.log("this is valid coupon", validCoupon);
+            if(validCoupon){
+               
+            }else{
+                couponInput.value = '';
+                removeCouponButton.classList.add('d-none');
+                showCouponButton.classList.remove('d-none');
+                location.reload();
+                alert(`NOTE: Offer limit is reached.`);
+            }
+        }else{
+            const grandTotal = document.getElementById("grandtotal");
+            grandTotal.textContent = totalPrice;
+        }
     }
 
     function updateTotal(qty, event){        
@@ -227,8 +293,7 @@
 
     //coupon
     document.addEventListener('DOMContentLoaded', function() {
-        let coupons
-
+        
         const showCouponButton = document.getElementById('showCouponButton');
         showCouponButton.addEventListener('click',async function() {
             await fetch('/api/v1/users/availableCoupons', {
@@ -268,18 +333,60 @@
 
         // Add event listener to Apply button
         const applyCouponBtn = document.getElementById('applyCouponBtn');
-        applyCouponBtn.addEventListener('click', function() {
+        applyCouponBtn.addEventListener('click',async function() {
             const selectedCoupon = document.querySelector('input[name="coupon"]:checked');
             if (selectedCoupon) {
                 const couponInput = document.getElementById('couponInput');
                 couponInput.value = selectedCoupon.value;
-                const removeCouponButton = document.getElementById('removeCouponButton');
-                removeCouponButton.classList.remove('d-none');
-                showCouponButton.classList.add('d-none');            
+                const validCoupon = await applyCoupon(couponInput.value);
+                console.log("this is valid coupon", validCoupon);
+                if(validCoupon){
+                    const removeCouponButton = document.getElementById('removeCouponButton');
+                    removeCouponButton.classList.remove('d-none');
+                    showCouponButton.classList.add('d-none');
+                }else{
+                    couponInput.value = '';
+                    alert(`NOTE: This coupon is not valid for this order.`);
+                }
             } else {
                 alert(`NOTE: You didn't select any coupon.`);
             }
         });
+
+        /*async function applyCoupon(couponCode) {
+            coupons.forEach(coupon => {
+                if(coupon.code === couponCode){
+                    const subTotal = document.getElementById("subtotal").innerText;
+                    if(coupon.minamount > subTotal || coupon.userlimit <= 0){
+                        console.log("Entered coupon invalid condition")
+                        return false
+                    }
+                    console.log("this is totalprice before applyuing coupon and discount prixe", subTotal, coupon.discount);
+                    const totaldiscount = document.getElementById("discount");
+                    totaldiscount.textContent = coupon.discount;
+                    const totalPrice = parseInt(subTotal) - coupon.discount;  
+                    console.log("this is totalprice after applyuing coupon", totalPrice);             
+                    const grandTotal = document.getElementById("grandtotal");
+                    grandTotal.textContent = totalPrice;
+                    return true               
+                }
+            })
+        }*/
+
+       
+
+        // Add event listener to Remove button
+        const removeCouponButton = document.getElementById('removeCouponButton');
+        removeCouponButton.addEventListener('click', function() {
+            const couponInput = document.getElementById('couponInput');
+            couponInput.value = '';
+            removeCouponButton.classList.add('d-none');
+            showCouponButton.classList.remove('d-none');
+            location.reload();
+        });
+
+
+        
         
     });
 
