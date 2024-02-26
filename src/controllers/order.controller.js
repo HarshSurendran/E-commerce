@@ -182,11 +182,13 @@ const checkOutPage = asyncHandler( async(req,res)=>{
         if (coupon) {
             if (coupon.minamount > total) {
                 discount = 0;
-                alert("Minimum amount should be greater than " + coupon.minamount);
+                return res.status(400)
+                //alert("Minimum amount should be greater than " + coupon.minamount);
             }
             if(coupon.userlimit<= 0){
                 discount = 0;
-                alert("Coupon is expired");
+                return res.status(400)
+                //alert("Coupon is expired");
             }
             discount = coupon.discount
         }
@@ -202,12 +204,11 @@ const checkOutPage = asyncHandler( async(req,res)=>{
 const createOrder = asyncHandler( async(req,res)=>{
     try{
         const user = req.user;
-        const {paymentMethod, address, couponCode} = req.body;      
+        const {paymentMethod, address, couponCode} = req.body;  
+        console.log("entered create order", paymentMethod)    
         
         const orderId = generateOrderId();
         let payment = paymentMethod.toLowerCase();
-
-        
 
         const cart = await Cart.aggregate([
             {
@@ -288,7 +289,6 @@ const createOrder = asyncHandler( async(req,res)=>{
             }
         ])
 
-
         let total = 0;
         let orderedItems = [];
         const promises = cart.map(async (element) => {
@@ -310,6 +310,11 @@ const createOrder = asyncHandler( async(req,res)=>{
 
         if(payment === "wallet"){
             const wallet = await Wallet.findOne({ userId: user._id });
+            if (!wallet) {
+                return res
+                .status(408)
+                .json(new ApiError(408, "Insufficient balance"));
+            }
             if(wallet.balance < total){
                 return res
                 .status(408)
@@ -363,7 +368,8 @@ const createOrder = asyncHandler( async(req,res)=>{
             .status(200)
             .json( new ApiResponse(200, {orderConfirm , codpayment:true}, "Order placed successfully"));
 
-        }else if (payment === "razorpay"){
+        }else if (payment === "online"){
+            console.log("reached razorpay");
             generateRazorpayOrder(orderConfirm.orderId, total)
             .then((razorpayOrder)=>{
                 return res

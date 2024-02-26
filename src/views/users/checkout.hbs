@@ -413,7 +413,8 @@
                 const razorpayOrder = res.data.razorpayOrder;
                 const order = res.data.orderConfirm;
                 console.log("reached razorpay", razorpayOrder, order);
-                razorpayCheckout(razorpayOrder, order);        
+                razorpayCheckout(razorpayOrder, order); 
+                return       
             }    
             
         })

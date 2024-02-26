@@ -264,8 +264,6 @@
             
             if ((currentValue + increment >= 1) && (currentValue + increment <= 10)) {                
                 let qty = currentValue + increment;
-                //implement the stockleft calculation here
-                                
 
                 fetch("/api/v1/users/cart",{
                     method : "PATCH",

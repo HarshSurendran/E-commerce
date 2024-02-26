@@ -27,12 +27,12 @@ const renderWalletPage = asyncHandler(async (req, res) => {
     console.log("This is wallet : ",wallet);
     
     if (!wallet) {
-        res
+        return res
         .status(200)
         .render("users/wallet", {user, title:"Urbane Wardrobe", layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});       
     }
 
-    wallet.transactions = wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    wallet.transactions = wallet?.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
     
     console.log(wallet);
     
