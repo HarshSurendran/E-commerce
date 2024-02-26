@@ -30,10 +30,8 @@ router.post("/changepassword", userController.changePassFromOtp);
 
 router.get("/home", auth.verifyUserJWT, userController.homePageRender);
 
-
 //coupons
 router.post("/availablecoupons", auth.verifyUserJWT, userController.availableCoupons);
-
 
 // cart management
 router.get("/cart", auth.verifyUserJWT, cartController.renderCartPage);

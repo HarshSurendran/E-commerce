@@ -714,6 +714,7 @@ const addToWishlist = asyncHandler( async(req,res)=>{
 const renderWishlist = asyncHandler( async(req,res)=>{
     //const wishlist = await Wishlist.findOne({userId: req.user._id})
     //.populate("productsId productsId.product_id")
+    
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
     let wishlistlayout = await Wishlist.find({userId: req.user._id})
@@ -778,14 +779,18 @@ const renderWishlist = asyncHandler( async(req,res)=>{
             }
         }
     ]);
+    wishlist.forEach(element => {
+        if (element.productsId.stock<1) {
+            element.isOutofStock = true;
+        }
+    })
 
-    
-    
-    console.log("this is wishlist",wishlist);
+    console.log("this is the wishlist", wishlist);
     let message = "";
     if (wishlist.length === 0) {
         message = "Wishlist is empty, add some products";        
     }
+
     //res.json(new ApiResponse(200, {wishlist}));
     res
     .status(200)

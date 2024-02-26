@@ -218,7 +218,7 @@ const deleteProduct = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .redirect("/api/v1/admin/products");
-})
+});
 
 const addProductVarientPage = asyncHandler( async(req,res)=>{    
     const color = await Color.find({}).select("-createdAt -updatedAt -hex");    
@@ -231,7 +231,7 @@ const addProductVarientPage = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .render("admin/addproductVarient",{admin:true, title:"Urbane Wardrobe", color, size});
-})
+});
 
 const addProductVarient = asyncHandler( async (req,res)=>{
         //get product details   
@@ -352,7 +352,7 @@ const editProductVarientPage = asyncHandler(async(req,res)=>{
     .status(200)
     .render("admin/editproductvarient",{admin:true, title:"Urbane Wardrobe", productVarient, color, size});
 
-})
+});
 
 const editProductVarient = asyncHandler( async (req,res)=>{
     //get datas name, about, category, islisted, 
@@ -486,6 +486,18 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     console.log("This is the product id to productdetails",prodId);
     console.log("This is user ", req.user);
 
+    //data for layout
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout?.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
+    }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+
     const prod = await ProductVarient.aggregate([
         {
             $match: {
@@ -571,8 +583,11 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
 
     const mainProdId = prodDetails.name._id;
 
-    console.log("Thisis mainprod id",mainProdId);
-    
+    if (prodDetails.stock < 1) {
+       prodDetails.isOutOfStock = true;
+    }
+
+    //to get the other varient of this product
     const prodVarients = await ProductVarient.aggregate([
         {
             $match: {
@@ -636,14 +651,13 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
             }
         }
     ]);
-    //lookupthe color and size etc
-    console.log("Thisi s the prodvarients",prodVarients);
-
+    
+    
     //add size logic here
     
     res
     .status(200)
-    .render("proddetails", {user:req.user, title:"Urbane Wardrobe", product: prodDetails, prodVarients, cart});
+    .render("proddetails", {user:req.user, title:"Urbane Wardrobe", product: prodDetails, prodVarients, cart, wishlistCountlayout, cartCountlayout, categorylayout});
 });
 
 const listUnlistProduct = asyncHandler( async(req,res)=>{
@@ -1129,7 +1143,6 @@ const productVarientDetailsPage = asyncHandler( async(req,res)=>{
 
 
 });
-
 
 const uploadImage = asyncHandler( async(req,res)=>{
     const {index,productId, cropedImage} = req.body;    

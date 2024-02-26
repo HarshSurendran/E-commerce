@@ -111,6 +111,9 @@
                                     <input type="text" value="1">
                                 </div>
                             </div>
+                            {{#if product.isOutOfStock}}
+                            <button id="outofstock" data-id="{{product._id}}" class="cart-btn border-0 " disabled><span class="icon_bag_alt"></span> Out of Stock</button>
+                            {{else}}
                             {{#if cart}}
                             <a id="alreadyInCart" style="background-color: #4CAF50 ;" data-id="{{product._id}}" href="/api/v1/users/cart" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Go to Cart</a>
                             {{else}}
@@ -124,6 +127,8 @@
                                 {{/if}}
                                 <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
                             </ul>
+                            {{/if}}
+                            
                         </div>
                         <div class="product__details__widget">
                             <ul>

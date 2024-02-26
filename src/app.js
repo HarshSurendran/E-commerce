@@ -82,7 +82,6 @@ hbs.registerHelper('formatDate', function(isoDate) {
     value2 = parseInt(value2);
     return value1+value2;
   });
-
 // hbs.registerHelper('ifZero', function (value) {
 //   if(value == 0){
 //     return true

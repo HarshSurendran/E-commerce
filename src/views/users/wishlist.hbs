@@ -45,10 +45,15 @@
                             <h5 class="card-title">{{this.productsId.product_id.name}}</h5>
                             <p class="card-text">{{this.productsId.price}}</p>
                             <div class="row">
+                                {{#if this.isOutofStock}}
+                                <div class="col-12">
+                                    <a href="#"  class="btn btn-danger btn-sm " disabled >Out of stock</a>
+                                {{else}}
                                 <div class="col-12">
                                     <a href="#" data-id="{{this.productsId._id}}" class="btn btn-success btn-sm  addToCart ">Add to cart</a>
                                     <a href="#" data-id="{{this.productsId._id}}" class="btn btn-danger removeWishlist btn-sm">X</a>
                                 </div>
+                                {{/if}}
                             </div>
                         </div>
                     </div>
