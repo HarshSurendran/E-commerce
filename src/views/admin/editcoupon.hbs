@@ -1,0 +1,64 @@
+<main class="main-wrap">            
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Edit Coupons</h2>
+                <p></p>
+            </div>
+            {{!-- <div>
+                <button class="btn btn-primary" id="addCouponForm" >Add Coupon</button>
+            </div> --}}
+        </div>
+        <div class="card" id="couponForm">
+            <div class="card-body">
+                {{#if message}}
+                <p class="text-danger text-center ">{{message}}</p>
+                {{/if}}
+                <form method="post" onsubmit="return validateForm()" action="/api/v1/admin/editcoupon">
+                    <div class="row">
+                        <input type="hidden" name="_id" value="{{coupon._id}}">
+                        <div class="mb-4 col-md-6">
+                            <label for="couponName" class="form-label">Name</label>
+                            <input type="text" value="{{coupon.name}}" class="form-control" id="couponName" name="name"/>
+                            <p id="nameAlert" class="text-danger"></p>
+                        </div>
+                        <div class="mb-4 col-md-6">
+                            <label for="CouponCode" class="form-label">Coupon Code</label>
+                            <input type="text" value="{{coupon.code}}" class="form-control" id="CouponCode" name="code"/>
+                            <p id="couponAlert" class="text-danger"></p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Description</label>
+                        <textarea id="description" value="{{coupon.description}}" placeholder="{{coupon.description}}" class="form-control"></textarea name="description">
+                    </div>
+                    <div class="row">
+                        <div class="mb-4 col-md-6">
+                            <label for="userLimit" class="form-label">User limit</label>
+                            <input type="number" value="{{coupon.userlimit}}" class="form-control" id="userLimit" name="userlimit" />
+                            <p id="userLimitAlert" class="text-danger"></p>
+                        </div>
+                        <div class="mb-4 col-md-6">
+                            <label for="expiryDate" class="form-label">Expiry Date</label>
+                            <input type="date" value="{{coupon.expiryDate}}" class="form-control" id="expiryDate" name="expiryDate"/>
+                            <p id="expiryAlert" class="text-danger"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-4 col-md-6">
+                            <label for="discount" class="form-label">Discount</label>
+                            <input type="number" value="{{coupon.discount}}" class="form-control" id="discount" name="discount"/>
+                            <p id="discountAlert" class="text-danger"></p>
+                        </div>
+                        <div class="mb-4 col-md-6">
+                            <label for="minAmount" class="form-label">Minimum Amount</label>
+                            <input type="number" value="{{coupon.minamount}}" class="form-control" id="minAmount" name="minamount"/>
+                            <p id="minAlert" class="text-danger"></p>
+                        </div>
+                    </div>
+                    <div class="d-grid d-flex justify-content-center ">
+                        <button type="submit" id="addCouponButton" class="btn btn-primary text-center ">Edit Coupon</button>
+                    </div>
+                </form>
+            </div>
+        </div>

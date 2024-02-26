@@ -159,7 +159,9 @@ router.post("/salesreport", auth.verifyAdminJWT, adminController.getSalesReport)
 //coupons
 router.get("/coupons", auth.verifyAdminJWT, couponController.renderCouponPage);
 router.post("/coupons", auth.verifyAdminJWT, couponController.addCoupon);
-
+router.get("/delete-coupon/:id", auth.verifyAdminJWT, couponController.deleteCoupon);
+router.get("/edit-coupon/:id", auth.verifyAdminJWT, couponController.editCouponPage);
+router.post("/editcoupon", auth.verifyAdminJWT, couponController.editCoupon)
 
 //graph
 router.post("/graphData", auth.verifyAdminJWT, adminController.graphData);

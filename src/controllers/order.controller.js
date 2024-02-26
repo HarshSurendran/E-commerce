@@ -287,41 +287,57 @@ const createOrder = asyncHandler( async(req,res)=>{
                 }
             }
         ])
-
         let total = 0;
         let orderedItems = [];
+        try{
         const promises = cart.map(async (element) => {
             const productVarient = await ProductVarient.findOne({ _id: element.productVarient_id });
+            // if (!productVarient) {
+            //     throw new Error("Product variant not found");
+            // }
+            // if (productVarient.stock < (element.quantity+1)) {
+            //     return res
+            //     .status(410)
+            //     .json(new ApiError(410, "Insufficient stock"));  
+            // }
+            // else if(productVarient.stock - element.quantity < 0){
+            //     return res
+            //     .status(410)
+            //     .json(new ApiError(410, "Insufficient stock"));               
+            // }
             if (!productVarient) {
-                throw new Error("Product variant not found");
+                throw new ApiError(404, "Product variant not found");
             }
-            if (productVarient.stock < element.quantity) {
-                return res
-                .status(410)
-                .json(new ApiError(410, "Insufficient stock"));  
-            }
-            else if(productVarient.stock - element.quantity < 0){
-                return res
-                .status(410)
-                .json(new ApiError(410, "Insufficient stock"));               
+            // if (productVarient.stock < (element.quantity + 1)) {
+            //     throw new ApiError(410, "Insufficient stock");
+            if ((productVarient.stock - element.quantity) < 0) {
+                throw new ApiError(410, "Insufficient stock");
             }
             // Update the stock
             const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
-            // Push the product variant and quantity to orderedItems array
             orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
             total = total + (element.quantity * element.product.price);
         });
-        try{
+        
         await Promise.all(promises);
-        }catch{
-            return res
-            .status(400)
-            .json(new ApiError(400, "Internal server error"));
+        }catch(error){
+            if (error instanceof ApiError) {
+                return res.status(error.statusCode).json(new ApiError(error.statusCode, error.message));
+            } else {
+                console.error(error);
+                return res.status(500).json(new ApiError(500, "Internal server error"));
+            }
         }
+        
         let coupon=''
         if(couponCode){
-            coupon = await Coupon.findOne({code: couponCode});
+            coupon = await Coupon.findOne({code: couponCode});            
             if(coupon){
+                if (coupon.userlimit <= 0) {
+                    return res
+                    .status(411)
+                    .json(new ApiError(411, "Coupon is expired"));
+                }
                 coupon.userlimit = coupon.userlimit - 1;
                 await coupon.save();
                 total = total - coupon.discount;

@@ -304,18 +304,7 @@
             notificationElement.style.display = 'none';
         }, 2000);
     }
-    // Attach event listeners to radio buttons
-    /*document.querySelectorAll('input[name="selectedAddress"]').forEach((radioButton, index) => {
-        radioButton.addEventListener('change', () => {
-            // Update the selected property of the corresponding address
-            addresses.forEach((address, i) => {
-                address.selected = i === index;
-            });
-
-            // Re-render the address list to reflect the changes
-            // This depends on how you're rendering your template
-        });
-    });*/
+    
     function verifyPayment(response, razorpayOrder, order){
         console.log("Entered verify payment");
         fetch("/api/v1/users/verifyPayment",{
@@ -336,7 +325,6 @@
             }
         })
     }
-
 
 
     function razorpayCheckout(razorpayOrder, order){        
@@ -403,6 +391,11 @@
                         location.href = '/api/v1/users/cart'
                     },500)
                     return showNotification("Product out of stock", "red");
+                }else if(res.statusCode === 411){                   
+                    setTimeout(()=>{
+                        location.href = '/api/v1/users/cart'
+                    },500)
+                    return showNotification("Coupon expired", "red");
                 }
                 showNotification(`Order not placed some technical issue, Try again`, "red");
                 return
@@ -417,7 +410,6 @@
             }else{
                 const razorpayOrder = res.data.razorpayOrder;
                 const order = res.data.orderConfirm;
-                console.log("reached razorpay", razorpayOrder, order);
                 razorpayCheckout(razorpayOrder, order); 
                 return       
             }    

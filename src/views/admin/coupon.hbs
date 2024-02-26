@@ -47,7 +47,7 @@
                     </div>
                     <div class="row">
                         <div class="mb-4 col-md-6">
-                            <label for="userLimit" class="form-label">User limit</label>
+                            <label for="userLimit" class="form-label">User limit (Min. 20)</label>
                             <input type="number" placeholder="Type here" class="form-control" id="userLimit" />
                             <p id="userLimitAlert" class="text-danger"></p>
                         </div>
@@ -105,11 +105,6 @@
                                 <tbody>
                                     {{#each coupons}}
                                     <tr class="text-center">
-                                        {{!-- <td class="text-center">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" />
-                                            </div>
-                                        </td> --}}
                                         <td >{{inc @index}}</td>
                                         <td>{{this.name}}</td>
                                         <td>{{this.code}}</td>
@@ -118,23 +113,11 @@
                                         <td>{{this.expiryDate}}</td>
                                         <td>{{this.userlimit}}</td>
                                         <td>{{this.minamount}}</td>
-                                        {{!-- <td id="editcategory" class="d-none"><b><input class="border-0 " type="text" value="{{this.category}}"></b></td> --}}
-                                        {{!-- <td>Cake & Milk</td>
-                                        <td>/cake</td>
-                                        <td>1</td> --}}
                                         <td class="text-end">
                                             <div>
-                                                {{!-- <a href="edit-caegory/{{this._id}}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> Edit </a> --}}
-
-
-                                                <a id="editbutton" data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-brand d-inline-block editbutton "> <i class="material-icons md-edit"></i> Edit </a>
-                                                <a id="savebutton" data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-brand d-none savebutton "> <i class="material-icons md-save"></i> Save </a>
-
-
-
-                                                <a onclick=" return confirm('Are you sure to delete {{this.category}}')" href="delete-category/{{this._id}}"  class="btn btn-sm font-sm rounded btn-danger"><i class="material-icons md-delete_forever"></i>Delete</a>
+                                                <a id="editbutton" href="/api/v1/admin/edit-coupon/{{this._id}}" data-id="{{this._id}}" class="btn btn-sm font-sm rounded btn-brand d-inline-block editbutton "> <i class="material-icons md-edit"></i> Edit </a>
+                                                <a onclick=" return confirm('Are you sure to delete {{this.name}}')" href="delete-coupon/{{this._id}}"  class="btn btn-sm font-sm rounded btn-danger"><i class="material-icons md-delete_forever"></i>Delete</a>
                                             </div>
-                                            <!-- dropdown //end -->               
                                         </td>
                                     </tr>
                                     {{/each}}
@@ -159,7 +142,6 @@
     const addCouponButton = document.getElementById("addCouponButton");
     const editButton = document.querySelectorAll(".editbutton");
     const saveButton = document.querySelectorAll(".savebutton");
-    const categoryElem = document.querySelectorAll(".category");
     const block = "d-inline-block"
     const none = "d-none"
 
