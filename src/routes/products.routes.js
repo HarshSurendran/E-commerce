@@ -18,8 +18,6 @@ router.get("/list/all", auth.verifyUserJWT,  productController.listProducts);
 
 router.get("/productdetails/:id", auth.verifyUserJWT, productController.productDetailsPage);
 
-
-
 router.get("/addproduct", auth.verifyAdminJWT, productController.addProductPage);
 
 module.exports = router

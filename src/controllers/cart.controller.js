@@ -47,8 +47,7 @@ const addToCart = asyncHandler( async(req, res)=>{
 
 const renderCartPage = asyncHandler( async(req,res)=>{
     const user = req.user;
-    console.log(user);
-
+    
     //layout data
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
@@ -146,8 +145,6 @@ const renderCartPage = asyncHandler( async(req,res)=>{
         total = total + (element.quantity * element.product.price)
     });
     
-    let items = JSON.stringify(cart[0])
-    console.log("this is cart items",items)
     
     res
     .status(200)

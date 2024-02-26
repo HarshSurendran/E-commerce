@@ -90,7 +90,6 @@ const checkOutPage = asyncHandler( async(req,res)=>{
     console.log("this is the coupon code", couponCode);
     const user = req.user
     const address = await Address.find({userid: user._id })
-    console.log(address);
 
     const cart = await Cart.aggregate([
         {
@@ -180,7 +179,6 @@ const checkOutPage = asyncHandler( async(req,res)=>{
     let discount = 0;
     if (couponCode) {
         const coupon = await Coupon.findOne({code: couponCode});
-        console.log(coupon);
         if (coupon) {
             if (coupon.minamount > total) {
                 discount = 0;
@@ -205,10 +203,11 @@ const createOrder = asyncHandler( async(req,res)=>{
     try{
         const user = req.user;
         const {paymentMethod, address, couponCode} = req.body;      
-        console.log("reqbody",paymentMethod, address, couponCode);
-
+        
         const orderId = generateOrderId();
-        let payment = paymentMethod.toLowerCase()
+        let payment = paymentMethod.toLowerCase();
+
+        
 
         const cart = await Cart.aggregate([
             {
@@ -294,15 +293,12 @@ const createOrder = asyncHandler( async(req,res)=>{
         let orderedItems = [];
         const promises = cart.map(async (element) => {
             const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
-            console.log("This is decreasing the stock after order placed", productVarientUpdate);
             // Push the product variant and quantity to orderedItems array
             orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
             total = total + (element.quantity * element.product.price);
-            console.log(orderedItems, "forEach");
-            console.log(total, "forEach");
         });
         await Promise.all(promises);
-        let coupon
+        let coupon=''
         if(couponCode){
             coupon = await Coupon.findOne({code: couponCode});
             if(coupon){
@@ -311,6 +307,34 @@ const createOrder = asyncHandler( async(req,res)=>{
                 total = total - coupon.discount;
             }
         }
+
+        if(payment === "wallet"){
+            const wallet = await Wallet.findOne({ userId: user._id });
+            if(wallet.balance < total){
+                return res
+                .status(408)
+                .json(new ApiError(408, "Insufficient balance"));
+            }
+            const walletUpdate = await Wallet.updateOne(
+                {
+                    userId: user._id
+                },
+                {
+                    $inc: {
+                        balance: -total
+                    },
+                    $push: {
+                        transactions: { amount: -total , type: "withdrawal", date: Date.now() }
+                    }
+                }
+            );
+            if (!walletUpdate.modifiedCount) {
+                return res
+                .status(500)
+                .json(new ApiError(500, "Failed to update wallet"));
+            }         
+        }
+
         const order = await Order.create({
             userId: user._id,
             address,
@@ -339,7 +363,7 @@ const createOrder = asyncHandler( async(req,res)=>{
             .status(200)
             .json( new ApiResponse(200, {orderConfirm , codpayment:true}, "Order placed successfully"));
 
-        }else{
+        }else if (payment === "razorpay"){
             generateRazorpayOrder(orderConfirm.orderId, total)
             .then((razorpayOrder)=>{
                 return res
@@ -351,15 +375,12 @@ const createOrder = asyncHandler( async(req,res)=>{
                 return res
                 .status(500)
                 .json( new ApiError(500, "Something went wrong", error));
-            })
+            })            
+        }else if(payment === "wallet"){
+            return res
+            .status(200)
+            .json( new ApiResponse(200, {orderConfirm , wallet:true}, "Order placed successfully"));
         }
-
-
-        // return res
-        // .status(200)
-        // .json( new ApiResponse(200, {orderConfirm}, "Order placed successfully"));
-        
-
     } catch(error){
         console.log(error)
         res

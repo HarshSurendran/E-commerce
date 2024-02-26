@@ -88,6 +88,7 @@ router.get("/invoice/:id", auth.verifyUserJWT, orderController.renderInvoice);
 router.get("/wallet", auth.verifyUserJWT, walletController.renderWalletPage);
 router.post("/wallet", auth.verifyUserJWT, orderController.addWalletMoney);
 router.post("/verifyTransfer", auth.verifyUserJWT, orderController.verifyTransfer);
+router.post("walletbalance", auth.verifyUserJWT, walletController.getWalletBalance);
 
 
 

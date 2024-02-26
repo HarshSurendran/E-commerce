@@ -28,15 +28,6 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
     </style>
-    {{!-- <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="/css/jquery-ui.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
-    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css"> --}}
-
 </head>
 
 <body> 
@@ -89,17 +80,6 @@
                         <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
                             <span> <i class="material-icons md-calendar_today"></i> <b>{{getCurrentDateTime}}</b> </span> <br />                            
                         </div>
-                        {{!-- <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <select class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
-                                <option>Change status</option>
-                                <option>Awaiting payment</option>
-                                <option>Confirmed</option>
-                                <option>Shipped</option>
-                                <option>Delivered</option>
-                            </select>
-                            <a class="btn btn-primary" href="#">Save</a>
-                            <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
-                        </div> --}}
                     </div>
                 </header>
                 <!-- card-header end// -->
@@ -127,39 +107,6 @@
                     <!-- row // -->
                     <div class="row  my-3 justify-content-center ">                        
                         <a id="addAddress" class="btn btn-outline-dark  col-6 justify-content-center align-content-center  " href=""><span>Add new address</span></a>
-                        
-                        {{!-- <div class="col-lg-6">
-                            <div class="discount__content">
-                                <h6>Apply Coupons</h6>
-                                <form class="w-100 mt-3">
-                                    <input id="couponInput" type="text" placeholder="Enter your coupon code">
-                                    
-                                    <button type="button" id="showCouponButton" class="site-btn " data-bs-toggle="modal" data-bs-target="#couponModal">
-                                    Show available coupons
-                                    </button>
-                                    <button type="button" class="site-btn d-none" id="removeCouponButton">Remove Coupon</button> 
-                                </form>
-                               
-                                <div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-scrollable">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Coupons</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                        <div class="modal-body" id="couponList">
-                                        
-                                        </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button id="applyCouponBtn" type="button" class="btn btn-primary" data-bs-dismiss="modal">Apply</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
-                        
                     </div>
         {{!-- add address form --}}
                     <address id="addressForm" hidden>
@@ -291,6 +238,15 @@
                                         <img src="/assets/imgs/card-brands/2.png" class="border" height="20" /> Master Card **** **** 4768 <br />
                                         Business name: Grand Market LLC <br />
                                         Phone: +1 (800) 555-154-52
+                                    </p>
+                                </div>
+                            </label>
+                            <label for="Wallet" class="col-4 d-block w-100  ">
+                                <input type="radio" id="Wallet" name="paymentmethod" value="Wallet" style="display: none;" checked>
+                                <div class="box shadow-sm bg-light mb-2 paymentcard">
+                                    <h6 class="mb-15"><i class="fa-solid fa-money-bill-1-wave"></i> Pay with wallet (Wallet)</h6>
+                                    <p>
+                                        You can check your balance from your profile.
                                     </p>
                                 </div>
                             </label>
@@ -438,10 +394,18 @@
         })
         .then(res => res.json())
         .then(res => {
+            console.log("Thid is response",res)
             if(!res.success){
-                showNotification("Order not placed. Try again", "red");
+                if(res.statusCode === 408){
+                    return showNotification("Insufficient balance in wallet, try other methods.", "red");
+                }
+                showNotification(`Order not placed some technical issue, Try again`, "red");
                 return
             }else if(res.data.codpayment){
+                const orderId = res.data.orderConfirm._id;
+                location.href = `/api/v1/users/ordersuccess/${orderId}`
+                return
+            }else if(res.data.wallet){
                 const orderId = res.data.orderConfirm._id;
                 location.href = `/api/v1/users/ordersuccess/${orderId}`
                 return
@@ -460,6 +424,10 @@
     cod.addEventListener('click', ()=>{
         orderButton.innerText = 'Place Order';
     });
+    const wallet = document.getElementById('Wallet');
+    wallet.addEventListener('click', ()=>{
+        orderButton.innerText = 'Place Order';
+    })
     const razorpay = document.getElementById('razorpay');
     razorpay.addEventListener('click', ()=>{   
         orderButton.innerText = 'Proceed to payment';
