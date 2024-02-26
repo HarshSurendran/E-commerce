@@ -1,3 +1,18 @@
+<head>
+    <style>
+        .notification {
+        display: none;
+        position: fixed;
+        top: 10px;
+        right: 40%;
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
 <body>
     <div class="screen-overlay"></div>   
     <main class="main-wrap">       
@@ -32,13 +47,14 @@
                                 <div style="background-color: #d8f1e5;" class="card-header text-center ">
                                     Add Amount
                                 </div>
-                                <form>
+                                <form method="post" onsubmit="return validate()" action="/api/v1/users/wallet">
                                     <div class="mb-3 p-2 ">
                                         <label for="amount" class="form-label mt-3 mb-2">Enter Amount</label>
-                                        <input type="number" class="form-control" id="amount" >
+                                        <input type="number" class="form-control" id="amount" name="amount" >
+                                        <p class="text-danger text-center" id="amountalert"></p>
                                     </div>
                                     <div class="d-flex justify-content-center mb-2  ">
-                                        <button type="submit" class="btn btn-primary">Add</button>
+                                        <button type="button" id="addAmount" class="btn btn-primary">Add</button>
                                     </div>
                                 </form>
                             </div>
@@ -114,8 +130,122 @@
                 </div>
                 <!-- card body .// -->
             </div>
-        </section>        
+        </section>  
+        <div id="notification" class="notification"></div>      
         <!-- content-main end// -->            
     </main>
 </body>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    function showNotification(message, color) {
+        const notificationElement = document.getElementById('notification');
+        if(color === "red" ){
+            notificationElement.style.backgroundColor = "red";
+        }
+        notificationElement.textContent = message;
+        notificationElement.style.display = 'block';
+
+        // Hide the notification after 5 seconds
+        setTimeout(() => {
+            if(color === "red"){
+                notificationElement.style.backgroundColor = "#4CAF50";
+            }
+            notificationElement.style.display = 'none';
+        }, 2000);
+    }
+
+    function verifyPayment(response, razorpayOrder, order){
+        console.log("Entered verify payment");
+        fetch("/api/v1/users/verifyTransfer",{
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                response,
+                razorpayOrder,
+                order
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                showNotification("Money added to your wallet", "green");
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);               
+            }else{
+                showNotification(data.message, "red");
+            }
+        })
+    }
+
+
+    function razorpayCheckout(razorpayOrder, order){        
+        console.log("Entered razorpay checkout and this is the amount", razorpayOrder.amount);    
+        var options = {
+            "key": "rzp_test_E4rvsz08Z54fM0", 
+            "amount": razorpayOrder.amount, 
+            "currency": "INR",
+            "name": "Urbane Wardrobe", 
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": razorpayOrder.id, 
+            "handler": function (response){                   
+                verifyPayment(response, razorpayOrder, order);
+            },
+            "prefill": { 
+                "name": "", 
+                "email": "", 
+                "contact": ""  
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
+
+    const addAmountBtn = document.getElementById('addAmount');
+    addAmountBtn.addEventListener("click", ()=>{
+        //validation
+        document.getElementById('amountalert').innerHTML = "";
+        const amount = document.getElementById('amount').value;
+        if(amount <= 0){
+            document.getElementById('amountalert').innerHTML = "Please enter amount";
+            return;
+        }
+
+        fetch("/api/v1/users/wallet",{
+            method:"POST",
+            headers: {
+                "content-type" : "application/json"
+            },
+            body: JSON.stringify({
+                amount
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("This is the order from razorpay", data)
+            if(!data.success){
+                if(!res.success){
+                showNotification("Order not placed. Try again", "red");
+                return
+                }
+            }else{
+                const razorpayOrder = data.data.razorpayOrder;
+                const transactionId = data.data.transactionId;
+                console.log("reached razorpay", razorpayOrder, transactionId);
+                razorpayCheckout(razorpayOrder, transactionId);        
+            }    
+        })
+        
+
+    })
+</script>
 

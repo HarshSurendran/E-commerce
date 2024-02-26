@@ -1029,7 +1029,69 @@ const renderInvoice = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .render("users/invoice",{user: req.user, title:"Urbane Wardrobe", order, products, wishlistCountlayout, categorylayout, cartCountlayout});
-})
+});
+
+const addWalletMoney = asyncHandler( async(req,res)=>{
+    const { amount } = req.body;
+    const transactionId = generateOrderId();
+    generateRazorpayOrder(transactionId, amount)
+    .then((razorpayOrder)=>{
+        return res
+        .status(200)
+        .json( new ApiResponse(200, {transactionId, razorpayOrder}, "Money added to wallet successfully"));
+    })
+    .catch((error)=>{
+        console.log(error);
+        return res
+        .status(500)
+        .json( new ApiError(500, "Something went wrong", error));
+    })
+
+});
+
+const verifyTransfer = asyncHandler( async(req,res)=>{    
+    const {response, razorpayOrder, order} = req.body;
+    console.log("RThis is respomse ", razorpayOrder)
+    let hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+
+    hmac.update(response.razorpay_order_id + "|" + response.razorpay_payment_id)
+    hmac = hmac.digest('hex');
+
+    if (hmac == response.razorpay_signature) {
+        console.log("Entered verified condition");
+        const wallet = await Wallet.updateOne(
+            {
+                userId: req.user._id
+            },
+            {
+                $inc: {
+                    balance: razorpayOrder.amount/100
+                },
+                $push: {
+                    transactions: { amount: razorpayOrder.amount/100 , type: "deposit", date: Date.now() }
+                }
+            },
+            {
+                upsert: true
+            }
+        ) 
+
+        if (wallet.modifiedCount===0 && wallet.upsertedCount===0) {
+            throw new ApiError(500, "Failed to update wallet");        
+        }
+
+        res
+        .status(200)
+        .json(new ApiResponse(200, {razorpayOrder}, "Payment verified successfully"));
+
+    } else {
+        res
+        .status(400)
+        .json(new ApiError(400, "Something went wrong"));        
+    }
+});
+    
+
 
 module.exports = {
     checkOutPage,
@@ -1043,5 +1105,7 @@ module.exports = {
     renderUserOrderDetailsPage,
     verifyPayment,
     returnOrder,
-    renderInvoice
+    renderInvoice,
+    addWalletMoney,
+    verifyTransfer
 }
