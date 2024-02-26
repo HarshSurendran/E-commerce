@@ -204,8 +204,7 @@ const checkOutPage = asyncHandler( async(req,res)=>{
 const createOrder = asyncHandler( async(req,res)=>{
     try{
         const user = req.user;
-        const {paymentMethod, address, couponCode} = req.body;  
-        console.log("entered create order", paymentMethod)    
+        const {paymentMethod, address, couponCode} = req.body; 
         
         const orderId = generateOrderId();
         let payment = paymentMethod.toLowerCase();
@@ -292,12 +291,33 @@ const createOrder = asyncHandler( async(req,res)=>{
         let total = 0;
         let orderedItems = [];
         const promises = cart.map(async (element) => {
+            const productVarient = await ProductVarient.findOne({ _id: element.productVarient_id });
+            if (!productVarient) {
+                throw new Error("Product variant not found");
+            }
+            if (productVarient.stock < element.quantity) {
+                return res
+                .status(410)
+                .json(new ApiError(410, "Insufficient stock"));  
+            }
+            else if(productVarient.stock - element.quantity < 0){
+                return res
+                .status(410)
+                .json(new ApiError(410, "Insufficient stock"));               
+            }
+            // Update the stock
             const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
             // Push the product variant and quantity to orderedItems array
             orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
             total = total + (element.quantity * element.product.price);
         });
+        try{
         await Promise.all(promises);
+        }catch{
+            return res
+            .status(400)
+            .json(new ApiError(400, "Internal server error"));
+        }
         let coupon=''
         if(couponCode){
             coupon = await Coupon.findOne({code: couponCode});

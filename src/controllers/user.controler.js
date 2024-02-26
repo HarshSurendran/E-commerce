@@ -310,6 +310,9 @@ const homePageRender = asyncHandler( async(req,res)=>{
         );
     
     const productList = await Promise.all(productList1.map(async (element) => {
+        if (element.stock < 1) {
+            element.isOutofStock = true;            
+        }
         const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
         console.log("isWishlisted", isWishlisted);
         if (isWishlisted) {

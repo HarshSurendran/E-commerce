@@ -398,6 +398,11 @@
             if(!res.success){
                 if(res.statusCode === 408){
                     return showNotification("Insufficient balance in wallet, try other methods.", "red");
+                }else if(res.statusCode === 410){                   
+                    setTimeout(()=>{
+                        location.href = '/api/v1/users/cart'
+                    },500)
+                    return showNotification("Product out of stock", "red");
                 }
                 showNotification(`Order not placed some technical issue, Try again`, "red");
                 return

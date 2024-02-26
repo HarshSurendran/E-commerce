@@ -382,8 +382,7 @@ const editProductVarient = asyncHandler( async (req,res)=>{
 
 });
 
-const listProducts = asyncHandler( async(req,res)=>{
-    console.log("This is the request");
+const listProducts = asyncHandler( async(req,res)=>{    
     //data for layout
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
@@ -396,7 +395,7 @@ const listProducts = asyncHandler( async(req,res)=>{
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
 
-    const productList1 = await ProductVarient.aggregate(
+    const product = await ProductVarient.aggregate(
     [   
         {
             $lookup: {
@@ -462,9 +461,11 @@ const listProducts = asyncHandler( async(req,res)=>{
     ]
     );    
 
-    const productList = await Promise.all(productList1.map(async (element) => {
+    const productList = await Promise.all(product.map(async (element) => {
+        if (element.stock < 1) {
+            element.isOutofStock = true;            
+        }
         const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
-        console.log("isWishlisted", isWishlisted);
         if (isWishlisted) {
             element.isWishlisted = true;
         } else {
@@ -1030,6 +1031,9 @@ const categoryListPage = asyncHandler( async(req,res)=>{
         });
 
         const categoryProducts = await Promise.all(categoryProducts1.map(async (element) => {
+            if (element.stock < 1) {
+                element.isOutofStock = true;            
+            }
             const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
             console.log("isWishlisted", isWishlisted);
             if (isWishlisted) {
