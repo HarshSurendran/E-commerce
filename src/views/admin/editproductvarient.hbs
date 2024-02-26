@@ -17,7 +17,7 @@
                         <h4>Basic</h4>
                        
                     </div>
-                    <form method="post" action="/api/v1/admin/products/editproductvarient" >
+                    <form onsubmit="return validateForm()" method="post" action="/api/v1/admin/products/editproductvarient" >
                         <div class="card-body">                           
                             <div class="row">
                                 <input  value="{{productVarient._id}}" type="text" name="prodId" hidden />
@@ -44,14 +44,17 @@
                                 <div class="col-sm-4 mb-3">
                                     <label for="price" class="form-label">Price</label>
                                     <input type="number" value="{{productVarient.price}}" class="form-control" id="price" name="price" required />
+                                    <p id="alertPrice" class="text-danger text-center "></p>
                                 </div>
                                 <div class="col-sm-4 mb-3">
                                     <label for="cost" class="form-label">Cost</label>
                                     <input type="number" value="{{productVarient.cost}}" class="form-control" id="cost" name="cost" required />
+                                    <p id="alertCost" class="text-danger text-center "></p>
                                 </div>
                                 <div class="col-sm-4 mb-3">
                                     <label for="stock" class="form-label">Stock</label>
                                     <input type="number" value="{{productVarient.stock}}" class="form-control" id="stock" name="stock" required />
+                                    <p id="alertStock" class="text-danger text-center "></p>
                                 </div>                                        
                             </div>
                                 {{!-- Upload image with preview --}}
@@ -103,7 +106,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Crop Image</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -191,6 +194,31 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
+    function validateForm(){
+        const cost = document.getElementById("cost").value;
+        const price = document.getElementById("price").value;
+        const stock = document.getElementById("stock").value;
+        const alertPrice = document.getElementById("alertPrice");
+        const alertStock = document.getElementById("alertStock");
+        const alertCost = document.getElementById("alertCost");
+        alertPrice.innerHTML = "";
+        alertStock.innerHTML = "";
+        alertCost.innerHTML = "";
+        if(cost <= 0){
+            alertCost.innerHTML = "Cost cannot be less than or equal to 0";
+            return false
+        }
+        if(price < cost){
+            alertPrice.innerHTML = "Price cannot be less than cost";
+            return false
+        }
+        if(stock <= 0){
+            alertStock.innerHTML = "Stock cannot be less than or equal to 0";
+            return false
+        }
+        return true
+    }
+
 
     function sendImage(cropedImage, id, productId){
         const formdata = new FormData();

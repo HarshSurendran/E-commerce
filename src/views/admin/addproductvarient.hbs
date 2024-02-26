@@ -201,7 +201,6 @@
 <script>
     //validation
     function validateForm() {
-        console.log("validate form")
         const alertPrice = document.getElementById("alertPrice");
         const alertStock = document.getElementById("alertStock");
         alertPrice.innerHTML = "";
@@ -209,8 +208,6 @@
         const price = document.getElementById("price").value;
         const cost = document.getElementById("cost").value;
         const stock = document.getElementById("stock").value;
-        console.log("price", price, "cost", cost, "stock", stock)
-
         if(cost <= 0){
             alertPrice.innerHTML = "Cost cannot be less than or equal to 0";
             return false;
