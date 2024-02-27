@@ -171,12 +171,12 @@ const addQuantity = asyncHandler( async(req,res)=>{
     
     if (cart.productVarient_id.stock < quantity) {
         console.log("Entered stock limit")
-        res
+        return res
         .status(500)
         .json( new ApiResponse(500,"Stock exceeded. Try with lesser quantity"));
     }
 
-    cart.productVarient_id.stock = cart.productVarient_id.stock - quantity
+    //cart.productVarient_id.stock = cart.productVarient_id.stock - quantity
 
     const updateCart = await Cart.updateOne(
         {

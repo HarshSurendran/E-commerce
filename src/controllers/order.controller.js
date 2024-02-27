@@ -390,7 +390,7 @@ const createOrder = asyncHandler( async(req,res)=>{
 
         console.log("This is the confirmed order", orderConfirm)
 
-        await Cart.deleteMany({user_id: user._id});
+        // await Cart.deleteMany({user_id: user._id});
 
         //check payment method 
         if(paymentMethod==="COD"){
@@ -409,6 +409,7 @@ const createOrder = asyncHandler( async(req,res)=>{
                 .status(500)
                 .json( new ApiError(500, "Order status not updated, server error", error));
             }
+            await Cart.deleteMany({user_id: user._id});
             return res
             .status(200)
             .json( new ApiResponse(200, {orderConfirm , codpayment:true}, "Order placed successfully"));
@@ -428,6 +429,7 @@ const createOrder = asyncHandler( async(req,res)=>{
                 .json( new ApiError(500, "Something went wrong", error));
             })            
         }else if(paymentMethod === "Wallet"){
+
             const updateOrder = await Order.updateOne(
                 {
                     _id: orderConfirm._id
@@ -444,6 +446,7 @@ const createOrder = asyncHandler( async(req,res)=>{
                 .status(500)
                 .json( new ApiError(500, "Order payment status not updated server error"));
             }
+            await Cart.deleteMany({user_id: user._id});
             return res
             .status(200)
             .json( new ApiResponse(200, {orderConfirm , wallet:true}, "Order placed successfully"));
@@ -1107,7 +1110,7 @@ const verifyPayment = asyncHandler( async(req,res)=>{
             .status(400)
             .json(new ApiError(400, "Couldnt update order database but payment is successful"));
         }
-
+        await Cart.deleteMany({user_id: user._id});
         res
         .status(200)
         .json(new ApiResponse(200, {order : order1}, "Payment verified successfully"));

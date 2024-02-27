@@ -51,7 +51,7 @@
                                         
                                         <div class="input-group quantity">
                                             <button class="btn btn-light   dec qtybtn" type="button">-</button>
-                                            <input type="text" style="" class="form-control quantity-input border-0 text-center"  data-id="{{this._id}}" value="{{this.quantity}}" min="1" disabled >
+                                            <input id="quantity{{this._id}}" type="text" style="" class="form-control quantity-input border-0 text-center"  data-id="{{this._id}}" value="{{this.quantity}}" min="1" disabled >
                                             <button class="btn btn-light  inc qtybtn" type="button">+</button>
                                         </div>
 
@@ -141,7 +141,6 @@
 
     //apply coupon function
     async function applyCoupon(couponCode) {
-        console.log("this is coupon code from asdadfasdfasdf", couponCode);
             for (const coupon of coupons) {
                 if (coupon.code === couponCode) {
                     const subTotal = parseInt(document.getElementById("subtotal").innerText);
@@ -279,6 +278,7 @@
                 .then((data)=>{
                     console.log("this is data",data)
                     if(!data.success){
+                        input.value = (qty - increment);
                         return alert("Stock is not available.");
                     }
                     input.value = qty;
