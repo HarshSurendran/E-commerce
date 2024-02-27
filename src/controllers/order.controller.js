@@ -290,8 +290,8 @@ const createOrder = asyncHandler( async(req,res)=>{
         ])
         if (cart.length === 0) {
             return res
-            .status(400)
-            .json(new ApiError(400, "Cart is empty"));
+            .status(420)
+            .json(new ApiError(420, "Cart is empty"));
         }
         let total = 0;
         let orderedItems = [];

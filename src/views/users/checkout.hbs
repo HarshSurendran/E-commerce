@@ -414,6 +414,11 @@
                         location.href = '/api/v1/users/cart'
                     },500)
                     return showNotification("Coupon expired", "red");
+                }else if(res.statusCode === 420){                   
+                    setTimeout(()=>{
+                        location.href = '/api/v1/users/cart'
+                    },500)
+                    return showNotification("Cart is empty, check your orders", "red");
                 }
                 showNotification(`Order not placed some technical issue, Try again`, "red");
                 return
