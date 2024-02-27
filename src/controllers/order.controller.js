@@ -1097,7 +1097,7 @@ const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
 const verifyPayment = asyncHandler( async(req,res)=>{
     console.log("Entered verify payment");
     
-    const {response, order} = req.body;
+    const {response, order, payLater} = req.body;
     let hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
 
     hmac.update(response.razorpay_order_id + "|" + response.razorpay_payment_id)
@@ -1110,7 +1110,9 @@ const verifyPayment = asyncHandler( async(req,res)=>{
             .status(400)
             .json(new ApiError(400, "Couldnt update order database but payment is successful"));
         }
-        await Cart.deleteMany({user_id: user._id});
+        if(!payLater){
+            await Cart.deleteMany({user_id: user._id});
+        }
         res
         .status(200)
         .json(new ApiResponse(200, {order : order1}, "Payment verified successfully"));
@@ -1405,6 +1407,29 @@ const renderInvoiceAdmin = asyncHandler( async(req,res)=>{
     .render('users/invoice', { title:"Urbane Wardrobe", order, products});
 });
 
+const payLater = asyncHandler( async(req,res)=>{
+    const { orderId } = req.body;
+    const order = await Order.findOne({ _id: orderId }).populate("userId");
+    if(!order){
+        return res
+        .status(400)
+        .json(new ApiError(400, "Cant find the order"));
+    }
+    const transactionId = generateOrderId();
+    generateRazorpayOrder(transactionId, order.orderAmount)
+    .then((razorpayOrder)=>{
+        return res
+        .status(200)
+        .json( new ApiResponse(200, {transactionId, razorpayOrder, order}, "Order for pay later made successfully"));
+    })
+    .catch((error)=>{
+        console.log(error);
+        return res
+        .status(500)
+        .json( new ApiError(500, "Something went wrong", error));
+    })
+})
+
 
 module.exports = {
     checkOutPage,
@@ -1422,4 +1447,5 @@ module.exports = {
     addWalletMoney,
     verifyTransfer,
     renderInvoiceAdmin,
+    payLater
 }

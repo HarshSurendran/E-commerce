@@ -72,11 +72,16 @@ router.patch("/orders", auth.verifyUserJWT, walletController.updateWallet, order
 router.patch("/returnorders", auth.verifyUserJWT,  orderController.returnOrder);
 router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
 
+
 //checkout
 router.post("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
 router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);
 router.get("/ordersuccess/:id", auth.verifyUserJWT, orderController.orderSuccessPage);
 router.post("/verifyPayment", auth.verifyUserJWT, orderController.verifyPayment);
+
+
+//pay later
+router.post("/paylater", auth.verifyUserJWT, orderController.payLater);
 
 //invoice
 router.get("/invoice/:id", auth.verifyUserJWT, orderController.renderInvoice);
@@ -87,7 +92,6 @@ router.get("/wallet", auth.verifyUserJWT, walletController.renderWalletPage);
 router.post("/wallet", auth.verifyUserJWT, orderController.addWalletMoney);
 router.post("/verifyTransfer", auth.verifyUserJWT, orderController.verifyTransfer);
 router.post("walletbalance", auth.verifyUserJWT, walletController.getWalletBalance);
-
 
 
 

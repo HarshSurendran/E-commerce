@@ -17,7 +17,8 @@
                             <small class="text-muted">Order ID: {{order.orderId}}</small>
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <span class="badge rounded-pill me-2 {{changeColor order.status}}">{{order.status}}</span>
+                            <span class="badge rounded-pill me-2 {{changeColor order.status}}">{{order.status}}</span>            
+
                             {{!-- <select id="orderStatus" class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
                                 <option>Change status</option>
                                 <option value="cancelled">Cancel</option>
@@ -60,8 +61,11 @@
                                     <p class="mb-1">
                                         {{order.orderId}} <br />
                                         Pay method: {{order.paymentMethod}}<br />
-                                        Payment Status: <span class="badge rounded-pill me-2 text-fw-normal {{changeColor order.paymentStatus}}"> {{order.paymentStatus}}</span>
+                                        Payment Status: <span class="badge-sm rounded-pill my-2 me-2 text-fw-normal fs-6 {{changeColor order.paymentStatus}}"> {{order.paymentStatus}}</span>
                                     </p>
+                                    <div class="d-flex justify-content-center ">
+                                    <button id="payNowBtn" class="btn-sm btn-success rounded-pill border-0 {{checkPending order.paymentStatus}}">Pay now</button>
+                                    </div>
                                     {{!-- <a href="/api/v1/admin/invoice/{{order._id}}">View invoice</a> --}}
                                 </div>
                             </article>
@@ -176,37 +180,91 @@
         </section>
         <!-- content-main end// -->
     </main>
-
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        const saveButton = document.getElementById("saveButton");
-        saveButton.addEventListener("click",changeStatus);
+        function verifyPayment(response, razorpayOrder, order){
+            console.log("Entered verify payment");
+            fetch("/api/v1/users/verifyPayment",{
+                method: "POST",
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    response,
+                    razorpayOrder,
+                    order,
+                    payLater: true
+                })
+            }).then(res => res.json())
+            .then(data => {
+                if(data.success){          
+                    location.href = `/api/v1/users/ordersuccess/${order._id}`
+                }
+            })
+        }
 
-        function changeStatus(){
-            const orderStatus = document.getElementById("orderStatus").value;
-            let orderId = saveButton.getAttribute("data-id");
-            console.log("orderStatus",orderStatus);
-            console.log("orderId",orderId);
+        function razorpayCheckout(razorpayOrder, transactionId, order){        
+            console.log("Entered razorpay checkout and this is the amount", razorpayOrder.amount, order);    
+            var options = {
+                "key": "rzp_test_E4rvsz08Z54fM0", 
+                "amount": razorpayOrder.amount, 
+                "currency": "INR",
+                "name": "Urbane Wardrobe", 
+                "description": "Test Transaction",
+                "image": "https://example.com/your_logo",
+                "order_id": razorpayOrder.id, 
+                "handler": function (response){                   
+                    verifyPayment(response, razorpayOrder, order);
+                },
+                "prefill": { 
+                    "name": order.userId.fullname, 
+                    "email": order.userId.email, 
+                    "contact": order.userId.phone   
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
 
-            fetch("/api/v1/admin/updateorderstatus",{
-                method: "post",
+
+        function payNow(){
+            const orderId = '{{order._id}}';
+            fetch("/api/v1/users/paylater",{
+                method:"POST",
                 headers: {
                     "content-type" : "application/json"
                 },
                 body: JSON.stringify({
-                    orderId,
-                    status: orderStatus
+                    orderId
                 })
             })
-            .then((res)=>res.json())
-            .then((data)=>{
-                if(data.success){
-                    location.reload();
+            .then(res => res.json())
+            .then(data => {
+                console.log("This is the order from razorpay", data)
+                if(!data.success){
+                    if(!res.success){  
+                        alert("Order not placed. Try again");                 
+                        return
+                    }
                 }else{
-                    alert(data.message);
-                }
+                    const razorpayOrder = data.data.razorpayOrder;
+                    const transactionId = data.data.transactionId;
+                    const order = data.data.order;
+                    console.log("reached razorpay", razorpayOrder, transactionId, order);
+                    razorpayCheckout(razorpayOrder, transactionId, order);        
+                }    
             })
-
+            
         }
+     
+        const payNowBtn = document.getElementById("payNowBtn");
+        payNowBtn.addEventListener("click",payNow);
     </script>
 </body>
 
