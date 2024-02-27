@@ -20,10 +20,12 @@
                             <span class="badge rounded-pill me-2 {{changeColor order.status}}">{{order.status}}</span>
                             <select id="orderStatus" class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
                                 <option>Change status</option>
-                                <option value="cancelled">Cancel</option>
-                                <option value="pending">Pending</option>
-                                <option value="shipped">Shipped</option>
-                                <option value="delivered">Delivered</option>
+                                <option value="Cancelled">Cancel</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Placed">Placed</option>
+                                <option value="Returned">Returned</option>
                             </select>
                             <a class="btn btn-primary" id="saveButton" data-id="{{order._id}}">Save</a>
                             <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>

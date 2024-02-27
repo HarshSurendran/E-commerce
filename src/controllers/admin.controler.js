@@ -580,7 +580,7 @@ const graphData = asyncHandler( async (req,res)=>{
 });
 
 const renderSalesReportPage = asyncHandler(async (req, res) => {
-    let orders = await Order.find({status:"delivered"}).populate("userId").sort({createdAt: -1});
+    let orders = await Order.find({status:"Delivered"}).populate("userId").sort({createdAt: -1});
     
 
     if (!orders) {
