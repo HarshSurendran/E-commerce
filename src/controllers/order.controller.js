@@ -207,7 +207,8 @@ const createOrder = asyncHandler( async(req,res)=>{
         const {paymentMethod, address, couponCode} = req.body; 
         
         const orderId = generateOrderId();
-        let payment = paymentMethod.toLowerCase();
+        // let payment = paymentMethod.toLowerCase();
+        console.log(paymentMethod)
 
         const cart = await Cart.aggregate([
             {
@@ -287,24 +288,16 @@ const createOrder = asyncHandler( async(req,res)=>{
                 }
             }
         ])
+        if (cart.length === 0) {
+            return res
+            .status(400)
+            .json(new ApiError(400, "Cart is empty"));
+        }
         let total = 0;
         let orderedItems = [];
         try{
         const promises = cart.map(async (element) => {
             const productVarient = await ProductVarient.findOne({ _id: element.productVarient_id });
-            // if (!productVarient) {
-            //     throw new Error("Product variant not found");
-            // }
-            // if (productVarient.stock < (element.quantity+1)) {
-            //     return res
-            //     .status(410)
-            //     .json(new ApiError(410, "Insufficient stock"));  
-            // }
-            // else if(productVarient.stock - element.quantity < 0){
-            //     return res
-            //     .status(410)
-            //     .json(new ApiError(410, "Insufficient stock"));               
-            // }
             if (!productVarient) {
                 throw new ApiError(404, "Product variant not found");
             }
@@ -315,11 +308,13 @@ const createOrder = asyncHandler( async(req,res)=>{
             }
             // Update the stock
             const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
+
             orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
             total = total + (element.quantity * element.product.price);
         });
         
         await Promise.all(promises);
+
         }catch(error){
             if (error instanceof ApiError) {
                 return res.status(error.statusCode).json(new ApiError(error.statusCode, error.message));
@@ -344,7 +339,7 @@ const createOrder = asyncHandler( async(req,res)=>{
             }
         }
 
-        if(payment === "wallet"){
+        if(paymentMethod === "Wallet"){
             const wallet = await Wallet.findOne({ userId: user._id });
             if (!wallet) {
                 return res
@@ -379,7 +374,7 @@ const createOrder = asyncHandler( async(req,res)=>{
         const order = await Order.create({
             userId: user._id,
             address,
-            paymentMethod : payment,
+            paymentMethod : paymentMethod,
             orderAmount: total,
             orderedItems,
             orderId,
@@ -387,24 +382,38 @@ const createOrder = asyncHandler( async(req,res)=>{
             couponDiscount: coupon.discount
         })
 
-        const orderConfirm = await Order.findOne({_id: order._id});
+        const orderConfirm = await Order.findOne({_id: order._id}).populate("userId")
 
         if(!orderConfirm){
-            // return res
-            // .status(500)
-            // .json(new ApiError(500, "Order not placed server error"));
             throw new Error("Order not placed server error");
         }
+
+        console.log("This is the confirmed order", orderConfirm)
 
         await Cart.deleteMany({user_id: user._id});
 
         //check payment method 
-        if(payment==="cod"){
+        if(paymentMethod==="COD"){
+            const updateOrder = await Order.updateOne(
+                {
+                    _id: orderConfirm._id
+                },
+                {
+                    $set: {
+                        status: "Placed"
+                    }
+                }
+            )
+            if(!updateOrder.modifiedCount){
+                return res
+                .status(500)
+                .json( new ApiError(500, "Order status not updated, server error", error));
+            }
             return res
             .status(200)
             .json( new ApiResponse(200, {orderConfirm , codpayment:true}, "Order placed successfully"));
 
-        }else if (payment === "online"){
+        }else if (paymentMethod === "Online"){
             console.log("reached razorpay");
             generateRazorpayOrder(orderConfirm.orderId, total)
             .then((razorpayOrder)=>{
@@ -418,7 +427,23 @@ const createOrder = asyncHandler( async(req,res)=>{
                 .status(500)
                 .json( new ApiError(500, "Something went wrong", error));
             })            
-        }else if(payment === "wallet"){
+        }else if(paymentMethod === "Wallet"){
+            const updateOrder = await Order.updateOne(
+                {
+                    _id: orderConfirm._id
+                },
+                {
+                    $set: {
+                        status: "Placed",
+                        paymentStatus: "Paid"
+                    }
+                }
+            )
+            if(!updateOrder.modifiedCount){
+                return res
+                .status(500)
+                .json( new ApiError(500, "Order payment status not updated server error"));
+            }
             return res
             .status(200)
             .json( new ApiResponse(200, {orderConfirm , wallet:true}, "Order placed successfully"));
@@ -912,19 +937,162 @@ const cancelOrder = asyncHandler( async(req,res)=>{
 });
 
 const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
-    const orderId = req.params.id;
-    const order = await Order.findOne({ _id: orderId });
-    if(!order){
-        return res
-        .status(400)
-        .json(new ApiResponse(400, "Something went wrong"));
+    const categorylayout = await Category.find({});
+    let wishlistCountlayout = 0;
+    let wishlistlayout = await Wishlist.find({userId: req.user._id});
+    wishlistlayout = wishlistlayout[0];
+    if (wishlistlayout?.productsId.length) {
+        wishlistlayout.productsId.forEach(element => {
+            wishlistCountlayout++;
+        });        
     }
+    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+
+    const orderid = req.params.id;
+    const orderVarients = await Order.aggregate(
+        [
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(orderid) // orderid
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id : 1,
+                                fullname : 1,
+                                phone : 1,
+                                email: 1
+                            }
+                        }
+                    ]
+                },
+            },
+            {
+                $lookup: {
+                    from: "addresses",
+                    localField: "address",
+                    foreignField: "_id",
+                    as: "address",
+                    pipeline: [
+                        {
+                            
+                            $project: {
+                                type : 1,
+                                fullname: 1,
+                                phone: 1,
+                                street: 1,
+                                locality: 1,
+                                district: 1,
+                                state: 1,
+                                pincode: 1,
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$orderedItems"
+            },
+            {
+                $lookup: {
+                    from: "productvarients",
+                    localField: "orderedItems.productVarientId",
+                    foreignField: "_id",
+                    as: "productVarient",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "products",
+                                localField: "product_id",
+                                foreignField: "_id",
+                                as: "product",
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "categories",
+                                            localField: "category",
+                                            foreignField: "_id",
+                                            as: "category",
+                                            pipeline: [
+                                                {
+                                                    $project: {
+                                                        category : 1
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },                            
+                                    {                                       
+                                        $project: {
+                                            name : 1,
+                                            category: 1
+                                        }
+                                    },
+                                    {
+                                        $addFields: {
+                                            category: { $first: "$category" }
+                                        }
+                                    }                             
+                                ]
+                            }
+                        },
+                        {                        
+                            $project: {
+                                _id:1,
+                                product: 1,
+                                images:1,
+                                price:1
+                            }
+                        },
+                        {
+                            $addFields: {
+                                product: { $first: "$product" }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    productVarient: {
+                        $arrayElemAt: ["$productVarient", 0]
+                    },
+                    user: {
+                        $arrayElemAt: ["$user", 0]
+                    },
+                    address: {
+                        $arrayElemAt: ["$address", 0]
+                    }
+                }
+            }
+        ]);
+
+    const order = orderVarients[0];
+    let subTotal = 0;
+    orderVarients.forEach((order)=>{
+        subTotal = subTotal + (order.productVarient.price * order.orderedItems.quantity)
+    })
+    const coupon = await Coupon.findOne({code: order.couponCode});
+
+    let total = parseInt(subTotal);
+    if (coupon) {
+        total = parseInt(subTotal) - parseInt(coupon.discount); 
+    }
+    
     res
     .status(200)
-    .render("users/orderdetails",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout"});
+    .render("users/orderdetails",{user:req.user, title:"Urbane Wardrobe", order, orderVarients, subTotal, total, coupon, layout: "userprofilelayout", wishlistCountlayout, cartCountlayout, categorylayout});
 });
 
 const verifyPayment = asyncHandler( async(req,res)=>{
+    console.log("Entered verify payment");
     
     const {response, order} = req.body;
     let hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
@@ -933,7 +1101,7 @@ const verifyPayment = asyncHandler( async(req,res)=>{
     hmac = hmac.digest('hex');
 
     if (hmac == response.razorpay_signature) {
-        let order1 = await  Order.updateOne({ _id: order._id }, {$set: { paymentStatus: "paid" }});
+        let order1 = await  Order.updateOne({ _id: order._id }, {$set: { paymentStatus: "Paid", status:"Placed" }});
         if(!order1){
             return res
             .status(400)
@@ -1153,7 +1321,86 @@ const verifyTransfer = asyncHandler( async(req,res)=>{
         .json(new ApiError(400, "Something went wrong"));        
     }
 });
+
+const renderInvoiceAdmin = asyncHandler( async(req,res)=>{
+    const orderId = req.params.id;
+    const order = await Order.findOne({ _id: orderId }).populate("userId").populate("address");
+    if(!order){
+        return res
+        .status(400)
+        .json(new ApiError(400, "Cant find the order"));
+    }
+    const products = await Order.aggregate([
+        {
+            $match: {
+                _id: order._id
+            }
+        },
+        {
+            $unwind: "$orderedItems"
+        },
+        {
+            $project: {
+                "orderedItems": 1
+            }
+        },
+        {
+            $lookup: {
+                from: "productvarients",
+                localField: "orderedItems.productVarientId",
+                foreignField: "_id",
+                as: "productvarient",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "products",
+                            localField: "product_id",
+                            foreignField: "_id",
+                            as: "product",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "categories",
+                                        localField: "category",
+                                        foreignField: "_id",
+                                        as: "category"
+                                    }
+                                },
+                                {
+                                    $addFields: {
+                                        category: {
+                                            $arrayElemAt: [ "$category", 0 ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            product: {
+                                $arrayElemAt: [ "$product", 0 ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+            {
+                    
+                $addFields: {
+                            productvarient: {
+                                $arrayElemAt: [ "$productvarient", 0 ]
+                        }
+            }
+        }
     
+    ]);
+
+    res
+    .status(200)
+    .render('users/invoice', { title:"Urbane Wardrobe", order, products});
+});
 
 
 module.exports = {
@@ -1170,5 +1417,6 @@ module.exports = {
     returnOrder,
     renderInvoice,
     addWalletMoney,
-    verifyTransfer
+    verifyTransfer,
+    renderInvoiceAdmin,
 }

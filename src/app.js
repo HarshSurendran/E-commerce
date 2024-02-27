@@ -51,16 +51,26 @@ hbs.registerHelper('getImageSrc', function(imagesArray, index) {
   }
 });
 hbs.registerHelper('changeColor', function ( status) {
-  if(status == "pending"){
+  if(status == "Pending"){
     return "alert-warning";
-  }else if(status == "delivered"){
+  }else if(status == "Delivered"){
     return "alert-success";
-  }else if(status == "cancelled"){
+  }else if(status == "Cancelled"){
     return "alert-danger";
-  }else if(status == "shipped"){
-    return "alert-success";
-  }else if(status == "returned"){
+  }else if(status == "Shipped"){
+    return "alert-info";
+  }else if(status == "Returned"){
     return "alert-danger";    
+  }else if(status == "Placed"){
+    return "alert-info";
+  }else if(status == "Failed"){
+    return "alert-danger";
+  }else if(status == "Paid"){
+    return "alert-success";
+  }else if(status == "Pending"){
+    return "alert-warning";    
+  }else if(status == "Refunded"){
+    return "alert-success";
   }
 });
 hbs.registerHelper('generateCancelButton', function(input1) {

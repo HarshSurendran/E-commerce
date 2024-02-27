@@ -23,8 +23,8 @@ const orderSchema = mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['pending', 'shipped', 'delivered', 'canceled', 'returned'],
-        default: "pending"
+        enum: ['Pending', 'Placed', 'Shipped', 'Delivered', 'Canceled', 'Returned'],
+        default: "Pending"
     },
     orderedItems: [{
         productVarientId: {
@@ -44,12 +44,12 @@ const orderSchema = mongoose.Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum : ['cod', 'online', 'wallet']
+        enum : ['COD', 'Online', 'Wallet']
     },
     paymentStatus: {
         type: String,
-        default: "pending",
-        enum : ['pending', 'paid', 'failed']
+        default: "Pending",
+        enum : ['Pending', 'Paid', 'Failed', 'Refunded']
     },
     returnPeriod: {
         type: Boolean,

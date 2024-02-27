@@ -9,86 +9,90 @@ const Order = require("../models/order.models.js");
 const Product = require("../models/product.models.js");
 const Category = require("../models/category.models.js");
 
+const cronjob = require("../controllers/cronjob.controller.js");
+
 
 const mongoose = require("mongoose");
 const cron = require("node-cron");
 const moment = require("moment");
 
-//change order status through cron job
-async function changeStatusToShipped() {
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);   
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+// //change order status through cron job
+// async function changeStatusToShipped() {
+//     const twoDaysAgo = new Date();
+//     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);   
+//     const fiveDaysAgo = new Date();
+//     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
-    const orders = await  Order.find({ 
-        createdAt: { 
-            $gt: fiveDaysAgo, // Greater than five days ago
-            $lt: twoDaysAgo   // Less than two days ago
-        } 
-    })
+//     const orders = await  Order.find({ 
+//         createdAt: { 
+//             $gt: fiveDaysAgo, 
+//             $lt: twoDaysAgo   
+//         } 
+//     })
 
-    orders.forEach(element => {  
-        if (element.status == "pending") {
-            element.status = "shipped";
-            element.save({ validateBeforeSave:false });          
-        }
-    });
+//     orders.forEach(element => {  
+//         if (element.status == "Placed") {
+//             element.status = "Shipped";
+//             element.save({ validateBeforeSave:false });          
+//         }
+//     });
 
-    console.log("These are the orders", orders);
-}
-async function changeStatusToDelivered() {     
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+//     console.log("These are the orders", orders);
+// }
+// async function changeStatusToDelivered() {     
+//     const fiveDaysAgo = new Date();
+//     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
-    const orders = await  Order.find({ 
-        createdAt: { 
-            $lt: fiveDaysAgo, // Greater than five days ago            
-        } 
-    })
+//     const orders = await  Order.find({ 
+//         createdAt: { 
+//             $lt: fiveDaysAgo,            
+//         } 
+//     })
 
-    orders.forEach(element => {
-        if (element.status == "shipped") {
-            element.status = "delivered";
-            if(element.paymentMethod == "cod"){
-                element.paymentStatus = "paid";
-            }
-            element.returnPeriod = true;
-            element.paymentStatus = "paid";
-            element.save({ validateBeforeSave:false });          
-        }
-    });
+//     orders.forEach(element => {
+//         if (element.status == "Shipped") {
+//             element.status = "Delivered";
+//             if(element.paymentMethod == "COD"){
+//                 element.paymentStatus = "Paid";
+//             }
+//             element.returnPeriod = true;
+//             element.paymentStatus = "Paid";
+//             element.save({ validateBeforeSave:false });          
+//         }
+//     });
 
-    console.log("These are the orders", orders);
-}
-async function changeStatusToReview() {     
-    const twentyDaysAgo = new Date();
-    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20);
+//     console.log("These are the orders", orders);
+// }
+// async function changeStatusToReview() {     
+//     const twentyDaysAgo = new Date();
+//     twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20);
 
-    const orders = await  Order.find({ 
-        createdAt: { 
-            $lt: twentyDaysAgo, // Greater than twenty days ago            
-        } 
-    })
+//     const orders = await  Order.find({ 
+//         createdAt: { 
+//             $lt: twentyDaysAgo, // Greater than twenty days ago            
+//         } 
+//     })
 
-    orders.forEach(element => {
-        if (element.status == "delivered") {  
-            element.returnPeriod = false;
-            element.save({ validateBeforeSave:false });          
-        }
-    });
+//     orders.forEach(element => {
+//         if (element.status == "Delivered") {  
+//             element.returnPeriod = false;
+//             element.save({ validateBeforeSave:false });          
+//         }
+//     });
 
-    console.log("These are the orders", orders);
-}
+//     console.log("These are the orders", orders);
+// }
+
+//calling the cron job function
 const task = cron.schedule('30 11 * * *', () => 
     {   
-        changeStatusToShipped();
-        changeStatusToDelivered();
-        changeStatusToReview();
+        cronjob.changeStatusToShipped();
+        cronjob.changeStatusToDelivered();
+        cronjob.changeStatusToReview();
     },
     {
         scheduled: true,
-        timezone: 'Asia/Kolkata' // Set the timezone according to your preference
+        timezone: 'Asia/Kolkata'
     }
 );
 task.start();

@@ -105,12 +105,12 @@
                         <div class="product__details__price">{{product.price}}<span>Rs 83.0</span></div>
                         <p>{{product.name.about}}</p>
                         <div class="product__details__button">
-                            <div class="quantity">
+                            {{!-- <div class="quantity">
                                 <span>Quantity:</span>
                                 <div class="pro-qty">
                                     <input type="text" value="1">
                                 </div>
-                            </div>
+                            </div> --}}
                             {{#if product.isOutOfStock}}
                             <button id="outofstock" data-id="{{product._id}}" class="cart-btn border-0 " disabled><span class="icon_bag_alt"></span> Out of Stock</button>
                             {{else}}

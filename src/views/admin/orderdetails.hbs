@@ -60,9 +60,9 @@
                                     <p class="mb-1">
                                         {{order.orderId}} <br />
                                         Pay method: {{order.paymentMethod}}<br />
-                                        Status: {{order.status}}
+                                        Payment Status: {{order.paymentStatus}}
                                     </p>
-                                    {{!-- <a href="#">Download info</a> --}}
+                                    <a href="/api/v1/admin/invoice/{{order._id}}">View invoice</a>
                                 </div>
                             </article>
                         </div>

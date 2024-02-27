@@ -8,6 +8,7 @@ const colorController = require("../controllers/color.controler.js");
 const sizeController = require("../controllers/size.controler.js");
 const orderController = require("../controllers/order.controller.js");
 const couponController = require("../controllers/coupon.controller.js");
+const offerController = require("../controllers/offer.controller.js");
 
 const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
@@ -150,7 +151,11 @@ router.get("/test", async(req,res)=>{
     // const order = await Order.findById(orderid);
     console.log("this is order ", order);
     res.json( new ApiResponse( 200, order, "Order details"))
-})
+});
+
+//offer
+router.get("/offers", auth.verifyAdminJWT, offerController.renderOffersPage);
+router.get("/get", auth.verifyAdminJWT, offerController.addOffersPage);
 
 //sales Report
 router.get("/salesreport", auth.verifyAdminJWT, adminController.renderSalesReportPage);
@@ -222,5 +227,8 @@ router.get("/size/:id", auth.verifyAdminJWT, sizeController.deleteSize);
 
 // Secured routes
 router.get("/logout", auth.verifyAdminJWT, adminController.logout);
+
+// invoice
+router.get("/invoice/:id", auth.verifyAdminJWT, orderController.renderInvoiceAdmin);
 
 module.exports = router;

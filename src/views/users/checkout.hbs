@@ -326,7 +326,7 @@
         })
     }
 
-
+    
     function razorpayCheckout(razorpayOrder, order){        
         console.log("Entered razorpay checkout and this is the amount", razorpayOrder.amount);    
         var options = {
@@ -337,13 +337,13 @@
             "description": "Test Transaction",
             "image": "https://example.com/your_logo",
             "order_id": razorpayOrder.id, 
-            "handler": function (response){                   
+            "handler": function (response){   
                 verifyPayment(response, razorpayOrder, order);
             },
             "prefill": { 
-                "name": "", 
-                "email": "", 
-                "contact": ""  
+                "name": order.userId.fullname, 
+                "email": order.userId.email, 
+                "contact": order.userId.phone  
             },
             "notes": {
                 "address": "Razorpay Corporate Office"
@@ -354,6 +354,24 @@
         };
         var rzp1 = new Razorpay(options);
         rzp1.open();
+        rzp1.on('payment.failed', function (response){
+            console.log("payment failed",response);
+            showNotification(response.error.description, "red");
+            location.href = `/api/v1/users/orders/${order._id}`
+            /*fetch("/api/v1/users/cancelOrder",{
+                method: "POST",
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    orderId: order._id
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                
+            }) */   
+        });
     }
 
     const orderButton = document.getElementById('orderButton');
