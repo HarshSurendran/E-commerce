@@ -251,16 +251,16 @@
                 imageElement.appendChild(img);
 
                 //crop image
-                    cropper = new Cropper(img, {
-                    aspectRatio: 0,
-                    viewMode: 1,
-                    dragMode: "move",
-                    minContainerWidth: 450,
+                cropper = new Cropper(img, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: "move",
+               /* minContainerWidth: 450,
                     minContainerHeight: 500,
                     minCropBoxWidth: 400,
                     minCropBoxHeight: 400,
                     minCanvasHeight: 500,
-                    minCanvasWidth: 500,                    
+                    minCanvasWidth: 500,   */              
                     /*crop(event) {
                         console.log(event.detail.x);
                         console.log(event.detail.y);

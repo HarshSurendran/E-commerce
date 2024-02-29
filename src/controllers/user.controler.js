@@ -10,6 +10,9 @@ const Category = require("../models/category.models.js");
 const Cart = require("../models/cart.models.js");
 const Coupon = require("../models/coupon.models.js");
 
+//controllers
+const { checkOffer, applyOffer } = require("./offer.controller");
+
 
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -319,6 +322,12 @@ const homePageRender = asyncHandler( async(req,res)=>{
             element.isWishlisted = true;
         } else {
             element.isWishlisted = false;
+        }
+        const offer = await checkOffer(element.name?.category.category);
+        if (offer) {
+            element.originalprice = element.price;
+            element.price = applyOffer(element.price, offer.discount);
+            element.offerApplied = true;
         }
         return element; // Return the modified element
     }));
@@ -668,12 +677,13 @@ const deleteUser = asyncHandler( async(req,res)=>{
 })
 
 const addToWishlist = asyncHandler( async(req,res)=>{
-    const {productId} = req.body;    
+    const {productId} = req.body;
+   
     try {
         const checkProduct = await Wishlist.findOne(
             {
                 userId:  req.user._id,           
-                productsId : new mongoose.Types.ObjectId(productId)
+                productsId : productId
             }
         );        
         if(!checkProduct){            
@@ -686,9 +696,9 @@ const addToWishlist = asyncHandler( async(req,res)=>{
                     upsert: true
                 }
             );
-            let wishlist1 = await Wishlist.find({userId: req.user._id});    
-            console.log("this is the wishlist count", wishlist1[0]);
-            let wishlistCount = wishlist1[0]?.productsId.length;
+            let updatedWishlist = await Wishlist.find({userId: req.user._id});    
+            console.log("this is the wishlist count", updatedWishlist[0]);
+            let wishlistCount = updatedWishlist[0]?.productsId.length;
             if(wishlist){
                 res
                 .status(200)
@@ -707,8 +717,6 @@ const addToWishlist = asyncHandler( async(req,res)=>{
         console.log("Error while adding product to wishlist", error);
         res.json( new ApiError(500, "Error while adding product to wishlist", error.message));
     }
-
-    
 })
 
 const renderWishlist = asyncHandler( async(req,res)=>{

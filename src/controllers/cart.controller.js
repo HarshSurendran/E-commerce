@@ -11,6 +11,9 @@ const { json } = require("express");
 const Category = require("../models/category.models.js");
 const Wishlist = require("../models/wishlist.models.js");
 
+
+const { applyOffer, checkOffer } = require("./offer.controller.js");
+
 const addToCart = asyncHandler( async(req, res)=>{
     const user_id = req.user._id;
     const productVarient_id = req.body.productId;
@@ -59,97 +62,96 @@ const renderCartPage = asyncHandler( async(req,res)=>{
         });        
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+    //layout data end
+    
 
     const cart = await Cart.aggregate([
-        {
-          $match: {
-              user_id : user._id
-          }
-        },
-        {
-          $lookup: {
-            from: "productvarients",
-            localField: "productVarient_id",
-            foreignField: "_id",
-            as: "product",
-            pipeline: [   
-                {
-                    $lookup: {
-                        from: "products",
-                        localField : "product_id",
-                        foreignField : "_id",
-                        as: "name",
-                        pipeline: [
-                            {
-                                $lookup: {
-                                    from: "categories",
-                                    localField: "category",
-                                    foreignField: "_id",
-                                    as: "category"
+            {
+              $match: {
+                  user_id : user._id
+              }
+            },
+            {
+              $lookup: {
+                from: "productvarients",
+                localField: "productVarient_id",
+                foreignField: "_id",
+                as: "productVarient_id",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "products",
+                            localField : "product_id",
+                            foreignField : "_id",
+                            as: "product_id",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "categories",
+                                        localField: "category",
+                                        foreignField: "_id",
+                                        as: "category"
+                                    }
+                                },
+                                {
+                                    $addFields: {
+                                        category: { $first: "$category" }
+                                    }
                                 }
-                            },
-                            {
-                                $addFields: {
-                                    category: { $first: "$category" }
-                                }
-                            }
-                        ]
-                    }        
-                },
-                {
-                    $lookup: {
-                        from: "colors",
-                        localField : "color_id",
-                        foreignField : "_id",
-                        as: "color"
-                    } 
-                },
-                {
-                    $lookup: {
-                        from: "sizes",
-                        localField : "size_id",
-                        foreignField : "_id",
-                        as: "size"
-                    } 
-                },
-                {            
-                    $addFields : {
-                        name : { $first: "$name" },
-                        color : { $first: "$color"},
-                        size : { $first: "$size" },
-                    }                       
-                },
-                {
-                    $project : {
-                        name:1,
-                        color:1,
-                        size:1,
-                        images:1,
-                        stock:1,
-                        price:1
+                            ]
+                        }
+                    },
+                    {                
+                        $lookup: {
+                            from: "colors",
+                            localField : "color_id",
+                            foreignField : "_id",
+                            as: "color_id"
+                        } 
+                    },
+                    {
+                        $lookup: {
+                            from: "sizes",
+                            localField : "size_id",
+                            foreignField : "_id",
+                            as: "size_id"
+                        } 
+                    },
+                    {
+                        $addFields: {
+                            product_id: { $first: "$product_id" },
+                            color_id : { $first: "$color_id"},
+                            size_id : { $first: "$size_id" },
+                        }
                     }
+                ]
+              }
+            },
+            {
+                $addFields : {
+                    productVarient_id: { $first: "$productVarient_id" },
                 }
-            ]
-          }
-        },
-        {
-            $addFields: {
-                product: { $first: "$product" }
             }
-        }
-    ])
+        ])
 
+    
 
     let total = 0;
-    cart.forEach(element => {
-        total = total + (element.quantity * element.product.price)
-    });
-    
+    for (const element of cart) {
+        const offer = await checkOffer(element.productVarient_id.product_id.category.category);
+        if (offer) {
+            element.productVarient_id.originalprice = element.productVarient_id.price;
+            element.productVarient_id.price = applyOffer(element.productVarient_id.price, offer.discount);
+            element.offerApplied = true;
+        }
+        console.log("this is price after applying offer", element.productVarient_id.price);
+        total += element.quantity * element.productVarient_id.price;
+    }
+    console.log("This is cart",cart);
     
     res
     .status(200)
-    .render("users/cartpage",{user: user , title:"Urbane Wardrobe", cart, total, categorylayout, wishlistCountlayout, cartCountlayout}); 
-        
+    .render("users/cartpage",{user: user , title:"Urbane Wardrobe", cart, total, categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
 const deleteCart = asyncHandler( async(req,res)=>{

@@ -42,7 +42,9 @@
                         <div class="product__item__pic set-bg" data-setbg="{{this.images.[0]}}">
                         {{!-- label above the image --}}
                             {{!-- <div class="label new">New</div> --}}
-                            {{!-- <div class="label">Sale</div> --}}
+                            {{#if this.offerApplied}}                        
+                                <div class="label sale">Sale</div>
+                            {{/if}}
                             {{#if this.isOutofStock}}
                             <div class="label stockout">out of stock</div>
                             {{else}}
@@ -67,7 +69,11 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
+                            {{#if this.offerApplied}}
+                            <div class="product__price">{{this.price}}<span>Rs {{this.originalprice}}</span></div>
+                            {{else}}
                             <div class="product__price">{{this.price}}</div>
+                            {{/if}}
                         </div>
                     </div>
                 </div>
@@ -144,7 +150,6 @@
             event.stopPropagation();
             
             const productId = element.getAttribute("data-id");
-            console.log("this is productid",productId);
             fetch("/api/v1/users/wishlist",{
                 method : "POST",
                 headers : {
@@ -156,24 +161,18 @@
             }).then( res=> res.json())
             .then((data)=>{
                 if(data.success){
-                    console.log("added to wishlist",data);
-                    console.log(event.target.tagName);
                     if(event.target.tagName == 'A'){
                         event.target.style.backgroundColor = "red";
                         event.target.style.color = "white";                        
                     }else if(event.target.tagName == 'SPAN'){
-                        console.log("this is span")
                         event.target.parentElement.style.backgroundColor = "red";
                         event.target.parentElement.style.color = "white";                        
                     }
                     const wishlistTip = document.getElementById('wishlist-tip');
-                    console.log("wishlisttp",wishlistTip);
-                    console.log(data.data.wishlistCount);
                     wishlistTip.innerHTML = data.data.wishlistCount;
                     showNotification("Item added to Wishlist");
                     return
                 }
-                console.log("This is the erespomse from wishlist",data);
                 showNotification("Item already in wishlist")
             })
         })

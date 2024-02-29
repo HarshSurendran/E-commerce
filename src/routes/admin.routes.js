@@ -155,7 +155,9 @@ router.get("/test", async(req,res)=>{
 
 //offer
 router.get("/offers", auth.verifyAdminJWT, offerController.renderOffersPage);
-router.get("/get", auth.verifyAdminJWT, offerController.addOffersPage);
+router.get("/offers/add-offer", auth.verifyAdminJWT, offerController.addOffersPage);
+router.post("/offers", auth.verifyAdminJWT, upload.single("images"), offerController.addOffers);
+router.get("/offers/delete-offer/:id", auth.verifyAdminJWT, offerController.deleteOffer);
 
 //sales Report
 router.get("/salesreport", auth.verifyAdminJWT, adminController.renderSalesReportPage);
@@ -221,6 +223,7 @@ router.patch("/category", auth.verifyAdminJWT, categoryController.editCategory);
 //Color
 router.post("/color", auth.verifyAdminJWT, colorController.addColor);
 router.post("/c/:id", auth.verifyAdminJWT, colorController.deleteColor);
+
 //Size
 router.post("/size", auth.verifyAdminJWT, sizeController.addSize);
 router.get("/size/:id", auth.verifyAdminJWT, sizeController.deleteSize);

@@ -13,6 +13,8 @@ const Wishlist = require("../models/wishlist.models.js");
 const ProductVarient = require("../models/productvarient.models.js");
 const Coupon = require("../models/coupon.models.js");
 
+const { checkOffer, applyOffer } = require("./offer.controller");
+
 const crypto = require("crypto")
 
 const mongoose = require("mongoose");
@@ -102,14 +104,14 @@ const checkOutPage = asyncHandler( async(req,res)=>{
             from: "productvarients",
             localField: "productVarient_id",
             foreignField: "_id",
-            as: "product",
-            pipeline: [   
+            as: "productVarient_id",
+            pipeline: [
                 {
                     $lookup: {
                         from: "products",
                         localField : "product_id",
                         foreignField : "_id",
-                        as: "name",
+                        as: "product_id",
                         pipeline: [
                             {
                                 $lookup: {
@@ -125,14 +127,14 @@ const checkOutPage = asyncHandler( async(req,res)=>{
                                 }
                             }
                         ]
-                    }        
+                    }
                 },
-                {
+                {                
                     $lookup: {
                         from: "colors",
                         localField : "color_id",
                         foreignField : "_id",
-                        as: "color"
+                        as: "color_id"
                     } 
                 },
                 {
@@ -140,40 +142,42 @@ const checkOutPage = asyncHandler( async(req,res)=>{
                         from: "sizes",
                         localField : "size_id",
                         foreignField : "_id",
-                        as: "size"
+                        as: "size_id"
                     } 
                 },
-                {            
-                    $addFields : {
-                        name : { $first: "$name" },
-                        color : { $first: "$color"},
-                        size : { $first: "$size" },
-                    }                       
-                },
                 {
-                    $project : {
-                        name:1,
-                        color:1,
-                        size:1,
-                        images:1,
-                        stock:1,
-                        price:1
+                    $addFields: {
+                        product_id: { $first: "$product_id" },
+                        color_id : { $first: "$color_id"},
+                        size_id : { $first: "$size_id" },
                     }
                 }
             ]
           }
         },
         {
-            $addFields: {
-                product: { $first: "$product" }
+            $addFields : {
+                productVarient_id: { $first: "$productVarient_id" },
             }
         }
     ])
 
     let total = 0;
-    cart.forEach(element => {
-        total = total + (element.quantity * element.product.price)
-    });
+    for (const element of cart) {
+        const offer = await checkOffer(element.productVarient_id.product_id.category.category);
+        if (offer) {
+            element.productVarient_id.originalprice = element.productVarient_id.price;
+            element.productVarient_id.price = applyOffer(element.productVarient_id.price, offer.discount);
+            element.offerApplied = true;
+        }
+        console.log("this is price after applying offer", element.productVarient_id.price);
+        total += element.quantity * element.productVarient_id.price;
+    }
+    console.log("This is cart",cart);
+
+
+
+
 
     // discount and shipping logic
     let discount = 0;
@@ -310,6 +314,14 @@ const createOrder = asyncHandler( async(req,res)=>{
             const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
 
             orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
+
+            const offer = await checkOffer(element.product.name.category.category);
+            if (offer) {
+                // productVarient.originalprice = productVarient.price;
+                element.product.price = applyOffer(element.product.price, offer.discount);
+                element.offerApplied = true;
+                console.log("this is price after applying offer", productVarient.price);
+            }
             total = total + (element.quantity * element.product.price);
         });
         

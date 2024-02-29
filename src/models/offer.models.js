@@ -17,7 +17,7 @@ const offerSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    endDate: {
+    expirydate: {
         type: Date,
         required: true
     },

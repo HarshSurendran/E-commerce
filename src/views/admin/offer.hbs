@@ -2,7 +2,16 @@
     <div class="screen-overlay"></div>
     <main class="main-wrap">
         <section class="content-main">
-            {{#each offers}}
+            <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Offers</h2>
+                <p>Add, edit or delete a Offer</p>
+            </div>
+            <div>
+                <a href="/api/v1/admin/offers/add-offer" class="btn btn-primary" id="addCouponForm" >Add Offer</a>
+            </div>
+        </div>
+        {{#each offers}}
             <div class="card mb-4">
                 <div class="card-header bg-brand-2" style="height: 150px"></div>
                 <div class="card-body">
@@ -19,13 +28,13 @@
                         </div>
                         <!--  col.// -->
                         <div class="col-xl-4 text-md-end">
-                            <select class="form-select w-auto d-inline-block">
+                            {{!-- <select class="form-select w-auto d-inline-block">
                                 <option>Actions</option>
-                                <option>Disable shop</option>
-                                <option>Analyze</option>
-                                <option>Something</option>
-                            </select>
-                            <a href="#" class="btn btn-primary"> View live <i class="material-icons md-launch"></i> </a>
+                                <option>Delete</option>
+                                <option>Edit</option>
+                            </select> --}}
+                            <a href="#" class="btn btn-primary"> Edit </a>
+                            <a onclick=" return confirm('Are you sure to delete {{this.name}}')" id="delete" href="/api/v1/admin/offers/delete-offer/{{this._id}}" class="btn btn-danger">Delete</a>
                         </div>
                         <!--  col.// -->
                     </div>
@@ -34,46 +43,44 @@
                     <div class="row g-4">
                         <div class="col-md-12 col-lg-4 col-xl-2">
                             <article class="box">
-                                <p class="mb-0 text-muted">Total sales:</p>
-                                <h5 class="text-success">238</h5>
-                                <p class="mb-0 text-muted">Revenue:</p>
-                                <h5 class="text-success mb-0">$2380</h5>
+                                <p class="mb-0 text-muted">Discount percentage:</p>
+                                <h5 class="text-success">{{this.discount}}</h5>
+                                {{!-- <p class="mb-0 text-muted">Revenue:</p>
+                                <h5 class="text-success mb-0">$2380</h5> --}}
                             </article>
                         </div>
                         <!--  col.// -->
                         <div class="col-sm-6 col-lg-4 col-xl-3">
-                            <h6>Contacts</h6>
+                            <h6>Category</h6>
                             <p>
-                                Manager: Jerome Bell <br />
-                                info@example.com <br />
-                                (229) 555-0109, (808) 555-0111
+                               {{this.category.category}}
                             </p>
                         </div>
                         <!--  col.// -->
                         <div class="col-sm-6 col-lg-4 col-xl-3">
-                            <h6>Address</h6>
+                            <h6>End Date</h6>
                             <p>
-                                Country: California <br />
-                                Address: Ranchview Dr. Richardson <br />
-                                Postal code: 62639
+                                {{this.expirydate}}
                             </p>
                         </div>
                         <!--  col.// -->
-                        <div class="col-sm-6 col-xl-4 text-xl-end">
+                        {{!-- <div class="col-sm-6 col-xl-4 text-xl-end">
                             <map class="mapbox position-relative d-inline-block">
                                 <img src="assets/imgs/misc/map.jpg" class="rounded2" height="120" alt="map" />
                                 <span class="map-pin" style="top: 50px; left: 100px"></span>
                                 <button class="btn btn-sm btn-brand position-absolute bottom-0 end-0 mb-15 mr-15 font-xs">Large</button>
                             </map>
-                        </div>
+                        </div> --}}
                         <!--  col.// -->
                     </div>
                     <!--  row.// -->
                 </div>
-                {{/each}}
                 <!--  card-body.// -->
             </div>
+        {{/each}}
+    </section>
+</body>
+<script>
+    
+</script>
 
-        </section>
-    </body>
-</html>

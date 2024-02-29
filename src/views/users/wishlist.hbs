@@ -25,7 +25,7 @@
     }*/
     </style>
 </head>
-
+{{!-- 
 <section class="product spad">
     <div class="container">
         <div class="row">
@@ -65,7 +65,66 @@
         </div>
     </div>
     <div id="notification" class="notification"></div>
-</section>
+</section> --}}
+
+<section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4">
+                    <div class="section-title">
+                        <h4>Wishlist</h4>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8">
+                    <ul class="filter__controls">
+                        <li class="active" data-filter="*">All</li>
+                        <li data-filter=".Womens">Women’s</li>
+                        <li data-filter=".Mens">Men’s</li>
+                        <li data-filter=".Kids">Kid’s</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row property__gallery">
+                {{#each wishlist}}
+                {{!-- {{#if this.name}} --}}
+                <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.productsId.product_id.category.category}} prodDetailsDiv" data-prodid="{{this._id}}">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{{this.productsId.images.[0]}}">
+                        {{!-- label above the image --}}
+                            {{!-- <div class="label new">New</div> --}}
+                            {{!-- <div class="label">Sale</div> --}}
+                           
+                            {{#if this.isOutofStock}}
+                                <div class="label stockout">out of stock</div>
+                                <ul class="product__hover">
+                                    <li><a data-id="{{this.productsId._id}}" class="removeWishlist" href="#"><span class="icon_close_alt "></span></a></li>
+                                </ul>
+                            {{else}}
+                                <ul class="product__hover ">   
+                                    <li id="addToCart" class="addToCart" data-id="{{this.productsId._id}}"><a href="#"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a data-id="{{this.productsId._id}}" class="removeWishlist" href="#"><span class="icon_close_alt "></span></a></li>
+                                </ul>
+                            {{/if}}
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">{{this.productsId.product_id.name}}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">{{this.price}}</div>
+                        </div>
+                    </div>
+                </div>
+                {{!-- {{/if}} --}}
+                {{/each}}
+            </div>
+        </div>
+        <div id="notification" class="notification"></div>
+    </section>
 
 <script>
     function showNotification(message) {

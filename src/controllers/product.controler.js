@@ -12,6 +12,8 @@ const Category = require("../models/category.models.js");
 const Cart = require("../models/cart.models.js");
 const Wishlist = require("../models/wishlist.models.js");
 
+const { checkOffer, applyOffer } = require("./offer.controller");
+
 
 const mongoose = require("mongoose");
 const fs = require("fs");
@@ -234,9 +236,8 @@ const addProductVarientPage = asyncHandler( async(req,res)=>{
 });
 
 const addProductVarient = asyncHandler( async (req,res)=>{
-        //get product details   
-        console.log("reached add products varient") 
-    const {productname, color, size, stock, price, cost} = req.body //add remaining parameters to add into product collection    
+    //get product details  
+    const {productname, color, size, stock, price, cost} = req.body 
     //collecting the _id from product,color and size 
     const productId = await Product.findOne({name:productname}).select("-name -about -category -islisted -createdAt -updatedAt");    
     const colorId = await Color.findOne({color:color}).select("-color -hex -createdAt -updatedAt");    
@@ -394,6 +395,7 @@ const listProducts = asyncHandler( async(req,res)=>{
         });        
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+    //end of data for layout
 
     const product = await ProductVarient.aggregate(
     [   
@@ -461,6 +463,8 @@ const listProducts = asyncHandler( async(req,res)=>{
     ]
     );    
 
+    console.log("this is product category",product[0].name.category.category);
+
     const productList = await Promise.all(product.map(async (element) => {
         if (element.stock < 1) {
             element.isOutofStock = true;            
@@ -471,10 +475,16 @@ const listProducts = asyncHandler( async(req,res)=>{
         } else {
             element.isWishlisted = false;
         }
-        return element; // Return the modified element
+        const offer = await checkOffer(element.name?.category.category);
+        if (offer) {
+            element.originalprice = element.price;
+            element.price = applyOffer(element.price, offer.discount);
+            element.offerApplied = true;
+        }   
+        return element; 
     }));
 
-    console.log("This is the product list asdsad",productList);
+   // console.log("This is the product list asdsad",productList);
 
     res
     .status(200)
@@ -483,9 +493,7 @@ const listProducts = asyncHandler( async(req,res)=>{
 
 const productDetailsPage = asyncHandler( async(req,res)=>{
     const prodId = req.params.id;
-    console.log("This is the product id to productdetails",prodId);
-    console.log("This is user ", req.user);
-
+    
     //data for layout
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
@@ -497,6 +505,7 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
         });        
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+    //end data layout
 
     const prod = await ProductVarient.aggregate([
         {
@@ -575,18 +584,29 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     if(cartItem){
         cart = true;
     }else{
-        cart = '';
+        cart = false;
     }
 
     const prodDetails = prod[0];
-    console.log(prodDetails);
+   
 
-    const mainProdId = prodDetails.name._id;
-
-    if (prodDetails.stock < 1) {
-       prodDetails.isOutOfStock = true;
+    const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: prodDetails._id });
+    
+    if (isWishlisted) {
+        prodDetails.isWishlisted = true;
+    } else {
+        prodDetails.isWishlisted = false;
     }
 
+    
+    
+    
+    const mainProdId = prodDetails.name._id;
+    
+    if (prodDetails.stock < 1) {
+        prodDetails.isOutOfStock = true;
+    }
+    
     //to get the other varient of this product
     const prodVarients = await ProductVarient.aggregate([
         {
@@ -651,7 +671,14 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
             }
         }
     ]);
-    
+
+    //check whether offer is applied
+    const offer = await checkOffer(prodDetails.name.category.category);
+    if (offer) {
+        prodDetails.originalprice = prodDetails.price;
+        prodDetails.price = applyOffer(prodDetails.price, offer.discount);
+        prodDetails.offerApplied = true;
+    }   
     
     //add size logic here
     
@@ -951,7 +978,6 @@ const listUnlistProduct = asyncHandler( async(req,res)=>{
 
 const categoryListPage = asyncHandler( async(req,res)=>{
     const category = req.params.category;
-
     //data for layout
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
@@ -1037,32 +1063,38 @@ const categoryListPage = asyncHandler( async(req,res)=>{
         ]
         );
         
-        const categoryProducts1 = categoryProductList.filter((element)=>{
-            if(element.name?.category){
-                return true
-            }
-            return false
-        });
+    const categoryProducts1 = categoryProductList.filter((element)=>{
+        if(element.name?.category){
+            return true
+        }
+        return false
+    });
 
-        const categoryProducts = await Promise.all(categoryProducts1.map(async (element) => {
-            if (element.stock < 1) {
-                element.isOutofStock = true;            
-            }
-            const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
-            console.log("isWishlisted", isWishlisted);
-            if (isWishlisted) {
-                element.isWishlisted = true;
-            } else {
-                element.isWishlisted = false;
-            }
-            return element; // Return the modified element
-        }));
+    const categoryProducts = await Promise.all(categoryProducts1.map(async (element) => {
+        if (element.stock < 1) {
+            element.isOutofStock = true;            
+        }
+        const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
+        console.log("isWishlisted", isWishlisted);
+        if (isWishlisted) {
+            element.isWishlisted = true;
+        } else {
+            element.isWishlisted = false;
+        }
+        const offer = await checkOffer(element.name?.category.category);
+        if (offer) {
+            element.originalprice = element.price;
+            element.price = applyOffer(element.price, offer.discount);
+            element.offerApplied = true;
+        } 
+        return element;
+    }));
 
 
-        res
-        .status(200)
-        //.json( new ApiResponse(200, {mensProducts}, "fetched"))
-        .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: req.user, products: categoryProducts , categorylayout, wishlistCountlayout, cartCountlayout});
+    res
+    .status(200)
+    //.json( new ApiResponse(200, {mensProducts}, "fetched"))
+    .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: req.user, products: categoryProducts , categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
 const productVarientDetailsPage = asyncHandler( async(req,res)=>{        

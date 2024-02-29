@@ -30,9 +30,9 @@
                                 {{#each cart}}
                                 <tr>
                                     <td class="cart__product__item text-start ">
-                                        <img width="90px" height="90px" src="{{this.product.images.[0]}}" alt="">
+                                        <img width="90px" height="90px" src="{{this.productVarient_id.images.[0]}}" alt="">
                                         <div class="cart__product__item__title">
-                                            <h6>{{this.product.name.name}}</h6>
+                                            <h6>{{this.productVarient_id.product_id.name}}</h6>
                                             <div class="rating">
                                                 <i class="fa fa-star"></i>
                                                 <i class="fa fa-star"></i>
@@ -42,7 +42,15 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="cart_price">{{this.product.price}}</td>
+                                    {{#if this.productVarient_id.originalprice}}
+                                    <td class="cart_price">
+                                        <div class="product__details__price mb-0">{{this.productVarient_id.price}}<span>Rs {{this.productVarient_id.originalprice}}</span></div>                                  
+                                    </td>
+                                    {{else}}                                    
+                                    <td class="cart_price">
+                                        <div class="product__details__price mb-0 " >{{this.productVarient_id.price}}</div>  
+                                    </td>
+                                    {{/if}}
                                     <td style="width: 7rem;" class="cart__quantity ">
                                         {{!-- <div class="pro-qty quantity123">
                                             <input type="number" class="quantity-input" value="{{this.quantity}}">
@@ -56,7 +64,9 @@
                                         </div>
 
                                     </td>
-                                    <td id="carttotal{{@index}}" class="cart_total">{{multiply this.quantity this.product.price}}</td>
+                                    <td id="carttotal{{@index}}" class="">
+                                        <div class="product__details__price mb-0 cart_total" >{{multiply this.quantity this.productVarient_id.price}}</div>  
+                                    </td>
                                     <a id="deleteCartBut" ><td class="cart__close deleteCartBut" data-id="{{this._id}}"><span class="icon_close"></span></td>
                                 </tr></a>
                                 {{/each}}

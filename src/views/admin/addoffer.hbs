@@ -1,3 +1,9 @@
+<head>
+    <link  href="/dist/cropper.css" rel="stylesheet">
+    <script src="/dist/cropper.js"></script>
+</head>
+
+
 <body>
     <div class="screen-overlay"></div>
     <main class="main-wrap">
@@ -8,101 +14,238 @@
                         <h2 class="content-title">Add New Offer</h2>
                         <div>
                             {{!-- <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button> --}}
-                            <button class="btn btn-md rounded font-sm hover-up">Publish</button>
+                            {{!-- <button for="addOfferForm" type="submit" id="addButton" class="btn btn-md rounded font-sm hover-up">Publish</button> --}}
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h4>Basic</h4>
-                        </div>
-                        <div class="card-body">
-                            <form>
-                                <div class="mb-4">
-                                    <label for="product_name" class="form-label">Offer Title</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="product_name" />
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Full description</label>
-                                    <textarea placeholder="Type here" class="form-control" rows="4"></textarea>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="mb-4">
-                                            <label class="form-label">Discount Percentage</label>
-                                            <input type="text" placeholder="%" class="form-control" id="product_name" />
+
+                <form id="addOfferForm" method="post" onsubmit="return validateForm()" action="/api/v1/admin/offers" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Basic</h4>
+                            </div>
+                            <div class="card-body">
+                                    <div class="mb-4">
+                                        <label for="offername" class="form-label">Offer Title</label>
+                                        <input id="offername" type="text" placeholder="Type here" class="form-control" name="name" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Full description</label>
+                                        <textarea id="description" placeholder="Type here" class="form-control" rows="4" name="description"></textarea>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="mb-4">
+                                                <label class="form-label">Discount Percentage</label>
+                                                <input id="discount" type="text" placeholder="%" class="form-control" id="product_name" name="discount" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="mb-4">
+                                                <label class="form-label">Expiry date</label>
+                                                <input id="expirydate" type="date" placeholder="Discouont %" class="form-control" name="expirydate"/>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <div class="mb-4">
-                                            <label class="form-label">Expiry date</label>
-                                            <input type="date" placeholder="%" class="form-control" id="product_name" />
-                                        </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Category</label>
+                                        <select id="category" class="form-select" name="category">
+                                            <option>Select a category</option>
+                                            {{#each category}}
+                                            <option>{{this.category}}</option>
+                                            {{/each}}
+                                        </select>
                                     </div>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Category</label>
-                                    <select class="form-select">
-                                        <option>Select a category</option>
-                                        {{#each category}}
-                                        <option>{{this.category}}</option>
-                                        {{/each}}
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <!-- card end// -->
-                    {{!-- <div class="card mb-4">
-                        <div class="card-header">
-                            <h4>Shipping</h4>
-                        </div>
-                        <div class="card-body">
-                            <form>
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="mb-4">
-                                            <label for="product_name" class="form-label">Width</label>
-                                            <input type="text" placeholder="inch" class="form-control" id="product_name" />
-                                        </div>
+                                    <div class="d-flex  justify-content-center">
+                                        <button for="addOfferForm" type="submit" id="addButton" class="btn btn-md rounded font-sm hover-up">Publish</button>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <div class="mb-4">
-                                            <label for="product_name" class="form-label">Height</label>
-                                            <input type="text" placeholder="inch" class="form-control" id="product_name" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="product_name" class="form-label">Weight</label>
-                                    <input type="text" placeholder="gam" class="form-control" id="product_name" />
-                                </div>
-                                <div class="mb-4">
-                                    <label for="product_name" class="form-label">Shipping fees</label>
-                                    <input type="text" placeholder="$" class="form-control" id="product_name" />
-                                </div>
-                            </form>
-                        </div>
-                    </div> --}}
-                    <!-- card end// -->
-                </div>
-                <div class="col-lg-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h4>Media</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="input-upload">
-                                <img src="/assets/imgs/theme/upload.svg" alt="" />
-                                <input class="form-control" type="file" />
                             </div>
                         </div>
+                        <!-- card end// -->
+                        {{!-- <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Shipping</h4>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="mb-4">
+                                                <label for="product_name" class="form-label">Width</label>
+                                                <input type="text" placeholder="inch" class="form-control" id="product_name" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="mb-4">
+                                                <label for="product_name" class="form-label">Height</label>
+                                                <input type="text" placeholder="inch" class="form-control" id="product_name" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Weight</label>
+                                        <input type="text" placeholder="gam" class="form-control" id="product_name" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Shipping fees</label>
+                                        <input type="text" placeholder="$" class="form-control" id="product_name" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div> --}}
+                        <!-- card end// -->
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Media</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="input-upload">
+                                    <img id="image-preview1" src="/assets/imgs/theme/upload.svg" alt="" />
+                                    <input data-id="1" class="form-control" name="images" type="file" id="image-input-1" accept="image/*" onchange="previewImage(event)" required />
+                                </div>
+                            </div>
+                            {{!-- <div class="card-body">
+                                <div class="input-upload">
+                                    <img src="/assets/imgs/theme/upload.svg" alt="" />
+                                    <input class="form-control" type="file" />
+                                </div>
+                            </div> --}}
+                        </div>
                     </div>
                 </div>
+                </form>
             </div>
         </section>
         <!-- content-main end// -->
+
+        <div class="modal fade" id="imageModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="imagecrop1 width-100">
+                            
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" id="cropButton1" class="btn btn-primary">Crop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    /*const addButton = document.getElementById('addButton')
+    addButton.addEventListener('click', () => {
+        fetch
+    })*/
+
+    function validateForm(){
+        const offername = document.getElementById("offername").value;
+        const description = document.getElementById("description").value;
+        const discount = document.getElementById("discount").value;
+        const expirydate = document.getElementById("expirydate").value;
+        const category = document.getElementById("category").value;
+
+        if(offername.trim() == ""){
+            alert("Offer name can't be empty");
+            return false;
+        }
+        if(description.trim() == ""){
+            alert("Description can't be empty");
+            return false;
+        }
+        if( 0 > discount || discount > 100){
+            alert("Discount must be between 0 and 100");
+            return false;
+        }
+        return true;
+    }
+
+    let cropper;
+    function previewImage(event) {
+        const input = event.target;
+        console.log( "Entered preview image" ,input)
+        let number = input.getAttribute("data-id");
+        
+        console.log(`image-preview${number}`);
+        const preview = document.getElementById(`image-preview${number}`);  
+        const imageElement = document.querySelector(`.imagecrop${number}`);   
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                //preview.src = e.target.result;
+                                
+                $(document).ready(function(){
+                    $(`#imageModal${number}`).modal('show');
+                });     
+
+                let img = document.createElement("img");
+                img.id = `image`; 
+                img.src = e.target.result;
+                
+                imageElement.appendChild(img);
+
+                //crop image
+                cropper = new Cropper(img, {
+                aspectRatio: 0,
+                viewMode: 1,
+                dragMode: "move",
+                minContainerWidth: 450,
+                minContainerHeight: 500,
+                minCropBoxWidth: 400,
+                minCropBoxHeight: 400,
+                minCanvasHeight: 500,
+                minCanvasWidth: 500,                    
+                /*crop(event) {
+                        console.log(event.detail.x);
+                        console.log(event.detail.y);
+                        console.log(event.detail.width);
+                        console.log(event.detail.height);
+                        console.log(event.detail.rotate);
+                        console.log(event.detail.scaleX);
+                        console.log(event.detail.scaleY);
+                    },*/
+                });
+
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        const cropButton = document.getElementById(`cropButton${number}`);
+        cropButton.addEventListener("click",()=>{
+            console.log("Entered crop button")
+            let imgsrc = cropper.getCroppedCanvas().toDataURL("image/jpeg");
+            console.log(imgsrc);            
+            preview.src = imgsrc;
+            //input.value = imgsrc;
+            //close modal
+            var modal = document.getElementById(`imageModal${number}`);
+            console.log("This is modal", modal)
+            var bootstrapModal = bootstrap.Modal.getInstance(modal);
+            bootstrapModal.hide();
+        });
+    }
+
+    
+  
+
+</script>
 

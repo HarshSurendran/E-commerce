@@ -8,6 +8,7 @@ const productController = require("../controllers/product.controler.js");
 const cartController = require("../controllers/cart.controller.js");
 const orderController = require("../controllers/order.controller.js");
 const walletController = require("../controllers/wallet.controller.js");
+const offerController = require("../controllers/offer.controller.js");
 
 //require middlewares
 const upload = require("../middlewares/multer.middleware.js");
@@ -92,6 +93,9 @@ router.get("/wallet", auth.verifyUserJWT, walletController.renderWalletPage);
 router.post("/wallet", auth.verifyUserJWT, orderController.addWalletMoney);
 router.post("/verifyTransfer", auth.verifyUserJWT, orderController.verifyTransfer);
 router.post("walletbalance", auth.verifyUserJWT, walletController.getWalletBalance);
+
+//offers 
+router.get("/offers", auth.verifyUserJWT, offerController.renderUserOffersPage);
 
 
 
