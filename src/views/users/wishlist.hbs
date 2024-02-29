@@ -85,6 +85,7 @@
                 </div>
             </div>
             <div class="row property__gallery">
+                {{#if wishlist}}
                 {{#each wishlist}}
                 {{!-- {{#if this.name}} --}}
                 <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.productsId.product_id.category.category}} prodDetailsDiv" data-prodid="{{this._id}}">
@@ -121,6 +122,9 @@
                 </div>
                 {{!-- {{/if}} --}}
                 {{/each}}
+                {{else}}
+                <h4 class="text-center text-danger ">Your wishlist is empty. Fill your bag.!!</h4>
+                {{/if}}
             </div>
         </div>
         <div id="notification" class="notification"></div>
