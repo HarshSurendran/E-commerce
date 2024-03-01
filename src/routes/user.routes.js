@@ -9,6 +9,7 @@ const cartController = require("../controllers/cart.controller.js");
 const orderController = require("../controllers/order.controller.js");
 const walletController = require("../controllers/wallet.controller.js");
 const offerController = require("../controllers/offer.controller.js");
+const filterController = require("../controllers/filter.controller.js");
 
 //require middlewares
 const upload = require("../middlewares/multer.middleware.js");
@@ -97,6 +98,11 @@ router.post("walletbalance", auth.verifyUserJWT, walletController.getWalletBalan
 //offers 
 router.get("/offers", auth.verifyUserJWT, offerController.renderUserOffersPage);
 
+//filters
+router.get("/filter/price/:min/:max", auth.verifyUserJWT , filterController.filterByPrice);
+router.get("/filter/color/:color", auth.verifyUserJWT, filterController.filterByColor);
+// router.post("/filter/brand", userController.filterByBrand);
+// router.post("/filter/category", userController.filterByCategory);
 
 
 module.exports = router;

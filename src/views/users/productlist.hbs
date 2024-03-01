@@ -12,6 +12,74 @@
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
+    /*button style*/
+    .button2 {
+    display: inline-block;
+    transition: all 0.2s ease-in;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    color: #090909;
+    padding: 0.5em 1.7em;
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 0.5em;
+    background: #e8e8e8;
+    border: 1px solid #e8e8e8;
+    box-shadow: 6px 6px 12px #c5c5c5, -6px -6px 12px #ffffff;
+    }
+
+    .button2:active {
+    color: #666;
+    box-shadow: inset 4px 4px 12px #c5c5c5, inset -4px -4px 12px #ffffff;
+    }
+
+    .button2:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) scaleY(1) scaleX(1.25);
+    top: 100%;
+    width: 140%;
+    height: 180%;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    display: block;
+    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: -1;
+    }
+
+    .button2:after {
+    content: "";
+    position: absolute;
+    left: 55%;
+    transform: translateX(-50%) scaleY(1) scaleX(1.45);
+    top: 180%;
+    width: 160%;
+    height: 190%;
+    background-color: #e5aa3b;
+    border-radius: 50%;
+    display: block;
+    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: -1;
+    }
+
+    .button2:hover {
+    color: #ffffff;
+    border: 1px solid #e5aa3b;
+    }
+
+    .button2:hover:before {
+    top: -35%;
+    background-color: #e5aa3b;
+    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+    }
+
+    .button2:hover:after {
+    top: -45%;
+    background-color: #e5aa3b;
+    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+    }
     </style>
 </head>
 
@@ -26,7 +94,9 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8">
+
                     <ul class="filter__controls">
+                        <li><button class="button2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">Filter</button></li>
                         <li class="active" data-filter="*">All</li>
                         <li data-filter=".Womens">Women’s</li>
                         <li data-filter=".Mens">Men’s</li>
@@ -35,6 +105,9 @@
                 </div>
             </div>
             <div class="row property__gallery">
+                {{#if message}}
+                <h4 class="alert alert-danger text-center ">{{message}}</h4>
+                {{/if}}
                 {{#each products}}
                 {{#if this.name}}
                 <div class="col-lg-3 col-md-4 col-sm-6 mix {{this.name.category.category}} prodDetailsDiv" data-prodid="{{this._id}}">
@@ -81,6 +154,40 @@
                 {{/each}}
             </div>
         </div>
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasExampleLabel">Apply Filters</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                {{!-- <div>
+                Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
+                </div> --}}
+                <div class="dropdown mt-3">
+                    <button class="btn btn-secondary dropdown-toggle w-100 " type="button" data-bs-toggle="dropdown">
+                        Prize Range
+                    </button>
+                    <ul class="dropdown-menu w-100 ">
+                        <li><a class="dropdown-item" href="/api/v1/products/list/all">All</a></li>
+                        <li><a class="dropdown-item" data-min="100" data-max="600" href="/api/v1/users/filter/price/100/600">100 to 600</a></li>
+                        <li><a class="dropdown-item" data-min="600" data-max="1200" href="/api/v1/users/filter/price/600/1200">600 to 1200</a></li>
+                        <li><a class="dropdown-item" data-min="1200" data-max="2500" href="/api/v1/users/filter/price/1200/2500">1200 to 2500</a></li>
+                        <li><a class="dropdown-item" data-min="1200" data-max="10000" href="/api/v1/users/filter/price/2500/10000">2500 and above</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown mt-3">
+                    <button class="btn btn-secondary dropdown-toggle w-100 " type="button" data-bs-toggle="dropdown">
+                        Colors
+                    </button>
+                    <ul id="colorDropdown" class="dropdown-menu w-100 ">
+                        <li><a class="dropdown-item" href="/api/v1/products/list/all">All</a></li>
+                        {{#each colors}}
+                        <li><a class="dropdown-item" data-color="{{this}}" href="/api/v1/users/filter/color/{{this.color}}">{{this.color}}</a></li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>        
         <div id="notification" class="notification"></div>
     </section>
     <!-- Product Section End -->
@@ -177,4 +284,38 @@
             })
         })
     })
+
+    //Filtering
+    /*const colorDropdownMenu = document.getElementById('colorDropdown');
+    colorDropdownMenu.addEventListener('click', (event) => {
+        console.log("entered dropdown", event.target);
+    if (event.target.tagName === 'LI' || event.target.tagName === 'A') {
+
+        const min = event.target.getAttribute('data-min');
+        const max = event.target.getAttribute('data-max');
+        const color = event.target.getAttribute('data-color');
+        
+        if(color){
+            console.log(`Color: ${color}`);
+            /*fetch(`/api/v1/products/filter/color`,{
+                method : "POST",
+                headers : {
+                    "content-type" : "application/json"
+                },
+                body : JSON.stringify({
+                    color
+                })
+            })
+            .then( res=> res.json())
+            .then((data)=>{
+                
+            })
+            fetch(`/api/v1/users/filter/color/${color}`)
+        }
+        console.log(`Min: ${min}, Max: ${max}`);
+        
+        // You can perform further actions based on the min and max values
+    }
+});*/
+
 </script>

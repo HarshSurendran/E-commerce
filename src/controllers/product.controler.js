@@ -463,8 +463,6 @@ const listProducts = asyncHandler( async(req,res)=>{
     ]
     );    
 
-    console.log("this is product category",product[0].name.category.category);
-
     const productList = await Promise.all(product.map(async (element) => {
         if (element.stock < 1) {
             element.isOutofStock = true;            
@@ -483,12 +481,17 @@ const listProducts = asyncHandler( async(req,res)=>{
         }   
         return element; 
     }));
+    
+    //rearranging outofstock elements to the last
+    const outOfStockProducts = productList.filter(product => product.isOutofStock);
+    const inStockProducts = productList.filter(product => !product.isOutofStock);
+    const rearrangedProducts = [...inStockProducts, ...outOfStockProducts];
 
-   // console.log("This is the product list asdsad",productList);
+    const colors = await Color.find({}).select("-createdAt -updatedAt -hex");
 
     res
     .status(200)
-    .render("users/productlist",{user:req.user, products: productList, title: "Urbane Wardrobe", categorylayout, wishlistCountlayout, cartCountlayout});
+    .render("users/productlist",{user:req.user, products: rearrangedProducts, colors, title: "Urbane Wardrobe", categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
 const productDetailsPage = asyncHandler( async(req,res)=>{
@@ -1063,14 +1066,14 @@ const categoryListPage = asyncHandler( async(req,res)=>{
         ]
         );
         
-    const categoryProducts1 = categoryProductList.filter((element)=>{
+    const products = categoryProductList.filter((element)=>{
         if(element.name?.category){
             return true
         }
         return false
     });
 
-    const categoryProducts = await Promise.all(categoryProducts1.map(async (element) => {
+    const categoryProducts = await Promise.all(products.map(async (element) => {
         if (element.stock < 1) {
             element.isOutofStock = true;            
         }
@@ -1090,11 +1093,16 @@ const categoryListPage = asyncHandler( async(req,res)=>{
         return element;
     }));
 
+    //rearranging outofstock elements to the last
+    const outOfStockProducts = categoryProducts.filter(product => product.isOutofStock);
+    const inStockProducts = categoryProducts.filter(product => !product.isOutofStock);
+    const rearrangedProducts = [...inStockProducts, ...outOfStockProducts];
+
 
     res
     .status(200)
     //.json( new ApiResponse(200, {mensProducts}, "fetched"))
-    .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: req.user, products: categoryProducts , categorylayout, wishlistCountlayout, cartCountlayout});
+    .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: req.user, products: rearrangedProducts , categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
 const productVarientDetailsPage = asyncHandler( async(req,res)=>{        

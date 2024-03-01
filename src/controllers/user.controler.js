@@ -317,7 +317,6 @@ const homePageRender = asyncHandler( async(req,res)=>{
             element.isOutofStock = true;            
         }
         const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
-        console.log("isWishlisted", isWishlisted);
         if (isWishlisted) {
             element.isWishlisted = true;
         } else {
@@ -329,12 +328,17 @@ const homePageRender = asyncHandler( async(req,res)=>{
             element.price = applyOffer(element.price, offer.discount);
             element.offerApplied = true;
         }
-        return element; // Return the modified element
+        return element;
     }));
+
+    //rearranging outofstock elements to the last
+    const outOfStockProducts = productList.filter(product => product.isOutofStock);
+    const inStockProducts = productList.filter(product => !product.isOutofStock);
+    const rearrangedProducts = [...inStockProducts, ...outOfStockProducts];
 
     res
     .status(200)
-    .render("users/userhome", {user:req.user , title: "Urbane Wardrobe", products:productList, categorylayout, wishlistCountlayout, cartCountlayout});
+    .render("users/userhome", {user:req.user , title: "Urbane Wardrobe", products:rearrangedProducts, categorylayout, wishlistCountlayout, cartCountlayout});
 
 });
 
