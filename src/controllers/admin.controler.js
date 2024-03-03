@@ -226,7 +226,8 @@ const renderDashboard = asyncHandler( async(req,res)=>{
             }
         }
     ]);
-    salesData = salesData[0].OrderAmount
+    
+    salesData = salesData[0]?.OrderAmount || 0;
     console.log("This is sales", sales, orders, products, category, salesData);
 
     res
@@ -597,7 +598,7 @@ const renderSalesReportPage = asyncHandler(async (req, res) => {
 const getSalesReport = asyncHandler(async (req, res) => {
     const {fromDate, toDate} = req.body;
     console.log(fromDate, toDate);
-    let orders = await Order.find({createdAt: {$gte: new Date(fromDate), $lte: new Date(toDate)},  status: "delivered"}).populate("userId").sort({createdAt: -1});
+    let orders = await Order.find({createdAt: {$gte: new Date(fromDate), $lte: new Date(toDate)},  paymentStatus: "Paid"}).populate("userId").sort({createdAt: -1});
 
     if (!orders) {
         res
@@ -608,6 +609,71 @@ const getSalesReport = asyncHandler(async (req, res) => {
     res
     .status(200)
     .json( new ApiResponse(200, orders, "Orders fetched successfully."));
+});
+
+const salesReportFilter = asyncHandler(async (req, res) => {    
+    let {filter } = req.body;
+    console.log(filter)
+    let groupstage;
+    if(filter === "week"){
+        groupstage = {
+            $group: {
+                _id: { $week: "$createdAt" }, 
+                count: { $sum: 1 }, 
+                totalAmount: { $sum: "$orderAmount" },
+                totalCouponDiscount: { $sum: "$couponDiscount" },
+                couponDiscountCount: {
+                    $sum: { $cond: { if: { $gt: ["$couponDiscount", 0] }, then: 1, else: 0 } }
+                }
+            }
+        }
+    }else if(filter === "month"){
+        groupstage = {
+            $group: {
+                _id: { $month: "$createdAt" }, 
+                count: { $sum: 1 }, 
+                totalAmount: { $sum: "$orderAmount" },
+                totalCouponDiscount: { $sum: "$couponDiscount" },
+                couponDiscountCount: {
+                    $sum: { $cond: { if: { $gt: ["$couponDiscount", 0] }, then: 1, else: 0 } }
+                }
+            }
+        }
+    }else{
+        groupstage = {
+            $group: {
+                _id: { $year: "$createdAt" }, 
+                count: { $sum: 1 }, 
+                totalAmount: { $sum: "$orderAmount" },
+                totalCouponDiscount: { $sum: "$couponDiscount" },
+                couponDiscountCount: {
+                    $sum: { $cond: { if: { $gt: ["$couponDiscount", 0] }, then: 1, else: 0 } }
+                }
+            }
+        }
+    }
+
+
+
+    const weeklyPaidOrders = await Order.aggregate([
+        {
+            $match: {
+                paymentStatus: "Paid" 
+            }
+        },
+        groupstage,
+        {
+            $sort: { _id: -1 } 
+        }
+    ]);
+
+    if(!weeklyPaidOrders){
+        throw new ApiError(500, "Something went wrong while fetching sales report")
+    }
+    
+    res
+    .status(200)
+    .json( new ApiResponse(200, weeklyPaidOrders, "Sales report fetched successfully."));
 })
 
 
@@ -627,5 +693,6 @@ module.exports = {
     editUserDetails,
     graphData,
     renderSalesReportPage,
-    getSalesReport
+    getSalesReport,
+    salesReportFilter
 }

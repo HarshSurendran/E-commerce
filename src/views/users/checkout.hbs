@@ -320,7 +320,7 @@
         }).then(res => res.json())
         .then(data => {
             if(data.success){
-                showNotification("Hurrey!order placed", "green");                    
+                showNotification("Hurrey! Order placed", "green");                    
                 location.href = `/api/v1/users/ordersuccess/${order._id}`
             }
         })

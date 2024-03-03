@@ -98,13 +98,6 @@ hbs.registerHelper('checkPending', function (paymentStatus){
   }
   return "d-none";
 })
-// hbs.registerHelper('ifZero', function (value) {
-//   if(value == 0){
-//     return true
-//   }else{
-//   return false;
-//   }
-// });
 
 app.use(nocache());
 

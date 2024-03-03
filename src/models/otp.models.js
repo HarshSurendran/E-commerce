@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const otpSchema = mongoose.Schema({
     userid:{
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true
     },
     otp:{

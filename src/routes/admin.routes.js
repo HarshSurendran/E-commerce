@@ -162,6 +162,8 @@ router.get("/offers/delete-offer/:id", auth.verifyAdminJWT, offerController.dele
 //sales Report
 router.get("/salesreport", auth.verifyAdminJWT, adminController.renderSalesReportPage);
 router.post("/salesreport", auth.verifyAdminJWT, adminController.getSalesReport);
+router.post("/filtersalesreport", adminController.salesReportFilter);
+
 
 //coupons
 router.get("/coupons", auth.verifyAdminJWT, couponController.renderCouponPage);
@@ -194,6 +196,7 @@ router.post("/editProduct", auth.verifyAdminJWT, productController.editProduct);
 //router.get("/delete-product/:id", auth.verifyAdminJWT, productController.deleteProduct); delete product is not needed.
 router.get("/productlist", auth.verifyAdminJWT, productController.listProducts);
 router.get("/products/products-varient", auth.verifyAdminJWT, productController.addProductVarientPage);
+router.get("/products/products-varient/:name", auth.verifyAdminJWT, productController.addProductVarientPagewithId);
 router.post("/products-varient", auth.verifyAdminJWT, upload.array("images",4), productController.addProductVarient);
 router.patch("/listunlist/:id", auth.verifyAdminJWT, productController.listUnlistProduct);
 router.post("/updatephoto", upload.any(), productController.uploadImage);

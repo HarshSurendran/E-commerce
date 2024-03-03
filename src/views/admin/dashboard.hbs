@@ -1,3 +1,4 @@
+  
     <body>
         <div class="screen-overlay"></div>        
         <main class="main-wrap">            
@@ -276,10 +277,9 @@
                 <div class="d-flex justify-content-center align-content-center  ">
                     <div class="custom_select me-2 " >
                         <select id="reportSelect" style="background-color: grey" class="form-select select-nice">
-                            <option selected>Yearly</option>
-                            <option>Monthly</option>
-                            <option>Weekly</option>
-                            <option>Daily</option>
+                            <option value="year" selected>Yearly</option>
+                            <option value="month">Monthly</option>
+                            <option value="week">Weekly</option>
                         </select>
                     </div>
                     <button id="reportButton" class="btn btn-primary btn-sm">Report</button>
@@ -297,42 +297,30 @@
                 <!-- card-header end// -->
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover text-center ">
                             <thead>
                                 <tr>
-                                    <th>#ID</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Total</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col" class="text-end">Action</th>
+                                    <th>Sl.No</th>
+                                    <th>No. of orders</th>
+                                    <th scope="col">Total Coupons used</th>
+                                    <th scope="col">Total Discount</th>
+                                    <th scope="col">Total Revenue</th>
+                                    {{!-- <th scope="col" class="text-end">Action</th> --}}
                                 </tr>
                             </thead>
-                            <tbody>
-                                {{#each orders}}
+                            <tbody class="report-table text-center">
                                 <tr>
-                                    <td>{{this.orderId}}</td>
-                                    <td><b>{{this.user.fullname}}</b></td>
-                                    <td>{{this.user.email}}</td>
-                                    <td>{{this.orderAmount}}</td>
-                                    <td><span class="badge rounded-pill {{changeColor this.status}}">{{this.status}}</span></td>
-                                    <td>{{this.createdAt}}</td>
-                                    <td class="text-end">
-                                        {{!-- <div class="dropdown">
-                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="#">View detail</a>
-                                                <a class="dropdown-item" href="#">Edit info</a>
-                                                <a class="dropdown-item text-danger" href="#">Delete</a>
-                                            </div>
-                                        </div> --}}
-                                        <a href="/api/v1/admin/orders/orderdetails/{{this._id}}" class="btn btn-md rounded font-sm">Detail</a>
-                                        <!-- dropdown //end -->
-                                    </td>
-                                </tr>
-                                {{/each}}                               
+                                </tr>                        
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="1" class="text-center"><h4>Grand Total</h4></td>
+                                    <td id="totalOrders"><b></b></td>
+                                    <td id="totalCoupons"><b></b></td>
+                                    <td id="totalDiscount"><b></b></td>
+                                    <td id="totalRevenue"><b></b></td>                                    
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                     <!-- table-responsive //end -->
@@ -372,8 +360,9 @@
 <script>
     const reportButton = document.getElementById('reportButton');
     reportButton.addEventListener('click', () => {
+        console.log("report button clicked");
         const filter = document.getElementById('reportSelect').value;
-        fetch('/api/v1/admin/salesreport',{
+        fetch('/api/v1/admin/filtersalesreport',{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -384,43 +373,54 @@
         })
         .then(res => res.json())
         .then(data => {
-            const reportContainer = document.getElementById('report');
-            reportContainer.innerHTML = '';
-            // Create a table to display the sales report
-            const table = document.createElement('table');
-            table.classList.add('table');
-            
-            // Create table header
-            const headerRow = document.createElement('tr');
-            const headers = ['Date', 'Sales', 'Revenue']; // Adjust as per your data structure
-            headers.forEach(headerText => {
-                const th = document.createElement('th');
-                th.textContent = headerText;
-                headerRow.appendChild(th);
+            console.log("This is the data from api", data);
+           // Reference to the tbody element
+            const tbody = document.querySelector(".report-table");
+            tbody.innerHTML = "";
+
+            // Loop through the data and create table rows
+            let slNumber = 0;
+            let totalAmount = 0;
+            let totalCouponDiscount = 0;
+            let couponCount = 0;
+            let totalOrders = 0;
+            data.data.forEach(order => {
+                // Create a new table row
+                const row = document.createElement("tr");
+
+                // Populate table cells with data
+                const slNo = document.createElement("td");
+                slNo.textContent = ++slNumber;
+                row.appendChild(slNo);
+
+                const countCell = document.createElement("td");
+                countCell.textContent = order.count;
+                row.appendChild(countCell);
+                totalOrders = totalOrders + order.count;
+
+                const couponCountCell = document.createElement("td");
+                couponCountCell.textContent = order.couponDiscountCount;
+                row.appendChild(couponCountCell);
+                couponCount = couponCount + order.couponDiscountCount;
+
+                const totalCouponDiscountCell = document.createElement("td");
+                totalCouponDiscountCell.textContent = order.totalCouponDiscount;
+                row.appendChild(totalCouponDiscountCell);
+                totalCouponDiscount = totalCouponDiscount + order.totalCouponDiscount;
+
+                const totalAmountCell = document.createElement("td");
+                totalAmountCell.textContent = order.totalAmount;
+                row.appendChild(totalAmountCell);
+                totalAmount = totalAmount + order.totalAmount;
+
+                // Append the row to the tbody
+                tbody.appendChild(row);
             });
-            table.appendChild(headerRow);
-            
-            // Create table rows for each sales report item
-            data.forEach(reportItem => {
-                const row = document.createElement('tr');
-                const dateCell = document.createElement('td');
-                dateCell.textContent = reportItem.date; // Adjust as per your data structure
-                row.appendChild(dateCell);
-                
-                const salesCell = document.createElement('td');
-                salesCell.textContent = reportItem.sales; // Adjust as per your data structure
-                row.appendChild(salesCell);
-                
-                const revenueCell = document.createElement('td');
-                revenueCell.textContent = reportItem.revenue; // Adjust as per your data structure
-                row.appendChild(revenueCell);
-                
-                table.appendChild(row);
-            });
-            
-            // Append the table to the report container
-            reportContainer.appendChild(table);
-        })
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('totalCoupons').textContent = couponCount;
+            document.getElementById('totalDiscount').textContent = totalCouponDiscount;
+            document.getElementById('totalRevenue').textContent = totalAmount;
+        });
         document.getElementById('report').classList.remove('d-none');
-    })
+    });
 </script>

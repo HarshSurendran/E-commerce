@@ -235,6 +235,20 @@ const addProductVarientPage = asyncHandler( async(req,res)=>{
     .render("admin/addproductVarient",{admin:true, title:"Urbane Wardrobe", color, size});
 });
 
+const addProductVarientPagewithId = asyncHandler( async(req,res)=>{
+    const name = req.params.name;
+    const color = await Color.find({}).select("-createdAt -updatedAt -hex");    
+    const size = await Size.find({}).select("-createdAt -updatedAt ");
+
+    if(!(color || size)){
+        throw new ApiError(500,"server error while getting size and color")
+    }    
+
+    res
+    .status(200)
+    .render("admin/addproductVarientwithId",{admin:true, title:"Urbane Wardrobe", color, size, name});
+})
+
 const addProductVarient = asyncHandler( async (req,res)=>{
     //get product details  
     const {productname, color, size, stock, price, cost} = req.body 
@@ -1257,5 +1271,6 @@ module.exports = {
     productVarientDetailsPage,
     editProductVarientPage,
     editProductVarient,
-    uploadImage
+    uploadImage,
+    addProductVarientPagewithId
 }

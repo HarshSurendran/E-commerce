@@ -5,7 +5,7 @@
                 <div class="content-header">
                     <h2 class="content-title">Add New Product</h2>
                     <div>                        
-                        <a href="products-varient"><button class="btn btn-md rounded font-sm hover-up">Add Product-Varient</button></a>
+                        <a href="#" id="addProductVarient" hidden><button class="btn btn-md rounded font-sm hover-up" >Add Product-Varient</button></a>
                     </div>
                 </div>
             </div>
@@ -99,12 +99,17 @@
                 islisted
             })
         }).then((res)=>{
-
+            console.log("fetch is succesfull", res);
             if(!res.ok){
                 alert.innerText = "Product is not added. Please try again";
             }
-            console.log("fetch is succesfgull");
+            return res.json();
+        }).then((data)=>{
+            console.log("data", data);
             productButton.disabled = true;
+            const addProductVarientButton = document.getElementById("addProductVarient");
+            addProductVarientButton.hidden = false;             
+            addProductVarientButton.href = `products-varient/${data.data.name}`;
             alert.innerText = "Product is added, now add the varients.";
             target.scrollIntoView({ behavior:"smooth"});
         })

@@ -311,7 +311,7 @@ const createOrder = asyncHandler( async(req,res)=>{
                 throw new ApiError(410, "Insufficient stock");
             }
             // Update the stock
-            const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
+            // const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
 
             orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
 
@@ -392,7 +392,12 @@ const createOrder = asyncHandler( async(req,res)=>{
             orderId,
             couponCode,
             couponDiscount: coupon.discount
-        })
+        });
+
+        for(const element of cart){
+            //update the stock 
+            const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
+        }
 
         const orderConfirm = await Order.findOne({_id: order._id}).populate("userId")
 
@@ -421,6 +426,8 @@ const createOrder = asyncHandler( async(req,res)=>{
                 .status(500)
                 .json( new ApiError(500, "Order status not updated, server error", error));
             }
+
+
             await Cart.deleteMany({user_id: user._id});
             return res
             .status(200)
