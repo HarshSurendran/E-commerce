@@ -374,9 +374,8 @@
         });
     }
 
-    const orderButton = document.getElementById('orderButton');
-
     //placing order 
+    const orderButton = document.getElementById('orderButton');
     orderButton.addEventListener("click", ()=>{
         const checkedPaymentMethod = document.querySelector('input[name="paymentmethod"]:checked');
         console.log("This is the checked patment method", checkedPaymentMethod.value);
@@ -386,7 +385,13 @@
         const paymentMethod = checkedPaymentMethod.value;
         const address = checkedAddress.value;
         const couponCode = `{{couponCode}}`
-
+        const totalAmount = `{{calculateTotal total discount shipping}}`        
+        if(paymentMethod === "COD"){
+            if(totalAmount>1000){
+                return showNotification("Sorry, COD is not available for orders above 1000 Rs. Try other payment methods.", "red");
+            }
+        }
+        
         fetch("/api/v1/users/orderplaced",{
             method:"POST",
             headers: {
@@ -440,7 +445,7 @@
         })
     })
     
-//toggling place order button
+    //toggling place order button
     const cod = document.getElementById('COD');
     cod.addEventListener('click', ()=>{
         orderButton.innerText = 'Place Order';
@@ -454,7 +459,7 @@
         orderButton.innerText = 'Proceed to payment';
     });
 
-//toggling address form
+    //toggling address form
     const addAddress = document.getElementById('addAddress');
     addAddress.addEventListener('click', (event)=>{
         event.preventDefault();
@@ -468,14 +473,13 @@
         }
     });
 
-//validation of address form
+    //validation of address form
     const nameAlert = document.getElementById("fullnamealert");    
     const phoneAlert = document.getElementById("phonealert");
     const streetAlert = document.getElementById("streetalert");
     const localityAlert = document.getElementById("localityalert");
     const districtAlert = document.getElementById("districtalert");
-    const pincodeAlert = document.getElementById("pincodealert");    
-
+    const pincodeAlert = document.getElementById("pincodealert"); 
         
     function validate(){
         console.log("This is validate")

@@ -164,7 +164,7 @@ const checkOutPage = asyncHandler( async(req,res)=>{
 
     let total = 0;
     for (const element of cart) {
-        const offer = await checkOffer(element.productVarient_id.product_id.category.category);
+        const offer = await checkOffer(element.productVarient_id.product_id.category?.category);
         if (offer) {
             element.productVarient_id.originalprice = element.productVarient_id.price;
             element.productVarient_id.price = applyOffer(element.productVarient_id.price, offer.discount);
@@ -315,7 +315,7 @@ const createOrder = asyncHandler( async(req,res)=>{
 
             orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
 
-            const offer = await checkOffer(element.product.name.category.category);
+            const offer = await checkOffer(element.product.name.category?.category);
             if (offer) {
                 // productVarient.originalprice = productVarient.price;
                 element.product.price = applyOffer(element.product.price, offer.discount);
