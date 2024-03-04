@@ -696,8 +696,7 @@ const renderOrderDetailsPage = asyncHandler( async(req,res)=>{
     .render("admin/orderdetails",{admin:true, title:"Urbane Wardrobe", order, orderVarients, subTotal, total, coupon});
 });
 
-const changeOrderStatus = asyncHandler( async(req,res)=>{
-    
+const changeOrderStatus = asyncHandler( async(req,res)=>{    
     const {orderId, status} = req.body;
     console.log("this is order id and status", orderId, status);
     const order = await Order.updateOne(
@@ -710,6 +709,23 @@ const changeOrderStatus = asyncHandler( async(req,res)=>{
             }
         }
     );
+    if (status === "Delivered") {
+        console.log("entered delivered condition")
+        const order = await Order.updateOne(
+            {
+                _id: orderId
+            },
+            {
+                $set: {
+                    returnPeriod : true
+                }
+            }
+        );    
+        
+        console.log("updated o;rder", order)
+    }
+    const updatedOrder = await Order.findOne({_id: orderId})
+    console.log("this is updated order",updatedOrder)
 
     if(!order){
         return res
@@ -1130,7 +1146,7 @@ const verifyPayment = asyncHandler( async(req,res)=>{
             .json(new ApiError(400, "Couldnt update order database but payment is successful"));
         }
         if(!payLater){
-            await Cart.deleteMany({user_id: user._id});
+            await Cart.deleteMany({user_id: req.user._id});
         }
         res
         .status(200)
@@ -1145,18 +1161,7 @@ const verifyPayment = asyncHandler( async(req,res)=>{
 
 const returnOrder = asyncHandler( async(req,res)=>{
     const orderId = req.body.orderId;
-    console.log("Entered return wiht order id", orderId);
-    // const order = await Order.updateOne(
-    //     {
-    //         _id: orderId
-    //     },
-    //     {
-    //         $set: {
-    //             returnPeriod: false,
-    //             status: "returned"
-    //         }
-    //     }        
-    // );
+    console.log("Entered return wiht order id", orderId);    
     const order = await Order.findOne({ _id: orderId });
     if(!order){
         return res
@@ -1164,11 +1169,10 @@ const returnOrder = asyncHandler( async(req,res)=>{
         .json(new ApiError(400, "Cant find the order"));
     }
     order.returnPeriod = false;
-    order.status = "returned";
-    await order.save();
-    console.log("asdfjklashdfjkhfjk :",order);
+    order.status = "Returned";
+    await order.save();    
     //put the amount to wallet
-    if (order.paymentStatus === "paid") {        
+    if (order.paymentStatus === "Paid") {
         const wallet = await Wallet.updateOne(
             {
                 userId: order.userId
@@ -1176,21 +1180,30 @@ const returnOrder = asyncHandler( async(req,res)=>{
             {
                 $inc: {
                     balance: order.orderAmount
+                },
+                $push: {
+                    transactions: { amount: order.orderAmount , type: "deposit", date: Date.now() }
                 }
             },
             {
                 upsert: true
             }
         )
-        console.log("this is wallet", wallet);
-        // if (wallet.modifiedCount === 0) {
-        //     return res
-        //     .status(400)
-        //     .json(new ApiError(400, "Couldnt add amount to wallet"));        
-        // }
+        
+        if (wallet.modifiedCount === 1 || Wallet.upsertedCount === 1) {            
+            const updatedOrder = await Order.updateOne(
+                {
+                    _id: order._id
+                },
+                {
+                    $set: {
+                        paymentStatus : "Refunded"                    
+                    }
+                }
+            )
+        }
     }
-    return res.status(200).json(new ApiResponse(200, null, "Order returned successfully"));        
-    
+    return res.status(200).json(new ApiResponse(200, null, "Order returned successfully"));
 });
 
 const renderInvoice = asyncHandler( async(req,res)=>{

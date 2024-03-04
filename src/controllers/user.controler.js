@@ -358,7 +358,7 @@ const logoutUser = asyncHandler( async (req,res)=>{
 
     return res
     .status(200)
-    .clearCookie("accessToken", options)
+    .clearCookie("userAccessToken", options)
     .clearCookie("RefreshToken", options)
     //.json(new ApiResponse(200,{},"User successfully logged out"));
     .render("landingPage", {common:true, title: "Urbane Wardrobe"});
