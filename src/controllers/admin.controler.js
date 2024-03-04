@@ -178,7 +178,7 @@ const adminlogin = asyncHandler( async(req,res)=>{
         }
 
         return res.status(200)
-        .cookie("accessToken", accessToken, options)
+        .cookie("adminAccessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         // .json( new ApiResponse(
         //     200,
@@ -581,7 +581,7 @@ const graphData = asyncHandler( async (req,res)=>{
 });
 
 const renderSalesReportPage = asyncHandler(async (req, res) => {
-    let orders = await Order.find({status:"Delivered"}).populate("userId").sort({createdAt: -1});
+    let orders = await Order.find({paymentStatus:"Paid"}).populate("userId").sort({createdAt: -1});
     
 
     if (!orders) {
@@ -674,7 +674,7 @@ const salesReportFilter = asyncHandler(async (req, res) => {
     res
     .status(200)
     .json( new ApiResponse(200, weeklyPaidOrders, "Sales report fetched successfully."));
-})
+}); 
 
 
 

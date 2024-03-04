@@ -215,7 +215,7 @@ const loginUser = asyncHandler( async (req,res)=>{
     //sending the tokens to browser through cookie
 
     return res.status(200)
-    .cookie("accessToken", accessToken, options)
+    .cookie("userAccessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     // .json( new ApiResponse(
     //     200,
@@ -322,7 +322,7 @@ const homePageRender = asyncHandler( async(req,res)=>{
         } else {
             element.isWishlisted = false;
         }
-        const offer = await checkOffer(element.name?.category.category);
+        const offer = await checkOffer(element.name?.category?.category);
         if (offer) {
             element.originalprice = element.price;
             element.price = applyOffer(element.price, offer.discount);

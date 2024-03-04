@@ -277,8 +277,7 @@
                 let img = document.createElement("img");
                 img.id = `image`; 
                 img.src = e.target.result;
-
-                //append this img tag to a modal
+                
                 imageElement.appendChild(img);
                 //crop image
                 cropper = new Cropper(img, {

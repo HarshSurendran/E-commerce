@@ -10,7 +10,7 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
     try {
         
         //getting token from request
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+        const token = req.cookies?.userAccessToken || req.header("Authorization")?.replace("Bearer ", "");
 
         if(!token){
             blocked = null
@@ -18,7 +18,7 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
         }
 
         // decoding the token and verifying it with user
-        const decodedtoken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        const decodedtoken = jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET);
 
         const user = await User.findOne({_id: decodedtoken._id}).select("-password -refreshToken");
         
@@ -107,13 +107,11 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
                     }
                 }
             ]
-            );
-        
-        
+            );    
         
         res
         .status(400)
-        .clearCookie("accessToken", options)
+        .clearCookie("userAccessToken", options)
         .clearCookie("RefreshToken", options)
         //.redirect("/api/v1/");
         .render("landingPage", {common:true , title: "Urbane Wardrobe" , products: productList, blocked });
@@ -123,14 +121,14 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
 const verifyAdminJWT = asyncHandler( async(req,res,next)=>{
     try {
         //getting token from request
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+        const token = req.cookies?.adminAccessToken || req.header("Authorization")?.replace("Bearer ", "");
 
         if(!token){
             throw new ApiError(401, "Unauthorised request");
         }
 
         // decoding the token and verifying it with user
-        const decodedtoken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        const decodedtoken = jwt.verify(token, process.env.ADMIN_ACCESS_TOKEN_SECRET);
 
         const admin = await Admin.findOne({_id: decodedtoken._id}).select("-password -refreshToken");
 
@@ -151,10 +149,10 @@ const verifyAdminJWT = asyncHandler( async(req,res,next)=>{
 const checkUserJWT = asyncHandler( async(req,res,next)=>{
     try {
         //getting token from request
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+        const token = req.cookies?.userAccessToken || req.header("Authorization")?.replace("Bearer ", "");
 
         if(token){
-            const decodedtoken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            const decodedtoken = jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET);
 
             const user = await User.findOne({_id: decodedtoken._id}).select("-password -refreshToken");
             if(user){
@@ -177,10 +175,10 @@ const checkUserJWT = asyncHandler( async(req,res,next)=>{
 const checkAdminJWT = asyncHandler( async(req,res,next)=>{
     try {
         //getting token from request
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+        const token = req.cookies?.adminAccessToken || req.header("Authorization")?.replace("Bearer ", "");
 
         if(token){
-            const decodedtoken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            const decodedtoken = jwt.verify(token, process.env.ADMIN_ACCESS_TOKEN_SECRET);
 
             const admin = await Admin.findOne({_id: decodedtoken._id}).select("-password -refreshToken");
             if(admin){
@@ -188,8 +186,8 @@ const checkAdminJWT = asyncHandler( async(req,res,next)=>{
             }
             
         }
-
         next();
+        
     } catch(error) {
         console.log(error);
     }
@@ -202,20 +200,18 @@ const checkIsBlocked = asyncHandler( async(req,res,next)=>{
     const check = User.findOne({_id: user._id}).select("-refreshToken -createdAt -updatedAt")
     console.log("this is check.isblocked",check.isBlocked);
     if(check.isBlocked){
-
         const options ={
             httpOnly:true,
             secure: true
         }
-
         res
         .status(200)
-        .clearCookie("accessToken", options)
+        .clearCookie("userAccessToken", options)
         .clearCookie("RefreshToken", options)
         .redirect("/api/v1");
     }
     next();
-})
+});
 
 module.exports = {
     verifyUserJWT,

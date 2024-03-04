@@ -487,7 +487,7 @@ const listProducts = asyncHandler( async(req,res)=>{
         } else {
             element.isWishlisted = false;
         }
-        const offer = await checkOffer(element.name?.category.category);
+        const offer = await checkOffer(element.name?.category?.category);
         if (offer) {
             element.originalprice = element.price;
             element.price = applyOffer(element.price, offer.discount);
@@ -501,7 +501,7 @@ const listProducts = asyncHandler( async(req,res)=>{
     const inStockProducts = productList.filter(product => !product.isOutofStock);
     const rearrangedProducts = [...inStockProducts, ...outOfStockProducts];
 
-    const colors = await Color.find({}).select("-createdAt -updatedAt -hex");
+    const colors = await Color.find({}).select("-createdAt -updatedAt -hex");    
 
     res
     .status(200)
@@ -690,7 +690,7 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     ]);
 
     //check whether offer is applied
-    const offer = await checkOffer(prodDetails.name.category.category);
+    const offer = await checkOffer(prodDetails.name?.category?.category);
     if (offer) {
         prodDetails.originalprice = prodDetails.price;
         prodDetails.price = applyOffer(prodDetails.price, offer.discount);

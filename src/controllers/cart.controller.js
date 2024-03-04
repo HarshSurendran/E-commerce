@@ -138,7 +138,7 @@ const renderCartPage = asyncHandler( async(req,res)=>{
 
     let total = 0;
     for (const element of cart) {
-        const offer = await checkOffer(element.productVarient_id.product_id.category.category);
+        const offer = await checkOffer(element.productVarient_id.product_id.category?.category);
         if (offer) {
             element.productVarient_id.originalprice = element.productVarient_id.price;
             element.productVarient_id.price = applyOffer(element.productVarient_id.price, offer.discount);

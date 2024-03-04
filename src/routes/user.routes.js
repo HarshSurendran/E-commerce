@@ -77,6 +77,7 @@ router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDe
 
 //checkout
 router.post("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
+router.get("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
 router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);
 router.get("/ordersuccess/:id", auth.verifyUserJWT, orderController.orderSuccessPage);
 router.post("/verifyPayment", auth.verifyUserJWT, orderController.verifyPayment);
@@ -93,7 +94,7 @@ router.get("/invoice/:id", auth.verifyUserJWT, orderController.renderInvoice);
 router.get("/wallet", auth.verifyUserJWT, walletController.renderWalletPage);
 router.post("/wallet", auth.verifyUserJWT, orderController.addWalletMoney);
 router.post("/verifyTransfer", auth.verifyUserJWT, orderController.verifyTransfer);
-router.post("walletbalance", auth.verifyUserJWT, walletController.getWalletBalance);
+router.post("/walletbalance", auth.verifyUserJWT, walletController.getWalletBalance);
 
 //offers 
 router.get("/offers", auth.verifyUserJWT, offerController.renderUserOffersPage);
