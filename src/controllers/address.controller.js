@@ -2,8 +2,6 @@ const ApiError = require("../utils/ApiError.js");
 const ApiResponse = require("../utils/ApiResponse.js");
 const asyncHandler = require("../utils/asynchandler.js");
 // require modals
-const Admin = require("../models/admin.models.js");
-const User = require("../models/user.models.js");
 const Address = require("../models/address.models.js");
 const Category = require("../models/category.models.js");
 const Wishlist = require("../models/wishlist.models.js");
@@ -67,8 +65,7 @@ const addressPage = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .render("users/address",{title:"Urbane Wardrobe", user, address, layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});
-})
-
+});
 
 const addAddressPage = asyncHandler( async(req,res)=>{
     const user = req.user;
@@ -104,7 +101,7 @@ const addAddress = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .redirect("/api/v1/users/profile");
-})
+});
 
 const editAddressPage = asyncHandler(async(req,res)=>{
     const user = req.user;
@@ -113,7 +110,7 @@ const editAddressPage = asyncHandler(async(req,res)=>{
     res
     .status(200)
     .render("users/editaddress",{title:"Urbane Wardrobe", user, state: stateNames, address,  layout: "userprofilelayout"})
-})
+});
 
 const editAddress = asyncHandler( async(req,res)=>{
     console.log(req.body)
@@ -146,7 +143,7 @@ const editAddress = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .redirect("/api/v1/users/address");
-})
+});
 
 const fetchAddAddress = asyncHandler( async(req,res)=>{
     const user = req.user    
@@ -177,9 +174,7 @@ const fetchAddAddress = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .redirect("/api/v1/users/checkout");
-})
-
-
+});
 
 
 module.exports = {

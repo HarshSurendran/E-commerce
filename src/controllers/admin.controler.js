@@ -9,86 +9,82 @@ const Order = require("../models/order.models.js");
 const Product = require("../models/product.models.js");
 const Category = require("../models/category.models.js");
 
-const cronjob = require("../controllers/cronjob.controller.js");
-
-
 const mongoose = require("mongoose");
 const cron = require("node-cron");
 const moment = require("moment");
 
 // //change order status through cron job
-// async function changeStatusToShipped() {
-//     const twoDaysAgo = new Date();
-//     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);   
-//     const fiveDaysAgo = new Date();
-//     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+async function changeStatusToShipped() {
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);   
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
-//     const orders = await  Order.find({ 
-//         createdAt: { 
-//             $gt: fiveDaysAgo, 
-//             $lt: twoDaysAgo   
-//         } 
-//     })
+    const orders = await  Order.find({ 
+        createdAt: { 
+            $gt: fiveDaysAgo, 
+            $lt: twoDaysAgo   
+        } 
+    })
 
-//     orders.forEach(element => {  
-//         if (element.status == "Placed") {
-//             element.status = "Shipped";
-//             element.save({ validateBeforeSave:false });          
-//         }
-//     });
+    orders.forEach(element => {  
+        if (element.status == "Placed") {
+            element.status = "Shipped";
+            element.save({ validateBeforeSave:false });          
+        }
+    });
 
-//     console.log("These are the orders", orders);
-// }
-// async function changeStatusToDelivered() {     
-//     const fiveDaysAgo = new Date();
-//     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+    console.log("These are the orders", orders);
+}
+async function changeStatusToDelivered() {     
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
-//     const orders = await  Order.find({ 
-//         createdAt: { 
-//             $lt: fiveDaysAgo,            
-//         } 
-//     })
+    const orders = await  Order.find({ 
+        createdAt: { 
+            $lt: fiveDaysAgo,            
+        } 
+    })
 
-//     orders.forEach(element => {
-//         if (element.status == "Shipped") {
-//             element.status = "Delivered";
-//             if(element.paymentMethod == "COD"){
-//                 element.paymentStatus = "Paid";
-//             }
-//             element.returnPeriod = true;
-//             element.paymentStatus = "Paid";
-//             element.save({ validateBeforeSave:false });          
-//         }
-//     });
+    orders.forEach(element => {
+        if (element.status == "Shipped") {
+            element.status = "Delivered";
+            if(element.paymentMethod == "COD"){
+                element.paymentStatus = "Paid";
+            }
+            element.returnPeriod = true;
+            element.paymentStatus = "Paid";
+            element.save({ validateBeforeSave:false });          
+        }
+    });
 
-//     console.log("These are the orders", orders);
-// }
-// async function changeStatusToReview() {     
-//     const twentyDaysAgo = new Date();
-//     twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20);
+    console.log("These are the orders", orders);
+}
+async function changeStatusToReview() {     
+    const twentyDaysAgo = new Date();
+    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20);
 
-//     const orders = await  Order.find({ 
-//         createdAt: { 
-//             $lt: twentyDaysAgo, // Greater than twenty days ago            
-//         } 
-//     })
+    const orders = await  Order.find({ 
+        createdAt: { 
+            $lt: twentyDaysAgo, // Greater than twenty days ago            
+        } 
+    })
 
-//     orders.forEach(element => {
-//         if (element.status == "Delivered") {  
-//             element.returnPeriod = false;
-//             element.save({ validateBeforeSave:false });          
-//         }
-//     });
+    orders.forEach(element => {
+        if (element.status == "Delivered") {  
+            element.returnPeriod = false;
+            element.save({ validateBeforeSave:false });          
+        }
+    });
 
-//     console.log("These are the orders", orders);
-// }
-
+    console.log("These are the orders", orders);
+}
 //calling the cron job function
 const task = cron.schedule('30 11 * * *', () => 
     {   
-        cronjob.changeStatusToShipped();
-        cronjob.changeStatusToDelivered();
-        cronjob.changeStatusToReview();
+        changeStatusToShipped();
+        changeStatusToDelivered();
+        changeStatusToReview();
     },
     {
         scheduled: true,
@@ -676,6 +672,114 @@ const salesReportFilter = asyncHandler(async (req, res) => {
     .json( new ApiResponse(200, weeklyPaidOrders, "Sales report fetched successfully."));
 }); 
 
+const categoryPage = asyncHandler( async(req,res)=>{
+    let category = await Category.find({}).select(" -updatedAt");
+
+    if(!category){
+        throw new ApiError(500, "Couldnt fetch category data");
+    }
+
+    const updatedCategory = category.map((element) => {
+        // Provided date string
+        console.log(element)
+        const dateString = element.createdAt;
+        const dateObject = new Date(dateString);
+        const day = dateObject.getDate();
+        const month = dateObject.getMonth() + 1; // Months are zero-indexed, so we add 1
+        const year = dateObject.getFullYear();
+        const formattedDate = `${day}/${month}/${year}`;
+        console.log(formattedDate);
+        
+        return {
+            ...element.toObject(), // Convert Mongoose model to plain JavaScript object
+            date: formattedDate,
+        }
+
+      });
+
+
+      console.log(updatedCategory);
+    res
+    .status(200)
+    .render("admin/category",{ admin:true, title:"Urbane Wardrobe", category:updatedCategory});
+})
+
+const addCategory = asyncHandler( async(req,res)=>{
+    const {category} = req.body;
+
+    //const categoryExist = await Category.findOne({category});
+    const categoryExist = await Category.findOne({ category: { $regex: `^${category}$`, $options: 'i' } }); //checking without case sensitivity
+
+    if(categoryExist){
+        throw new ApiError(400,"Category already exist");
+    }
+
+    const cat = await Category.create({
+        category
+    });
+
+    if(!cat){
+        throw new ApiError(500,"something went wrong while uploading category to database")
+    }
+
+    return res
+    .status(200)
+    .json( new ApiResponse(
+        200, 
+        cat, 
+        "category successfully added"
+        )
+    );    
+})
+
+const editCategory = asyncHandler( async(req,res)=>{
+    const {category, id} = req.body;
+    console.log("edit cat",category);
+    const categoryExist = await Category.findOne({ category: { $regex: `^${category}$`, $options: 'i' } });
+    console.log("This is categ exist",categoryExist);
+
+    if(categoryExist){        
+        return res
+        .status(500)
+        .json( new ApiError(500, "Category already exist."));        
+    }
+    
+    const catedited = await Category.updateOne(
+            {
+                _id:id
+            },
+            {
+                $set: {category}
+            }
+        );
+    
+    if(!catedited){
+        return res
+        .status(500)
+        .json( new ApiError(500, "Category not updated."));
+    }
+
+    return res
+    .status(200)
+    .json( new ApiResponse(200, {catedited}, "Category updated"));
+
+})
+
+const deleteCategory = asyncHandler( async(req,res)=>{
+    const id = req.params.id;
+    console.log("This is delte id " ,id);
+
+    if(!id){
+        throw new ApiError(400, "Bad request");
+    }
+
+    const deleted = await Category.deleteOne({_id:id});
+
+    res
+    .status(200)
+    .redirect("/api/v1/admin/category");
+});
+
 
 
 module.exports = {
@@ -694,5 +798,9 @@ module.exports = {
     graphData,
     renderSalesReportPage,
     getSalesReport,
-    salesReportFilter
+    salesReportFilter,
+    categoryPage,
+    addCategory,
+    editCategory,
+    deleteCategory
 }

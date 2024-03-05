@@ -7,9 +7,7 @@ const userController = require("../controllers/user.controler.js");
 const productController = require("../controllers/product.controler.js");
 const cartController = require("../controllers/cart.controller.js");
 const orderController = require("../controllers/order.controller.js");
-const walletController = require("../controllers/wallet.controller.js");
 const offerController = require("../controllers/offer.controller.js");
-const filterController = require("../controllers/filter.controller.js");
 
 //require middlewares
 const upload = require("../middlewares/multer.middleware.js");
@@ -70,7 +68,7 @@ router.post("/fetchaddaddress", auth.verifyUserJWT, addressController.fetchAddAd
 
 //orders
 router.get("/orders", auth.verifyUserJWT,  orderController.renderUserOrdersPage);
-router.patch("/orders", auth.verifyUserJWT, walletController.updateWallet, orderController.cancelOrder);
+router.patch("/orders", auth.verifyUserJWT, userController.updateWallet, orderController.cancelOrder);
 router.patch("/returnorders", auth.verifyUserJWT,  orderController.returnOrder);
 router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
 
@@ -91,17 +89,17 @@ router.get("/invoice/:id", auth.verifyUserJWT, orderController.renderInvoice);
 
 
 //wallet
-router.get("/wallet", auth.verifyUserJWT, walletController.renderWalletPage);
+router.get("/wallet", auth.verifyUserJWT, userController.renderWalletPage);
 router.post("/wallet", auth.verifyUserJWT, orderController.addWalletMoney);
 router.post("/verifyTransfer", auth.verifyUserJWT, orderController.verifyTransfer);
-router.post("/walletbalance", auth.verifyUserJWT, walletController.getWalletBalance);
+router.post("/walletbalance", auth.verifyUserJWT, userController.getWalletBalance);
 
 //offers 
 router.get("/offers", auth.verifyUserJWT, offerController.renderUserOffersPage);
 
 //filters
-router.get("/filter/price/:min/:max", auth.verifyUserJWT , filterController.filterByPrice);
-router.get("/filter/color/:color", auth.verifyUserJWT, filterController.filterByColor);
+router.get("/filter/price/:min/:max", auth.verifyUserJWT , productController.filterByPrice);
+router.get("/filter/color/:color", auth.verifyUserJWT, productController.filterByColor);
 // router.post("/filter/brand", userController.filterByBrand);
 // router.post("/filter/category", userController.filterByCategory);
 

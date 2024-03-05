@@ -1,276 +1,275 @@
-
 <body>
-    <div class="screen-overlay"></div>        
-    <main class="main-wrap">            
-        <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <h2 class="content-title card-title">Order detail</h2>
-                    <p>Details for Order ID: {{order.orderId}}</p>
-                </div>
+<div class="screen-overlay"></div>        
+<main class="main-wrap">            
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Order detail</h2>
+                <p>Details for Order ID: {{order.orderId}}</p>
             </div>
-            <div class="card">
-                <header class="card-header">
-                    <div class="row align-items-center">
-                        <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
-                            <span> <i class="material-icons md-calendar_today"></i> <b>{{order.createdAt}}</b> </span> <br />
-                            <small class="text-muted">Order ID: {{order.orderId}}</small>
-                        </div>
-                        <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <span class="badge rounded-pill me-2 {{changeColor order.status}}">{{order.status}}</span>            
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                        <span> <i class="material-icons md-calendar_today"></i> <b>{{order.createdAt}}</b> </span> <br />
+                        <small class="text-muted">Order ID: {{order.orderId}}</small>
+                    </div>
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <span class="badge rounded-pill me-2 {{changeColor order.status}}">{{order.status}}</span>            
 
-                            {{!-- <select id="orderStatus" class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
-                                <option>Change status</option>
-                                <option value="cancelled">Cancel</option>
-                                <option value="pending">Pending</option>
-                                <option value="shipped">Shipped</option>
-                                <option value="delivered">Delivered</option>
-                            </select>
-                            <a class="btn btn-primary" id="saveButton" data-id="{{order._id}}">Save</a>
-                            <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> --}}
-                        </div>
-                    </div>
-                </header>
-                <!-- card-header end// -->
-                <div class="card-body">
-                    <div class="row mb-50 mt-20 order-info-wrap">
-                        <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-person"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Customer</h6>
-                                    <p class="mb-1">
-                                        {{order.user.fullname}} <br />
-                                        {{order.user.email}} <br />
-                                        {{order.user.phone}}
-                                    </p>
-                                    {{!-- <a href="#">View profile</a> --}}
-                                </div>
-                            </article>
-                        </div>
-                        <!-- col// -->
-                        <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-local_shipping"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Order info</h6>
-                                    <p class="mb-1">
-                                        {{order.orderId}} <br />
-                                        Pay method: {{order.paymentMethod}}<br />
-                                        Payment Status: <span class="badge-sm rounded-pill my-2 me-2 text-fw-normal fs-6 {{changeColor order.paymentStatus}}"> {{order.paymentStatus}}</span>
-                                    </p>
-                                    <div class="d-flex justify-content-center ">
-                                    <button id="payNowBtn" class="btn-sm btn-success rounded-pill border-0 {{checkPending order.paymentStatus}}">Pay now</button>
-                                    </div>
-                                    {{!-- <a href="/api/v1/admin/invoice/{{order._id}}">View invoice</a> --}}
-                                </div>
-                            </article>
-                        </div>
-                        <!-- col// -->
-                        <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-place"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Deliver to</h6>
-                                    <p class="mb-1">
-                                        City: {{order.address.district}}<br />{{order.address.street}}<br />
-                                        {{order.address.pincode}}
-                                    </p>
-                                    {{!-- <a href="#">View profile</a> --}}
-                                </div>
-                            </article>
-                        </div>
-                        <!-- col// -->
-                    </div>
-                    <!-- row // -->
-                    <div class="row">
-                        <div class="col-lg-7">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th width="40%">Product</th>
-                                            <th width="20%">Unit Price</th>
-                                            <th width="20%">Quantity</th>
-                                            <th width="20%" class="text-end">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{#each orderVarients}}
-                                        <tr>
-                                            <td>
-                                                <a class="itemside" href="#">
-                                                    <div class="left">
-                                                        <img src="{{this.productVarient.images.[0]}}" width="40" height="40" class="img-xs" alt="Item" />
-                                                    </div>
-                                                    <div class="info">{{this.productVarient.product.name}}</div>
-                                                </a>
-                                            </td>
-                                            <td> ₹{{this.productVarient.price}}</td>
-                                            <td>{{this.orderedItems.quantity}}</td>
-                                            <td class="text-end"> ₹{{multiply this.productVarient.price this.orderedItems.quantity}}</td>
-                                            {{!-- add review feature for delivered products --}}
-                                        </tr>
-                                        {{/each}}                                       
-                                        <tr>
-                                            <td colspan="4">
-                                                <article class="float-end">
-                                                    <dl class="dlist">
-                                                        <dt>Subtotal:</dt>
-                                                        <dd>₹{{subTotal}}</dd>
-                                                    </dl>
-                                                    <dl class="dlist">
-                                                        <dt>Shipping cost:</dt>
-                                                        <dd>₹ 0.00</dd>
-                                                    </dl>
-                                                    <dl class="dlist">
-                                                        <dt>Grand total:</dt>
-                                                        <dd><b class="h5">₹{{total}}</b></dd>
-                                                    </dl>
-                                                    <dl class="dlist">
-                                                        {{!-- <dt class="text-muted">Status:</dt>
-                                                        <dd>
-                                                            <span class="badge rounded-pill alert-success text-success">Payment done</span>
-                                                        </dd> --}}
-                                                    </dl>
-                                                </article>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!-- table-responsive// -->
-                        </div>
-                        <!-- col// -->
-                        <div class="col-lg-1"></div>
-                        <div class="col-lg-4">
-                            <div class="box shadow-sm bg-light">
-                                <h6 class="mb-15">Payment info</h6>
-                                {{!-- <p>
-                                    <img src="/assets/imgs/card-brands/2.png" class="border" height="20" /> Master Card **** **** 4768 <br />
-                                    Business name: Grand Market LLC <br />
-                                    Phone: +1 (800) 555-154-52
-                                </p> --}}
-                                <p>
-                                    METHOD : <b>{{order.paymentMethod}}</b>
-                                </p>
-                            </div>
-                            <div class="box shadow-sm bg-light">
-                                <h6 class="mb-15">Discount info</h6>
-                                <p>
-                                    COUPON CODE : <b>{{coupon.code}}</b>
-                                </p>
-                                <p>
-                                    DISCOUNT : ₹ <b>{{coupon.discount}}</b>
-                                </p>
-                            </div>
-                            
-                        </div>
-                        <!-- col// -->
+                        {{!-- <select id="orderStatus" class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
+                            <option>Change status</option>
+                            <option value="cancelled">Cancel</option>
+                            <option value="pending">Pending</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                        <a class="btn btn-primary" id="saveButton" data-id="{{order._id}}">Save</a>
+                        <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> --}}
                     </div>
                 </div>
-                <!-- card-body end// -->
+            </header>
+            <!-- card-header end// -->
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-person"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Customer</h6>
+                                <p class="mb-1">
+                                    {{order.user.fullname}} <br />
+                                    {{order.user.email}} <br />
+                                    {{order.user.phone}}
+                                </p>
+                                {{!-- <a href="#">View profile</a> --}}
+                            </div>
+                        </article>
+                    </div>
+                    <!-- col// -->
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-local_shipping"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Order info</h6>
+                                <p class="mb-1">
+                                    {{order.orderId}} <br />
+                                    Pay method: {{order.paymentMethod}}<br />
+                                    Payment Status: <span class="badge-sm rounded-pill my-2 me-2 text-fw-normal fs-6 {{changeColor order.paymentStatus}}"> {{order.paymentStatus}}</span>
+                                </p>
+                                <div class="d-flex justify-content-center ">
+                                <button id="payNowBtn" class="btn-sm btn-success rounded-pill border-0 {{checkPending order.paymentStatus}}">Pay now</button>
+                                </div>
+                                {{!-- <a href="/api/v1/admin/invoice/{{order._id}}">View invoice</a> --}}
+                            </div>
+                        </article>
+                    </div>
+                    <!-- col// -->
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-place"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Deliver to</h6>
+                                <p class="mb-1">
+                                    City: {{order.address.district}}<br />{{order.address.street}}<br />
+                                    {{order.address.pincode}}
+                                </p>
+                                {{!-- <a href="#">View profile</a> --}}
+                            </div>
+                        </article>
+                    </div>
+                    <!-- col// -->
+                </div>
+                <!-- row // -->
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="40%">Product</th>
+                                        <th width="20%">Unit Price</th>
+                                        <th width="20%">Quantity</th>
+                                        <th width="20%" class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each orderVarients}}
+                                    <tr>
+                                        <td>
+                                            <a class="itemside" href="#">
+                                                <div class="left">
+                                                    <img src="{{this.productVarient.images.[0]}}" width="40" height="40" class="img-xs" alt="Item" />
+                                                </div>
+                                                <div class="info">{{this.productVarient.product.name}}</div>
+                                            </a>
+                                        </td>
+                                        <td> ₹{{this.productVarient.price}}</td>
+                                        <td>{{this.orderedItems.quantity}}</td>
+                                        <td class="text-end"> ₹{{multiply this.productVarient.price this.orderedItems.quantity}}</td>
+                                        {{!-- add review feature for delivered products --}}
+                                    </tr>
+                                    {{/each}}                                       
+                                    <tr>
+                                        <td colspan="4">
+                                            <article class="float-end">
+                                                <dl class="dlist">
+                                                    <dt>Subtotal:</dt>
+                                                    <dd>₹{{subTotal}}</dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt>Shipping cost:</dt>
+                                                    <dd>₹ 0.00</dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt>Grand total:</dt>
+                                                    <dd><b class="h5">₹{{total}}</b></dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    {{!-- <dt class="text-muted">Status:</dt>
+                                                    <dd>
+                                                        <span class="badge rounded-pill alert-success text-success">Payment done</span>
+                                                    </dd> --}}
+                                                </dl>
+                                            </article>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table-responsive// -->
+                    </div>
+                    <!-- col// -->
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-4">
+                        <div class="box shadow-sm bg-light">
+                            <h6 class="mb-15">Payment info</h6>
+                            {{!-- <p>
+                                <img src="/assets/imgs/card-brands/2.png" class="border" height="20" /> Master Card **** **** 4768 <br />
+                                Business name: Grand Market LLC <br />
+                                Phone: +1 (800) 555-154-52
+                            </p> --}}
+                            <p>
+                                METHOD : <b>{{order.paymentMethod}}</b>
+                            </p>
+                        </div>
+                        <div class="box shadow-sm bg-light">
+                            <h6 class="mb-15">Discount info</h6>
+                            <p>
+                                COUPON CODE : <b>{{coupon.code}}</b>
+                            </p>
+                            <p>
+                                DISCOUNT : ₹ <b>{{coupon.discount}}</b>
+                            </p>
+                        </div>
+                        
+                    </div>
+                    <!-- col// -->
+                </div>
             </div>
-            <!-- card end// -->
-        </section>
-        <!-- content-main end// -->
-    </main>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        function verifyPayment(response, razorpayOrder, order){
-            console.log("Entered verify payment");
-            fetch("/api/v1/users/verifyPayment",{
-                method: "POST",
-                headers: {
-                    "content-type": "application/json"
-                },
-                body: JSON.stringify({
-                    response,
-                    razorpayOrder,
-                    order,
-                    payLater: true
-                })
-            }).then(res => res.json())
-            .then(data => {
-                if(data.success){          
-                    location.href = `/api/v1/users/ordersuccess/${order._id}`
+            <!-- card-body end// -->
+        </div>
+        <!-- card end// -->
+    </section>
+    <!-- content-main end// -->
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    function verifyPayment(response, razorpayOrder, order){
+        console.log("Entered verify payment");
+        fetch("/api/v1/users/verifyPayment",{
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                response,
+                razorpayOrder,
+                order,
+                payLater: true
+            })
+        }).then(res => res.json())
+        .then(data => {
+            if(data.success){          
+                location.href = `/api/v1/users/ordersuccess/${order._id}`
+            }
+        })
+    }
+
+    function razorpayCheckout(razorpayOrder, transactionId, order){        
+        console.log("Entered razorpay checkout and this is the amount", razorpayOrder.amount, order);    
+        var options = {
+            "key": "rzp_test_E4rvsz08Z54fM0", 
+            "amount": razorpayOrder.amount, 
+            "currency": "INR",
+            "name": "Urbane Wardrobe", 
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": razorpayOrder.id, 
+            "handler": function (response){                   
+                verifyPayment(response, razorpayOrder, order);
+            },
+            "prefill": { 
+                "name": order.userId.fullname, 
+                "email": order.userId.email, 
+                "contact": order.userId.phone   
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
+
+    function payNow(){
+        const orderId = '{{order._id}}';
+        fetch("/api/v1/users/paylater",{
+            method:"POST",
+            headers: {
+                "content-type" : "application/json"
+            },
+            body: JSON.stringify({
+                orderId
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("This is the order from razorpay", data)
+            if(!data.success){
+                if(!res.success){  
+                    //alert("Order not placed. Try again");
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Order not placed. Try again."                
+                    });                
+                    return
                 }
-            })
-        }
-
-        function razorpayCheckout(razorpayOrder, transactionId, order){        
-            console.log("Entered razorpay checkout and this is the amount", razorpayOrder.amount, order);    
-            var options = {
-                "key": "rzp_test_E4rvsz08Z54fM0", 
-                "amount": razorpayOrder.amount, 
-                "currency": "INR",
-                "name": "Urbane Wardrobe", 
-                "description": "Test Transaction",
-                "image": "https://example.com/your_logo",
-                "order_id": razorpayOrder.id, 
-                "handler": function (response){                   
-                    verifyPayment(response, razorpayOrder, order);
-                },
-                "prefill": { 
-                    "name": order.userId.fullname, 
-                    "email": order.userId.email, 
-                    "contact": order.userId.phone   
-                },
-                "notes": {
-                    "address": "Razorpay Corporate Office"
-                },
-                "theme": {
-                    "color": "#3399cc"
-                }
-            };
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
-        }
-
-
-        function payNow(){
-            const orderId = '{{order._id}}';
-            fetch("/api/v1/users/paylater",{
-                method:"POST",
-                headers: {
-                    "content-type" : "application/json"
-                },
-                body: JSON.stringify({
-                    orderId
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                console.log("This is the order from razorpay", data)
-                if(!data.success){
-                    if(!res.success){  
-                        //alert("Order not placed. Try again");
-                        Swal.fire({
-                            icon: "error",
-                            title: "Oops...",
-                            text: "Order not placed. Try again."                
-                        });                
-                        return
-                    }
-                }else{
-                    const razorpayOrder = data.data.razorpayOrder;
-                    const transactionId = data.data.transactionId;
-                    const order = data.data.order;
-                    console.log("reached razorpay", razorpayOrder, transactionId, order);
-                    razorpayCheckout(razorpayOrder, transactionId, order);        
-                }    
-            })
-            
-        }
-     
-        const payNowBtn = document.getElementById("payNowBtn");
-        payNowBtn.addEventListener("click",payNow);
-    </script>
+            }else{
+                const razorpayOrder = data.data.razorpayOrder;
+                const transactionId = data.data.transactionId;
+                const order = data.data.order;
+                console.log("reached razorpay", razorpayOrder, transactionId, order);
+                razorpayCheckout(razorpayOrder, transactionId, order);        
+            }    
+        })
+        
+    }
+    
+    const payNowBtn = document.getElementById("payNowBtn");
+    payNowBtn.addEventListener("click",payNow);
+</script>
 </body>
+
 

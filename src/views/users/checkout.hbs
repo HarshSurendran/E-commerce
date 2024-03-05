@@ -202,19 +202,19 @@
                                     <tbody>
                                         <tr>                                            
                                             <td>Price</td>
-                                            <td class="text-end">{{total}}</td>
+                                            <td class="text-end">₹ {{total}}</td>
                                         </tr>
                                         <tr>                                            
                                             <td>Discount</td>
-                                            <td class="text-end">{{discount}}</td>
+                                            <td class="text-end">₹ {{discount}}</td>
                                         </tr>
                                         <tr>                                            
                                             <td class="text-black-50 " >Shipping fee</td>
-                                            <td class="text-black-50  text-end">{{shipping}}</td>
+                                            <td class="text-black-50  text-end">₹ {{shipping}}</td>
                                         </tr>
                                         <tr>                                            
                                             <td class="fw-bolder fs-5">Total price</td>
-                                            <td class="fw-bolder fs-5 text-end">{{calculateTotal total discount shipping}}</td>
+                                            <td class="fw-bolder fs-5 text-end">₹ {{calculateTotal total discount shipping}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -454,6 +454,7 @@
     wallet.addEventListener('click', ()=>{
         orderButton.innerText = 'Place Order';
     })
+    
     const razorpay = document.getElementById('razorpay');
     razorpay.addEventListener('click', ()=>{   
         orderButton.innerText = 'Proceed to payment';

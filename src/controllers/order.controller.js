@@ -750,11 +750,11 @@ const renderUserOrdersPage = asyncHandler( async(req,res)=>{
         });        
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
-
+    
     const order = await Order.aggregate([
         {
             $match: {
-                userId: new mongoose.Types.ObjectId(userId) // Assuming orderid is the variable containing the order _id
+                userId: new mongoose.Types.ObjectId(userId)
             }
         },
         {
@@ -903,7 +903,7 @@ const renderUserOrdersPage = asyncHandler( async(req,res)=>{
                     createdAt: "$createdAt",
                     size: "$orderedItems.size",
                     color: "$orderedItems.color",
-                    quantity: "$quantity",
+                    //quantity: "$quantity",
                     returnPeriod: "$returnPeriod"
                 }, 
                 user: { $first: "$user" },
@@ -934,16 +934,12 @@ const renderUserOrdersPage = asyncHandler( async(req,res)=>{
         }
     ]);
 
-    //order is coming properly you have to render it to order details page
-    // res
-    // .status(200)
-    // .json( new ApiResponse( 200, order, "Orders fetched"));
-
     order.forEach((order)=>{
         const formattedCreatedAt = order.createdAt.toISOString().split('T')[0];
         order.createdAt = formattedCreatedAt;        
     });
 
+    console.log("This is order data", order)
     res
     .status(200)
     .render("users/orderlist",{user: req.user, title:"Urbane Wardrobe", order, layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});

@@ -103,9 +103,9 @@
                             <span>( 138 reviews )</span>
                         </div>
                         {{#if product.offerApplied}}
-                        <div class="product__details__price">{{product.price}}<span>Rs {{product.originalprice}}</span></div>
+                        <div class="product__details__price">₹ {{product.price}}<span>₹ {{product.originalprice}}</span></div>
                         {{else}}
-                        <div class="product__details__price">{{product.price}}</div>
+                        <div class="product__details__price">₹ {{product.price}}</div>
                         {{/if}}
                         <p>{{product.name.about}}</p>
                         <div class="product__details__button">
@@ -279,7 +279,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">$ 59.0</div>
+                            <div class="product__price">₹ 59.0</div>
                         </div>
                     </div>
                 </div>
@@ -301,7 +301,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">$ 49.0</div>
+                            <div class="product__price">₹ 49.0</div>
                         </div>
                     </div>
                 </div>
@@ -324,7 +324,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">$ 59.0</div>
+                            <div class="product__price">₹ 59.0</div>
                         </div>
                     </div>
                 </div>
@@ -346,7 +346,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">$ 59.0</div>
+                            <div class="product__price">₹ 59.0</div>
                         </div>
                     </div>
                 </div>
@@ -405,7 +405,7 @@
             }
             console.log(res);
             const goToCartHTML = `
-                <a id="alreadyInCart" style="background-color: #4CAF50;" data-id="${productId}" href="/api/v1/users/cart" class="cart-btn border-0">
+                <a id="alreadyInCart" style="background-color: #4CAF50;" data-id="₹{productId}" href="/api/v1/users/cart" class="cart-btn border-0">
                     <span class="icon_bag_alt"></span> Go to Cart
                 </a>
             `;

@@ -143,9 +143,9 @@
                                 <i class="fa fa-star"></i>
                             </div>
                             {{#if this.offerApplied}}
-                            <div class="product__price">{{this.price}}<span>Rs {{this.originalprice}}</span></div>
+                            <div class="product__price">₹ {{this.price}}<span>₹ {{this.originalprice}}</span></div>
                             {{else}}
-                            <div class="product__price">{{this.price}}</div>
+                            <div class="product__price">₹ {{this.price}}</div>
                             {{/if}}
                         </div>
                     </div>
@@ -296,7 +296,7 @@
         const color = event.target.getAttribute('data-color');
         
         if(color){
-            console.log(`Color: ${color}`);
+            console.log(`Color: ₹{color}`);
             /*fetch(`/api/v1/products/filter/color`,{
                 method : "POST",
                 headers : {
@@ -310,9 +310,9 @@
             .then((data)=>{
                 
             })
-            fetch(`/api/v1/users/filter/color/${color}`)
+            fetch(`/api/v1/users/filter/color/₹{color}`)
         }
-        console.log(`Min: ${min}, Max: ${max}`);
+        console.log(`Min: ₹{min}, Max: ₹{max}`);
         
         // You can perform further actions based on the min and max values
     }

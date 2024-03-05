@@ -9,8 +9,6 @@ const Category = require("../models/category.models.js");
 const Wishlist = require("../models/wishlist.models.js");
 const Cart = require("../models/cart.models.js");
 
-
-
 const path = require("path");
 
 const renderOffersPage = asyncHandler( async(req,res)=>{

@@ -1,19 +1,15 @@
 const express = require("express");
 const router = express.Router();
-
+//controllers
 const adminController = require("../controllers/admin.controler.js")
 const productController = require("../controllers/product.controler.js");
-const categoryController = require("../controllers/category.controler.js");
-const colorController = require("../controllers/color.controler.js");
-const sizeController = require("../controllers/size.controler.js");
 const orderController = require("../controllers/order.controller.js");
 const couponController = require("../controllers/coupon.controller.js");
 const offerController = require("../controllers/offer.controller.js");
 
 const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
-
-
+//models
 const Order = require("../models/order.models.js");
 const Product = require("../models/product.models.js");
 
@@ -218,18 +214,18 @@ router.patch("/editdetails", auth.verifyAdminJWT, adminController.editUserDetail
 
 
 //category handling
-router.get("/category", auth.verifyAdminJWT, categoryController.categoryPage);
-router.post("/category", auth.verifyAdminJWT, categoryController.addCategory);
-router.get("/delete-category/:id", auth.verifyAdminJWT, categoryController.deleteCategory);
-router.patch("/category", auth.verifyAdminJWT, categoryController.editCategory);
+router.get("/category", auth.verifyAdminJWT, adminController.categoryPage);
+router.post("/category", auth.verifyAdminJWT, adminController.addCategory);
+router.get("/delete-category/:id", auth.verifyAdminJWT, adminController.deleteCategory);
+router.patch("/category", auth.verifyAdminJWT, adminController.editCategory);
 
 //Color
-router.post("/color", auth.verifyAdminJWT, colorController.addColor);
-router.post("/c/:id", auth.verifyAdminJWT, colorController.deleteColor);
+router.post("/color", auth.verifyAdminJWT, productController.addColor);
+router.get("/color/:id", auth.verifyAdminJWT, productController.deleteColor);
 
 //Size
-router.post("/size", auth.verifyAdminJWT, sizeController.addSize);
-router.get("/size/:id", auth.verifyAdminJWT, sizeController.deleteSize);
+router.post("/size", auth.verifyAdminJWT, productController.addSize);
+router.get("/size/:id", auth.verifyAdminJWT, productController.deleteSize);
 
 // Secured routes
 router.get("/logout", auth.verifyAdminJWT, adminController.logout);

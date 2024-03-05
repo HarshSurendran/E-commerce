@@ -1,7 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const commonController = require("../controllers/common.controller.js");
-const userController = require("../controllers/user.controler.js");
 const productController = require("../controllers/product.controler.js");
 const auth = require("../middlewares/auth.middleware.js");
 const verifyOtp = require("../middlewares/otpVerification.middleware.js");

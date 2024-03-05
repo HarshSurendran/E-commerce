@@ -119,6 +119,7 @@
         </section>
         <div id="notification" class="notification"></div>
     
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         const showNotification = (message) => {
@@ -166,8 +167,46 @@
         const returnButton = document.querySelectorAll(".returnButton");
         returnButton.forEach((element) => {
             element.addEventListener("click", (event) => {
-               const conform = confirm("Are you sure you want to return this order?");
-               if(conform){
+               //const conform = confirm("Are you sure you want to return this order?");
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete"
+                }).then((result) => {
+                    if (result.isConfirmed) { 
+                        console.log("Entered fetch for retirn", event.target.dataset.id)
+                        const orderId = event.target.dataset.id;
+                        fetch("/api/v1/users/returnorders", {
+                            method: "PATCH",
+                            headers: {
+                                "content-type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                orderId
+                            })
+                        })
+                        .then(response => response.json())
+                        .then((data) => {
+                            console.log("this is response after return",data);
+                            if (data.success) {
+                                event.target.remove();
+                                showNotification("Return request initiated");
+                                return
+                            }                       
+                            showNotification("Return request failed");
+                        })    
+                        /*Swal.fire({
+                        title: "Deleted!",
+                        text: "Your file has been deleted.",
+                        icon: "success"                
+                        });*/                            
+                    }   
+                });
+               /*if(conform){
                    console.log("Entered fetch for retirn", event.target.dataset.id)
                    const orderId = event.target.dataset.id;
                    fetch("/api/v1/users/returnorders", {
@@ -189,7 +228,7 @@
                        }                       
                        showNotification("Return request failed");
                    })
-               }
+               }*/
             })
         })
     </script>
