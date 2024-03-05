@@ -288,6 +288,7 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+    
     function showNotification(message, color) {
         const notificationElement = document.getElementById('notification');
         if(color === "red" ){
@@ -326,7 +327,6 @@
         })
     }
 
-    
     function razorpayCheckout(razorpayOrder, order){        
         console.log("Entered razorpay checkout and this is the amount", razorpayOrder.amount);    
         var options = {

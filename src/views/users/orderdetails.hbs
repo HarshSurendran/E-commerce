@@ -250,7 +250,12 @@
                 console.log("This is the order from razorpay", data)
                 if(!data.success){
                     if(!res.success){  
-                        alert("Order not placed. Try again");                 
+                        //alert("Order not placed. Try again");
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Order not placed. Try again."                
+                        });                
                         return
                     }
                 }else{

@@ -39,7 +39,7 @@
                                         <div class="col-lg-6">
                                             <div class="mb-4">
                                                 <label class="form-label">Discount Percentage</label>
-                                                <input id="discount" type="text" placeholder="%" class="form-control" id="product_name" name="discount" />
+                                                <input id="discount" type="text" placeholder="%" class="form-control" id="product_name" name="discount" required />
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
@@ -162,15 +162,31 @@
         const category = document.getElementById("category").value;
 
         if(offername.trim() == ""){
-            alert("Offer name can't be empty");
+            //alert("Offer name can't be empty");
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Name can't be empty."                
+            });
             return false;
         }
         if(description.trim() == ""){
-            alert("Description can't be empty");
+            //alert("Description can't be empty");
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Description can't be empty."                
+            });
             return false;
         }
+        
         if( 0 > discount || discount > 100){
-            alert("Discount must be between 0 and 100");
+            //alert("Discount must be between 0 and 100");
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Discount must be between 0 to 100."                
+            });
             return false;
         }
         return true;

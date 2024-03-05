@@ -201,8 +201,41 @@
             element.addEventListener("click", ()=>{
                 const id = element.getAttribute("data-id");
                 console.log("This  is cart id", id)
-                    const confirmation = window.confirm("Are you sure you want to delete this item from the cart?");
-                if(confirmation){
+                    //const confirmation = window.confirm("Are you sure you want to delete this item from the cart?");
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete"
+                    }).then((result) => {
+                        if (result.isConfirmed) { 
+                            fetch("/api/v1/users/cart", {
+                                method: "DELETE",
+                                headers: {
+                                    "content-type": "application/json"
+                                },
+                                body : JSON.stringify({
+                                    id
+                                })
+                            }).then( (res)=>{
+                                if(!res.ok){
+                                    console.log("somethign wronf")
+                                    return 
+                                }
+                                
+                                location.reload();
+                            })    
+                            /*Swal.fire({
+                            title: "Deleted!",
+                            text: "Your file has been deleted.",
+                            icon: "success"                
+                            });*/                            
+                        }   
+                    });
+                /*if(confirmation){
                     fetch("/api/v1/users/cart", {
                         method: "DELETE",
                         headers: {
@@ -219,7 +252,7 @@
                         
                         location.reload();
                     })
-                }
+                }*/
             });
         });
 
@@ -245,8 +278,13 @@
                 couponInput.value = '';
                 removeCouponButton.classList.add('d-none');
                 showCouponButton.classList.remove('d-none');
+                //alert(`NOTE: Offer limit is reached.`);
+                Swal.fire({
+                        title: "Coupon code invalid",
+                        text: "Sorry, Coupons minimum amount limit reached",
+                        icon: "error"
+                    });
                 location.reload();
-                alert(`NOTE: Offer limit is reached.`);
             }
         }else{
             const grandTotal = document.getElementById("grandtotal");
@@ -289,7 +327,12 @@
                     console.log("this is data",data)
                     if(!data.success){
                         input.value = (qty - increment);
-                        return alert("Stock is not available.");
+                        //return alert("Stock is not available.");
+                        return Swal.fire({
+                            title: "Out of stock",
+                            text: "Sorry, this product is out of stock right now",
+                            icon: "error"
+                        });
                     }
                     input.value = qty;
                     updateTotal(qty, event); 
@@ -300,10 +343,9 @@
 
 
     //coupon
-    document.addEventListener('DOMContentLoaded', function() {
-        
+    document.addEventListener('DOMContentLoaded', function() {        
         const showCouponButton = document.getElementById('showCouponButton');
-        showCouponButton.addEventListener('click',async function() {
+        showCouponButton.addEventListener('click',async function() {           
             await fetch('/api/v1/users/availableCoupons', {
                 method: 'POST',
                 headers: {
@@ -315,11 +357,14 @@
             .then(data => {
                 console.log("This si rsponse", data)
                 if(!data.success){
-                    return alert("couldnt get the available coupon")
+                    return  Swal.fire({
+                        title: "Couldn't Find any Coupons",
+                        text: "Sorry, there are no coupons available right now",
+                        icon: "question"
+                    });
                 }
                 coupons = data.data.coupons;
             })
-            console.log("This is coupon", coupons)
             
             const couponList = document.getElementById('couponList');
             couponList.innerHTML = '';
@@ -354,10 +399,20 @@
                     showCouponButton.classList.add('d-none');
                 }else{
                     couponInput.value = '';
-                    alert(`NOTE: This coupon is not valid for this order.`);
+                    //alert(`NOTE: This coupon is not valid for this order.`);
+                    Swal.fire({
+                        title: "Coupon not valid",
+                        text: "Sorry, This coupon is not valid for this order.",
+                        icon: "error"
+                    });
                 }
             } else {
-                alert(`NOTE: You didn't select any coupon.`);
+                //alert(`NOTE: You didn't select any coupon.`);
+                Swal.fire({
+                        title: "Coupon not Selected",
+                        text: "You have not selected any coupons.",
+                        icon: "question"
+                    });
             }
         });
 

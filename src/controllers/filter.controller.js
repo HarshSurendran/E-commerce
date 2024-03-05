@@ -123,7 +123,7 @@ const filterByPrice = asyncHandler(async (req, res) => {
         } else {
             element.isWishlisted = false;
         }
-        const offer = await checkOffer(element.name?.category.category);
+        const offer = await checkOffer(element.name?.category?.category);
         if (offer) {
             element.originalprice = element.price;
             element.price = applyOffer(element.price, offer.discount);

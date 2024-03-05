@@ -206,7 +206,12 @@
                 if(data.success){
                     location.reload();
                 }else{
-                    alert(data.message);
+                    //alert(data.message);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: data.message                
+                    });
                 }
             })
 

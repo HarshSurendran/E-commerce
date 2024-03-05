@@ -175,19 +175,19 @@ router.post("/editcoupon", auth.verifyAdminJWT, couponController.editCoupon)
 //graph
 router.post("/graphData", auth.verifyAdminJWT, adminController.graphData);
 
-// order
+//order
 router.get("/orders/orderdetails/:id", orderController.renderOrderDetailsPage);
 router.get("/orders", orderController.renderOrdersPage);
 router.post("/updateorderstatus", orderController.changeOrderStatus);
 
-// login
+//login
 router.get("/", auth.checkAdminJWT , adminController.renderLoginPage);
 router.post("/", adminController.adminlogin);
 router.post("/verify", adminController.verifyEmailPassword);
 router.get("/dashboard", auth.verifyAdminJWT, adminController.renderDashboard);
 
 
-// product handling 
+//product handling 
 router.get("/Products", auth.verifyAdminJWT, productController.onlyProductsList);
 router.get("/products/addproduct", auth.verifyAdminJWT, productController.addProductPage);
 router.post("/addproduct", auth.verifyAdminJWT, productController.addProduct);
