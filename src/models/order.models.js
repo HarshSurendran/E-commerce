@@ -62,6 +62,10 @@ const orderSchema = mongoose.Schema({
     couponDiscount: {
         type: Number,
         default: 0
+    },
+    deliveryCharge: {
+        type: Number,
+        default: 0
     }
 },
 {

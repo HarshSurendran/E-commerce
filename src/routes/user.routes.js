@@ -74,6 +74,7 @@ router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDe
 
 
 //checkout
+router.post("/deliverycharge", auth.verifyUserJWT, orderController.calcDelCharge)
 router.post("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
 router.get("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
 router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);

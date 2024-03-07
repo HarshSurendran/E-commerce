@@ -86,8 +86,8 @@
                 <div class="card-body"> 
                     <div class="row">  
                         {{#each address}}
-                            <label for="address{{@index}}" class="col-4">
-                                <input type="radio" id="address{{@index}}" name="selectedAddress" value="{{this._id}}" style="display: none;" checked>
+                            <label for="address{{@index}}" class="col-4 " >
+                                <input type="radio" id="address{{@index}}" name="selectedAddress" value="{{this._id}}" style="display: none;" class="addressLabel" checked>
                                 <div class="card">
                                     <div class="card-header text-center fw-bolder ">{{this.type}}</div>
                                     <div class="card-body">
@@ -210,11 +210,11 @@
                                         </tr>
                                         <tr>                                            
                                             <td class="text-black-50 " >Shipping fee</td>
-                                            <td class="text-black-50  text-end">₹ {{shipping}}</td>
+                                            <td class="text-black-50  text-end" id="shippingCharge" >₹ {{shipping}}</td>
                                         </tr>
                                         <tr>                                            
                                             <td class="fw-bolder fs-5">Total price</td>
-                                            <td class="fw-bolder fs-5 text-end">₹ {{calculateTotal total discount shipping}}</td>
+                                            <td id="grandTotal" class="fw-bolder fs-5 text-end">₹ {{calculateTotal total discount shipping}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -384,6 +384,7 @@
         
         const paymentMethod = checkedPaymentMethod.value;
         const address = checkedAddress.value;
+        console.log("address", address);
         const couponCode = `{{couponCode}}`
         const totalAmount = `{{calculateTotal total discount shipping}}`        
         if(paymentMethod === "COD"){
@@ -538,7 +539,48 @@
         return true;
     }
 
-    
+    function modifyTotal(shippingCharge){
+        let total = `{{total}}`
+        let discount = `{{discount}}`
+        discount = parseInt(discount)
+        total = parseInt(total)
+        let grandtotal = (total + shippingCharge) - discount;
+        console.log("this is grand", grandtotal);
+        const grandTotalElem = document.getElementById("grandTotal");
+        grandTotalElem.innerText = "₹ " + grandtotal;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const addressLabels = document.querySelectorAll(".addressLabel");
+        console.log(addressLabels)
+        addressLabels.forEach(function(element) {
+            element.addEventListener("click", function(event) {              
+                const addressId = event.target.value
+                console.log("Hi, address selected:", addressId);
+                fetch("/api/v1/users/deliverycharge",{
+                    method:"POST",
+                    headers: {
+                        "content-type" : "application/json"
+                    },
+                    body: JSON.stringify({
+                        addressId
+                    })
+                })
+                .then((res)=> res.json())
+                .then((data)=>{
+                    if(data.success){
+                        console.log(data.data);
+                        const shippingCharge = document.getElementById("shippingCharge");
+                        if(data.data == null){
+                            data.data = 0;
+                        }
+                        shippingCharge.innerText ="₹ " + data.data;                        
+                        modifyTotal(data.data);
+                    }
+                });                
+            });
+        }); 
+    });
 </script>
 
 </body>

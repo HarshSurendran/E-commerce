@@ -23,7 +23,62 @@ const Razorpay = require('razorpay');
 var instance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
+});
+
+
+//code for distance calculation
+const NodeGeocoder = require('node-geocoder');
+const { toNamespacedPath } = require("path");    
+const options = {
+provider: 'openstreetmap'
+};
+// Initialize geocoder
+const geocoder = NodeGeocoder(options);    
+async function calculateDistance(sourceAddress, destinationAddress) {
+    try {        
+        let [sourceLocation, destinationLocation] = await Promise.all([
+        geocoder.geocode(sourceAddress),
+        geocoder.geocode(destinationAddress)
+        ]);      
+        console.log("destination address", destinationLocation);
+        destinationLocation = destinationLocation.filter((element)=>{
+            return element.countryCode === "IN"
+        })
+        const sourceCoords = [sourceLocation[0].latitude, sourceLocation[0].longitude];
+        const destinationCoords = [destinationLocation[0].latitude, destinationLocation[0].longitude];
+        const distance = getDistance(sourceCoords, destinationCoords);        
+        return distance;        
+    } catch (error) {
+        console.log(error)
+        console.error('Error:', error.message);
+    }
+}    
+function getDistance(sourceCoords, destinationCoords) {
+    const [lat1, lon1] = sourceCoords;
+    const [lat2, lon2] = destinationCoords;
+
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return distance;
+}    
+function deg2rad(deg) {
+return deg * (Math.PI / 180);
+}
+function calculateDeliveryCharge(distance){
+    let charge = distance * 0.25;
+    charge = Math.ceil(charge);
+    console.log("This is the delivery charge ", charge);
+    return charge;
+}
+
 
 const state = [    
     { name: "Andhra Pradesh" },
@@ -173,12 +228,7 @@ const checkOutPage = asyncHandler( async(req,res)=>{
         console.log("this is price after applying offer", element.productVarient_id.price);
         total += element.quantity * element.productVarient_id.price;
     }
-    console.log("This is cart",cart);
-
-
-
-
-
+    
     // discount and shipping logic
     let discount = 0;
     if (couponCode) {
@@ -187,18 +237,27 @@ const checkOutPage = asyncHandler( async(req,res)=>{
             if (coupon.minamount > total) {
                 discount = 0;
                 return res.status(400)
-                //alert("Minimum amount should be greater than " + coupon.minamount);
             }
             if(coupon.userlimit<= 0){
                 discount = 0;
                 return res.status(400)
-                //alert("Coupon is expired");
             }
             discount = coupon.discount
         }
     }
+
     let shipping = 0;
-    
+    const lastAddressDocument = address[address.length - 1];    
+    if(lastAddressDocument){
+        let pincode = lastAddressDocument.pincode
+        pincode = pincode.toString(); 
+        let distance = await calculateDistance("673639", pincode);      
+        shipping = calculateDeliveryCharge(distance);        
+    }
+    if (!shipping) {
+        shipping = 0;        
+    }
+    console.log("this is final shipping", shipping)    
 
     res
     .status(200)
@@ -210,9 +269,8 @@ const createOrder = asyncHandler( async(req,res)=>{
         const user = req.user;
         const {paymentMethod, address, couponCode} = req.body; 
         
-        const orderId = generateOrderId();
-        // let payment = paymentMethod.toLowerCase();
-        console.log(paymentMethod)
+        const orderId = generateOrderId();        
+        console.log("Thisisis the input to order placed",paymentMethod, address)
 
         const cart = await Cart.aggregate([
             {
@@ -350,6 +408,13 @@ const createOrder = asyncHandler( async(req,res)=>{
                 total = total - coupon.discount;
             }
         }
+//delivery charge calculator
+        const deliveryAddress = await Address.findOne({_id: address})        
+        let pincode = deliveryAddress.pincode;
+        pincode = pincode.toString();        
+        let distance = await calculateDistance("673639", pincode); 
+        deliveryCharge = calculateDeliveryCharge(distance);
+        total = total + deliveryCharge;
 
         if(paymentMethod === "Wallet"){
             const wallet = await Wallet.findOne({ userId: user._id });
@@ -391,7 +456,8 @@ const createOrder = asyncHandler( async(req,res)=>{
             orderedItems,
             orderId,
             couponCode,
-            couponDiscount: coupon.discount
+            couponDiscount: coupon.discount,
+            deliveryCharge
         });
 
         for(const element of cart){
@@ -497,11 +563,15 @@ const orderSuccessPage = asyncHandler( async(req,res)=>{
     const addressArray = await Address.find({_id: order.address });
     const address = addressArray[0]
     let discount = 0;
-    let totalAmount = order.orderAmount;
+    let totalAmount = order.orderAmount;    
     if(order.couponCode){
-        const coupon = await Coupon.findOne({code: order.couponCode});
-        discount = coupon.discount
+        //const coupon = await Coupon.findOne({code: order.couponCode});
+        //discount = coupon.discount
+        discount = order.couponDiscount
         totalAmount = order.orderAmount + discount;
+    }
+    if(order.deliveryCharge){
+        totalAmount = totalAmount - order.deliveryCharge;
     }
 
     if(!order){
@@ -1456,6 +1526,21 @@ const payLater = asyncHandler( async(req,res)=>{
         .status(500)
         .json( new ApiError(500, "Something went wrong", error));
     })
+});
+
+const calcDelCharge = asyncHandler( async(req,res)=>{
+    const {addressId} = req.body;
+
+    const deliveryAddress = await Address.findOne({_id: addressId})
+    let pincode = deliveryAddress.pincode;
+    pincode = pincode.toString();        
+    let distance = await calculateDistance("673639", pincode);
+    console.log("this is the distance", distance);
+
+    deliveryCharge = calculateDeliveryCharge(distance);
+    res
+    .status(200)
+    .json( new ApiResponse(200, deliveryCharge, "successfully calculated delivery charge"))
 })
 
 
@@ -1475,5 +1560,6 @@ module.exports = {
     addWalletMoney,
     verifyTransfer,
     renderInvoiceAdmin,
-    payLater
+    payLater,
+    calcDelCharge
 }
