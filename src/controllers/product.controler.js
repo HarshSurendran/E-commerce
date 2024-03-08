@@ -1335,6 +1335,119 @@ const filterByColor = asyncHandler(async (req, res) => {
 
 });
 
+const bestSellerProducts = asyncHandler(async (req, res) => {
+    // const categorylayout = await Category.find({});
+    // let wishlistCountlayout = 0;
+    // let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    // wishlistlayout = wishlistlayout[0];
+    // if (wishlistlayout?.productsId.length) {
+    //     wishlistlayout.productsId.forEach(element => {
+    //         wishlistCountlayout++;
+    //     });        
+    // }
+    // const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+
+    const product = await ProductVarient.aggregate(
+        [   
+            {
+                $lookup: {
+                    from: "products",
+                    localField : "product_id",
+                    foreignField : "_id",
+                    as: "name",
+                    pipeline: [
+                        {
+                            $match: {
+                                islisted : true
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "categories",
+                                localField: "category",
+                                foreignField: "_id",
+                                as: "category"
+                            }
+                        },
+                        {
+                            $addFields: {
+                                category: { $first: "$category" }
+                            }
+                        }
+                    ]
+                }        
+            },
+            {
+                $lookup: {
+                    from: "colors",
+                    localField : "color_id",
+                    foreignField : "_id",
+                    as: "color"
+                } 
+            },
+            {
+                $lookup: {
+                    from: "sizes",
+                    localField : "size_id",
+                    foreignField : "_id",
+                    as: "size"
+                } 
+            },
+            {            
+                $addFields : {
+                    name : { $first: "$name" },
+                    color : { $first: "$color"},
+                    size : { $first: "$size" },
+                }                       
+            },
+            {
+                $project : {
+                    name:1,
+                    color:1,
+                    size:1,
+                    images:1,
+                    stock:1,
+                    price:1,
+                    sold_count:1
+                }
+            },
+            {
+                $sort :{
+                    sold_count: -1
+                }
+            },
+            {
+                $limit : 10
+            }
+        ]
+        );          
+            
+        const productList = await Promise.all(product.map(async (element) => {
+            if (element.stock < 1) {
+                element.isOutofStock = true;            
+            }
+            const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
+            if (isWishlisted) {
+                element.isWishlisted = true;
+            } else {
+                element.isWishlisted = false;
+            }
+            const offer = await checkOffer(element.name?.category?.category);
+            if (offer) {
+                element.originalprice = element.price;
+                element.price = applyOffer(element.price, offer.discount);
+                element.offerApplied = true;
+            }
+            return element; 
+        }));
+
+    console.log("products after filter", productList);
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {productList}, "fetched product data"))
+})
+
 
 
 module.exports = {
@@ -1363,5 +1476,6 @@ module.exports = {
     addSize,
     deleteSize,
     filterByPrice,
-    filterByColor
+    filterByColor,
+    bestSellerProducts
 }

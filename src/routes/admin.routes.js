@@ -190,7 +190,7 @@ router.post("/addproduct", auth.verifyAdminJWT, productController.addProduct);
 router.get("/products/edit-product/:id", auth.verifyAdminJWT, productController.editProductPage);
 router.post("/editProduct", auth.verifyAdminJWT, productController.editProduct);
 //router.get("/delete-product/:id", auth.verifyAdminJWT, productController.deleteProduct); delete product is not needed.
-router.get("/productlist", auth.verifyAdminJWT, productController.listProducts);
+//router.get("/productlist", auth.verifyAdminJWT, productController.listProducts);
 router.get("/products/products-varient", auth.verifyAdminJWT, productController.addProductVarientPage);
 router.get("/products/products-varient/:name", auth.verifyAdminJWT, productController.addProductVarientPagewithId);
 router.post("/products-varient", auth.verifyAdminJWT, upload.array("images",4), productController.addProductVarient);

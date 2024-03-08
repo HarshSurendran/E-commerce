@@ -41,6 +41,10 @@ const productVarientSchema = mongoose.Schema({
         },
         review_count:{
             type: Number
+        },
+        sold_count:{
+            type : Number,
+            default: 0
         }
     },
     {

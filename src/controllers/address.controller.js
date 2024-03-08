@@ -60,8 +60,8 @@ const addressPage = asyncHandler( async(req,res)=>{
         });        
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
-    const address = await Address.find({userid: user._id })
-    console.log(address);
+    const address = await Address.find({userid: user._id });
+        
     res
     .status(200)
     .render("users/address",{title:"Urbane Wardrobe", user, address, layout: "userprofilelayout", wishlistCountlayout, categorylayout, cartCountlayout});
@@ -114,8 +114,8 @@ const editAddressPage = asyncHandler(async(req,res)=>{
 
 const editAddress = asyncHandler( async(req,res)=>{
     console.log(req.body)
-    const { addressid, fullname, phone, type, street, locality, district, state, pincode} = req.body;
-    const userid = req.user._id
+    const { addressid, fullname, phone, type, street, locality, district, state, pinCode} = req.body;
+    const userid = req.user._id    
     
     const address = await Address.updateOne(
         {
@@ -131,7 +131,7 @@ const editAddress = asyncHandler( async(req,res)=>{
                 locality,
                 district,
                 state,
-                pincode
+                pincode : pinCode
             }
         }
     );

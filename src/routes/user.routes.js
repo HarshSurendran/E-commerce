@@ -19,6 +19,12 @@ const getUserId = require("../middlewares/giveuserid.middleware.js");
 
 
 
+//routes starts
+
+router.get("/test", auth.verifyUserJWT, productController.bestSellerProducts)
+
+
+
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
 router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
 router.post("/resendotp", otpGenerator, userController.resendotpsender);

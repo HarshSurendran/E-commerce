@@ -142,7 +142,16 @@ const verifyAdminJWT = asyncHandler( async(req,res,next)=>{
         
     } catch (error) {
         // throw new ApiError(401,"Verification of JWT unsuccessful.",error)
-        res.redirect("/api/v1/admin");
+        const options ={
+            httpOnly:true,
+            secure: true
+        }
+        
+        res
+        .status(400)
+        .clearCookie("adminAccessToken", options)
+        .clearCookie("RefreshToken", options)
+        .redirect("/api/v1/admin");
     }
 })
 
@@ -190,6 +199,12 @@ const checkAdminJWT = asyncHandler( async(req,res,next)=>{
         
     } catch(error) {
         console.log(error);
+        if (error.name === 'TokenExpiredError') {            
+            res.redirect("/api/v1/admin");
+        } else {            
+            console.log(error);
+            next(error);
+        }
     }
 
 });

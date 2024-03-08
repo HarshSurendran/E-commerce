@@ -15,8 +15,7 @@ const Coupon = require("../models/coupon.models.js");
 
 const { checkOffer, applyOffer } = require("./offer.controller");
 
-const crypto = require("crypto")
-
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 const Razorpay = require('razorpay');
 
@@ -24,7 +23,6 @@ var instance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
-
 
 //code for distance calculation
 const NodeGeocoder = require('node-geocoder');
@@ -79,7 +77,6 @@ function calculateDeliveryCharge(distance){
     return charge;
 }
 
-
 const state = [    
     { name: "Andhra Pradesh" },
     { name: "Arunachal Pradesh" },
@@ -118,12 +115,10 @@ const state = [
     { name: "Uttarakhand" },
     { name: "West Bengal" }
   ];
-
 function generateOrderId() {
     let orderId = Math.floor(10000000 + Math.random() * 90000000);
     return orderId;
 }
-
 function generateRazorpayOrder(orderid, total){
     return new Promise((resolve, reject)=>{
         var options = {
@@ -459,11 +454,18 @@ const createOrder = asyncHandler( async(req,res)=>{
             couponDiscount: coupon.discount,
             deliveryCharge
         });
-
+                    
         for(const element of cart){
             //update the stock 
-            const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
-        }
+            const productVarientUpdate = await ProductVarient.updateOne(
+                { 
+                    _id: element.productVarient_id 
+                }, 
+                { 
+                    $inc: { stock: -element.quantity, sold_count: element.quantity } 
+                }
+            );
+        }       
 
         const orderConfirm = await Order.findOne({_id: order._id}).populate("userId")
 
@@ -471,28 +473,25 @@ const createOrder = asyncHandler( async(req,res)=>{
             throw new Error("Order not placed server error");
         }
 
-        console.log("This is the confirmed order", orderConfirm)
-
-        // await Cart.deleteMany({user_id: user._id});
+        console.log("This is the confirmed order", orderConfirm);       
 
         //check payment method 
         if(paymentMethod==="COD"){
             const updateOrder = await Order.updateOne(
-                {
-                    _id: orderConfirm._id
-                },
-                {
-                    $set: {
-                        status: "Placed"
+                    {
+                        _id: orderConfirm._id
+                    },
+                    {
+                        $set: {
+                            status: "Placed"
+                        }
                     }
-                }
-            )
+                )
             if(!updateOrder.modifiedCount){
                 return res
                 .status(500)
                 .json( new ApiError(500, "Order status not updated, server error", error));
             }
-
 
             await Cart.deleteMany({user_id: user._id});
             return res
@@ -1541,7 +1540,8 @@ const calcDelCharge = asyncHandler( async(req,res)=>{
     res
     .status(200)
     .json( new ApiResponse(200, deliveryCharge, "successfully calculated delivery charge"))
-})
+});
+
 
 
 module.exports = {
