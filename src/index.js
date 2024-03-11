@@ -7,7 +7,7 @@ const app = require('./app.js');
 connectDB()
 .then(()=>{
     app.listen(process.env.PORT || 4000, ()=>{
-        console.log(`Server started at http://localhost:${process.env.PORT}`);
+        console.log(`Server started at http://localhost:${process.env.PORT}/api/v1`);
     })
 })
 .catch((error)=>{

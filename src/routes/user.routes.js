@@ -14,10 +14,6 @@ const upload = require("../middlewares/multer.middleware.js");
 const auth = require("../middlewares/auth.middleware.js");
 const insertUser = require("../middlewares/insertUser.middleware.js");
 const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
-const verifyOtp = require("../middlewares/otpVerification.middleware.js");
-const getUserId = require("../middlewares/giveuserid.middleware.js");
-
-
 
 //routes starts
 
@@ -26,11 +22,11 @@ router.get("/test", auth.verifyUserJWT, productController.bestSellerProducts)
 
 
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
-router.post("/verify-otp", verifyOtp, userController.verifiedUserLogin);
+router.post("/verify-otp", userController.verifyOtp, userController.verifiedUserLogin);
 router.post("/resendotp", otpGenerator, userController.resendotpsender);
 //router.post("/signup", userController.loginUser);
 //router.get("/product-list", userController.allproductlist)
-router.post("/forgotpassword", getUserId, otpGenerator, userController.forgotPassOtpSender);
+router.post("/forgotpassword", userController.getUserId, otpGenerator, userController.forgotPassOtpSender);
 router.post("/changepassword", userController.changePassFromOtp);
 
 

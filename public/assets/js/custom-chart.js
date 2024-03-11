@@ -128,13 +128,27 @@
                         }
                     }
                 });
+
+        fetchDataAndUpdateChart("yearly",2024);
     
-        // Fetch data and update chart
+        
     }
 
     // let filter = 'monthly';
-    // let time = 2024;
+    // let time = "2024";
     // fetchDataAndUpdateChart(filter,time);
+    const yearlyBtn = document.getElementById("yearlyBtn");
+    const monthlyBtn = document.getElementById("monthlyBtn");
+    yearlyBtn.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const time = document.getElementById("time").value;
+        fetchDataAndUpdateChart("yearly",time);
+    })
+    monthlyBtn.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const time = document.getElementById("time").value;
+        fetchDataAndUpdateChart("monthly",time);
+    })
 
 
 

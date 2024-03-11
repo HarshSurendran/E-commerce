@@ -114,7 +114,69 @@ const onlyProductsList = asyncHandler( async (req,res)=>{
         throw new ApiError(500, "Something went wrong while fetching category details");
     }
 
-    res.render("admin/onlyProductList", {admin: true, title: "Urbane Wardrobe", products, category});
+    //const bestSellers = await ProductVarient.find({}).sort({sold_count: -1}).limit(10)
+    const bestSellers = await ProductVarient.aggregate([
+        {
+            $lookup: {
+                from: "products",
+                localField : "product_id",
+                foreignField : "_id",
+                as: "name",
+                pipeline: [
+                    {
+                        $match: {
+                            islisted : true
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "categories",
+                            localField: "category",
+                            foreignField: "_id",
+                            as: "category"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            category: { $first: "$category" }
+                        }
+                    }
+                ]
+            }        
+        },
+        {
+            $lookup: {
+                from: "colors",
+                localField : "color_id",
+                foreignField : "_id",
+                as: "color"
+            } 
+        },
+        {
+            $lookup: {
+                from: "sizes",
+                localField : "size_id",
+                foreignField : "_id",
+                as: "size"
+            } 
+        },
+        {            
+            $addFields : {
+                name : { $first: "$name" },
+                color : { $first: "$color"},
+                size : { $first: "$size" },
+            }                       
+        },
+        {
+            $sort: { sold_count: -1}
+        },
+        {
+            $limit: 10 
+        }
+    ])
+    console.log("this is the bestseller", bestSellers)
+
+    res.render("admin/onlyProductList", {admin: true, title: "Urbane Wardrobe", products, category, bestSellers});
 });
 
 const editProductPage = asyncHandler ( async (req,res)=>{

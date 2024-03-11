@@ -110,6 +110,28 @@ const generateAccessAndRefreshToken = async (adminid)=>{
     }
 }
 
+function getMonthNumber(monthName) {
+    console.log("the month input", monthName)
+    const months = {
+        January: 0,
+        February: 1,
+        March: 2,
+        April: 3,
+        May: 4,
+        June: 5,
+        July: 6,
+        August: 7,
+        September: 8,
+        October: 9,
+        November: 10,
+        December: 11
+    };    
+    const formattedMonthName = monthName.charAt(0).toUpperCase() + monthName.slice(1).toLowerCase();
+    console.log("this is formatted name", formattedMonthName)
+    console.log("month number", months[formattedMonthName])
+    return months[formattedMonthName];
+}
+
 const renderLoginPage =  asyncHandler( async(req,res)=>{
     res
     .status(200)
@@ -224,7 +246,6 @@ const renderDashboard = asyncHandler( async(req,res)=>{
     ]);
     
     salesData = salesData[0]?.OrderAmount || 0;
-    console.log("This is sales", sales, orders, products, category, salesData);
 
     res
     .status(200)
@@ -419,29 +440,126 @@ const graphData = asyncHandler( async (req,res)=>{
     const { filter, time } = req.body
     console.log("this is filter and time", filter, time);
 
-    if (filter === "weekly") {
-        salesData.labels = ["week1", "week2", "week3", "week4", "week5"];
+    // if (filter === "weekly") {
+    //     salesData.labels = ["week1", "week2", "week3", "week4", "week5"];
+    //     const sales = await Order.aggregate([
+    //         {
+    //             $match: {
+    //                 $month: time
+    //             }
+    //         },
+    //         {
+    //             $group: {
+    //                 _id: {
+    //                         $month: "$createdAt"
+    //                 },
+    //                 revenueData: {
+    //                     $sum: "$orderAmount"
+    //                 },
+    //                 salesData: {
+    //                     $sum: 1
+    //                 }
+    //             }
+    //         }
+    //     ])
+    //     console.log(sales);
+
+    if (filter === "weekly") {      
+        
+        let month = getMonthNumber(time);
+        console.log("This is montyht  mnumber",month)
+        
+
+        const startOfMonth = new Date(2024, month, 1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        const endOfMonth = new Date(2024, month + 1, 0);
+        endOfMonth.setHours(23, 59, 59, 999);
+        console.log("This is the start of month and end", startOfMonth, endOfMonth)
+
+        const differenceInMilliseconds = endOfMonth.getTime() - startOfMonth.getTime();
+        // Define the number of milliseconds in a week
+        const millisecondsInWeek = 7 * 24 * 60 * 60 * 1000;
+        // Calculate the number of weeks
+        const numberOfWeeks = Math.ceil(differenceInMilliseconds / millisecondsInWeek);
+        console.log("Number of weeks:", numberOfWeeks);
+    
+        for (let i = 1; i <= numberOfWeeks; i++) {
+            salesData.labels.push(`week${i}`);
+        }
+        
+      
+    
         const sales = await Order.aggregate([
             {
                 $match: {
-                    $month: time
+                    createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+                }
+            },
+            {
+                $group: {
+                    _id: { $week: "$createdAt" },
+                    revenueData: { $sum: "$orderAmount" },
+                    salesData: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id": 1 } 
+            }
+        ]);
+
+        const products = await Product.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startOfMonth, $lte: endOfMonth }
                 }
             },
             {
                 $group: {
                     _id: {
-                            $month: "$createdAt"
+                        $year: "$createdAt"
                     },
-                    revenueData: {
-                        $sum: "$orderAmount"
-                    },
-                    salesData: {
+                    productsData: {
                         $sum: 1
                     }
                 }
+            },
+            {
+                $sort: {
+                    "_id": 1 
+                }
             }
         ])
-        console.log(sales);
+    
+        // Populate the salesData object
+        // sales.forEach(item => {
+        //     // Store the data in the salesDataById object
+        //     salesData = {
+        //         revenueData: item.revenueData,
+        //         salesData: item.salesData,
+        //         labels: `week${item._id}`
+        //     };
+            
+           
+        // });
+        // sales.forEach((item) => {            
+        //     salesData.labels.forEach((salesData) => {
+        //         console.log("sales data",key)
+        //         if (`week${item._id}` == salesData ) {
+        //             console.log("Entered if condidtion",item._id)
+        //             salesData.salesData = item.salesData;
+        //             salesData.revenueDate = item.revenueData;
+        //         }else{
+        //             salesData = 0
+        //         }
+        //     })
+        // });
+        salesData.salesData = sales.map((item) => item.salesData);
+        salesData.revenueData = sales.map((item) => item.revenueData/1000);
+        salesData.productsData = products.map((item) => item.productsData);
+    
+        console.log("This is the data of sales ",sales, salesData);   
+        res.json(salesData) 
+
     }else if(filter === "monthly"){
         salesData.labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const contraints = {
@@ -469,7 +587,7 @@ const graphData = asyncHandler( async (req,res)=>{
             },
             {
                 $sort: {
-                    "_id": 1 // Sort by month in ascending order
+                    "_id": 1
                 }
             }
         ])
@@ -499,7 +617,6 @@ const graphData = asyncHandler( async (req,res)=>{
         salesData.revenueData = sales.map((item) => item.revenueData/1000);
         salesData.productsData = products.map((item) => item.productsData);
 
-        console.log("this is sales data ",sales, products);
     }else{
         console.log("Entered else condition");
         salesData.labels = [`${time-10}`, `${time-9}`, `${time-8}`, `${time-7}`, `${time-6}`, `${time-5}`, `${time-4}`, `${time-3}`, `${time-2}`, `${time-1}`, `${time}`];
@@ -554,23 +671,32 @@ const graphData = asyncHandler( async (req,res)=>{
                 }
             }
         ])
-        console.log(sales);
-        let array;
-        sales.forEach((item) => {
-            salesData.labels.forEach((salesData) => {
-                console.log("sales data",salesData)
-                if (item._id == salesData ) {
-                   console.log("Entered if condidtion",item._id)
-                  array.push(item.salesData)
+
+        for(let key of sales){
+            console.log("this is ind", key)
+            for(let data of salesData.labels){
+                console.log("iteratong", data)                
+                if (key._id == data) {                        
+                    salesData.salesData.push(key.salesData) 
+                    salesData.revenueData.push(key.revenueData/1000)
                 }else{
-                   array.push(0)
-                }
-            })
-        });
-        console.log(array)
-        salesData.revenueData = sales.map((item) => item.revenueData/1000);
-        salesData.productsData = products.map((item) => item.productsData);
-        console.log("thisafdfafa",salesData.revenueData, salesData.productsData);
+                    salesData.salesData.push(0)
+                    salesData.revenueData.push(0)
+                }                    
+            }            
+        }
+        for(let key of products){
+            console.log("this is ind", key)
+            for(let data of salesData.labels){
+                console.log("iteratong", data)                
+                if (key._id == data) {                        
+                    salesData.productsData.push(key.productsData) 
+                }else{
+                    salesData.productsData.push(0)
+                }                    
+            }            
+        }
+
     }
     
     res.json(salesData)
@@ -697,11 +823,61 @@ const categoryPage = asyncHandler( async(req,res)=>{
 
       });
 
+    const bestSellingCategories = await Order.aggregate([
+        {
+          $unwind: "$orderedItems" // Deconstruct the orderedItems array
+        },
+        {
+          $lookup: {
+            from: "productvarients",
+            localField: "orderedItems.productVarientId",
+            foreignField: "_id",
+            as: "productVariant"
+          }
+        },
+        {
+          $unwind: "$productVariant"
+        },
+        {
+          $lookup: {
+            from: "products",
+            localField: "productVariant.product_id",
+            foreignField: "_id",
+            as: "product"
+          }
+        },
+        {
+          $unwind: "$product"
+        },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "product.category",
+            foreignField: "_id",
+            as: "category"
+          }
+        },
+        {
+          $unwind: "$category"
+        },
+        {
+          $group: {
+            _id: "$category.category", // Assuming category has a "name" field
+            totalSoldQuantity: { $sum: "$orderedItems.quantity" }
+          }
+        },
+        {
+          $sort: { totalSoldQuantity: -1 }
+        }
+      ]);
+      
+      console.log("Best selling categories:", bestSellingCategories);
 
-      console.log(updatedCategory);
+
+      //console.log(updatedCategory);
     res
     .status(200)
-    .render("admin/category",{ admin:true, title:"Urbane Wardrobe", category:updatedCategory});
+    .render("admin/category",{ admin:true, title:"Urbane Wardrobe", category:updatedCategory, bestSellingCategories});
 })
 
 const addCategory = asyncHandler( async(req,res)=>{

@@ -13,6 +13,7 @@
                     <form action="/api/v1/verifyotp" method="post" id="otpForm">
                         <div class="d-flex">
                             <input type="hidden" class="form-control p-3" id="userid" name="userId" value="{{userId}}">
+                            <input type="hidden" class="form-control p-3" id="forgotpass" name="forgotpassword" value="true">
                             <div class="form-group me-2 p-2">
                             <input type="text" class="form-control p-3 otp-input" id="otp1" name="otp1" maxlength="1" required>
                             </div>

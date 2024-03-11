@@ -78,7 +78,6 @@ hbs.registerHelper('generateCancelButton', function(input1) {
     return new hbs.SafeString('<a data-id="{{this._id}}" class="btn btn-danger cancelButton me-3 ">Cancel</a>');
   }
 });
-
 hbs.registerHelper('formatDate', function(isoDate) {
       const date = new Date(isoDate);
       const day = ('0' + date.getDate()).slice(-2);
@@ -86,7 +85,6 @@ hbs.registerHelper('formatDate', function(isoDate) {
       const year = date.getFullYear();
       return `${day}/${month}/${year}`;
     });
-
 hbs.registerHelper('add', function(value1, value2) {
   value1 = parseInt(value1);
   value2 = parseInt(value2);
