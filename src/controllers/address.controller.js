@@ -114,8 +114,9 @@ const editAddressPage = asyncHandler(async(req,res)=>{
 
 const editAddress = asyncHandler( async(req,res)=>{
     console.log(req.body)
-    const { addressid, fullname, phone, type, street, locality, district, state, pinCode} = req.body;
-    const userid = req.user._id    
+    const { addressid, fullName, phone, type, street, locality, district, state, pinCode} = req.body;
+    const userid = req.user._id   
+     
     
     const address = await Address.updateOne(
         {
@@ -124,7 +125,7 @@ const editAddress = asyncHandler( async(req,res)=>{
         {
             $set : {
                 userid,
-                fullname,
+                fullname: fullName,
                 phone,
                 type,
                 street, 

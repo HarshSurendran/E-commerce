@@ -103,7 +103,7 @@ const editCouponPage = asyncHandler( async(req,res)=>{
 
 const editCoupon = asyncHandler( async(req,res)=>{
     const {_id, name, code, description, userlimit, expiryDate, discount, minamount} = req.body;   
-    console.log("this is expery date", expiryDate);
+    
 
     const coupon = await Coupon.findOne({_id: _id});
     if(!coupon){

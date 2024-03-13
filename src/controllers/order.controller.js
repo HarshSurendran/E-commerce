@@ -1179,15 +1179,44 @@ const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
 
     const order = orderVarients[0];
     let subTotal = 0;
-    orderVarients.forEach((order)=>{
-        subTotal = subTotal + (order.productVarient.price * order.orderedItems.quantity)
-    })
+    // orderVarients.forEach((order)=>{  
+    //     console.log("this is inside map", order.productVarient.product.category?.category);
+    //     const offer = await checkOffer(order.productVarient.product.category?.category);
+    //     if (offer) {
+    //         // productVarient.originalprice = productVarient.price;
+    //         order.productVarient.price = applyOffer(Order.productVarient.price, offer.discount);
+    //         order.offerApplied = true;
+    //         console.log("this is price after applying offer", order.productVarient.price);
+    //     }
+    //     subTotal = subTotal + (order.productVarient.price * order.orderedItems.quantity)
+    // })
+    for (const order of orderVarients) {
+        console.log("This is inside the loop:", order.productVarient.product.category?.category);    
+        try {
+          const offer = await checkOffer(order.productVarient.product.category?.category);
+    
+          if (offer) {
+            order.productVarient.originalPrice = order.productVarient.price;    
+            order.productVarient.price = applyOffer(order.productVarient.price, offer.discount);
+            order.offerApplied = true;
+            console.log("Price after applying offer:", order.productVarient.price);
+          }
+
+        } catch (error) {          
+          console.error("Error checking offer:", error);
+        }    
+        subTotal += order.productVarient.price * order.orderedItems.quantity;
+        console.log("This is subtotal", subTotal)
+    }
     const coupon = await Coupon.findOne({code: order.couponCode});
 
-    let total = parseInt(subTotal);
+    let total = parseInt(subTotal);    
     if (coupon) {
         total = parseInt(subTotal) - parseInt(coupon.discount); 
     }
+    total = total + parseInt(order.deliveryCharge);
+    console.log("this is total", total);
+    console.log("Thisis order", order);
     
     res
     .status(200)
@@ -1358,7 +1387,23 @@ const renderInvoice = asyncHandler( async(req,res)=>{
     
     ]);
 
-    console.log("invboice page  prodcuts", products)
+    for (const prod of products) {
+        console.log("This is inside the loop:", prod.productvarient.product.category?.category);    
+        try {
+          const offer = await checkOffer(prod.productvarient.product.category?.category);
+    
+          if (offer) {
+            prod.productvarient.originalPrice = prod.productvarient.price;    
+            prod.productvarient.price = applyOffer(prod.productvarient.price, offer.discount);
+            prod.offerApplied = true;
+            console.log("Price after applying offer:", prod.productvarient.price);
+          }
+
+        } catch (error) {          
+          console.error("Error checking offer:", error);
+        }    
+    }
+    console.log("invboice page  prodcuts", products, "thus us order" ,order)
     res
     .status(200)
     .render("users/invoice",{user: req.user, title:"Urbane Wardrobe", order, products, wishlistCountlayout, categorylayout, cartCountlayout});

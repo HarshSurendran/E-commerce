@@ -126,6 +126,11 @@
                         <div class="invoice-price-left">
                             <div class="invoice-price-row">
                                 <div class="sub-price">
+                                    <small>DELIVERY :</small>
+                                    <span class="text-inverse">₹ {{order.deliveryCharge}}</span>
+                                </div>
+
+                                <div class="sub-price">
                                     <small>SUBTOTAL :</small>
                                     <span class="text-inverse">₹ {{add order.orderAmount order.couponDiscount}}</span>
                                 </div>
