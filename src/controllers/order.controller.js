@@ -750,9 +750,6 @@ const renderOrderDetailsPage = asyncHandler( async(req,res)=>{
 
     const order = orderVarients[0];
     let subTotal = 0;
-    // orderVarients.forEach((order)=>{
-    //     subTotal = subTotal + (order.productVarient.price * order.orderedItems.quantity)
-    // })
     for (const order of orderVarients) {   
         try {
           const offer = await checkOffer(order.productVarient.product.category?.category);
@@ -1200,17 +1197,7 @@ const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
 
     const order = orderVarients[0];
     let subTotal = 0;
-    // orderVarients.forEach((order)=>{  
-    //     console.log("this is inside map", order.productVarient.product.category?.category);
-    //     const offer = await checkOffer(order.productVarient.product.category?.category);
-    //     if (offer) {
-    //         // productVarient.originalprice = productVarient.price;
-    //         order.productVarient.price = applyOffer(Order.productVarient.price, offer.discount);
-    //         order.offerApplied = true;
-    //         console.log("this is price after applying offer", order.productVarient.price);
-    //     }
-    //     subTotal = subTotal + (order.productVarient.price * order.orderedItems.quantity)
-    // })
+   
     for (const order of orderVarients) {
         console.log("This is inside the loop:", order.productVarient.product.category?.category);    
         try {
@@ -1290,7 +1277,7 @@ const returnOrder = asyncHandler( async(req,res)=>{
     order.returnPeriod = false;
     order.status = "Returned";
     await order.save();    
-    //put the amount to wallet
+    
     if (order.paymentStatus === "Paid") {
         const wallet = await Wallet.updateOne(
             {

@@ -45,22 +45,6 @@
     </div>
     <!-- Offcanvas Menu End -->
 
-    {{!-- <!-- Breadcrumb Begin -->
-    <div class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__links">
-                        <a href="./index.html"><i class="fa fa-home"></i> Home</a>
-                        <a href="#">Women’s </a>
-                        <span>Essential structured blazer</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Breadcrumb End --> --}}
-
     <!-- Product Details Section Begin -->
     <section class="product-details spad">
         <div class="container">
@@ -109,27 +93,28 @@
                         {{/if}}
                         <p>{{product.name.about}}</p>
                         <div class="product__details__button">
-                            {{!-- <div class="quantity">
-                                <span>Quantity:</span>
-                                <div class="pro-qty">
-                                    <input type="text" value="1">
-                                </div>
-                            </div> --}}
                             {{#if product.isOutOfStock}}
                             <button id="outofstock" data-id="{{product._id}}" class="cart-btn border-0 " disabled><span class="icon_bag_alt"></span> Out of Stock</button>
                             {{else}}
                             {{#if cart}}
                             <a id="alreadyInCart" style="background-color: #4CAF50 ;" data-id="{{product._id}}" href="/api/v1/users/cart" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Go to Cart</a>
                             {{else}}
-                            <button id="addtocartbutton" data-id="{{product._id}}" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Add to cart</button>
+                                {{#if user}}
+                                    <button id="addtocartbutton" data-id="{{product._id}}" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Add to cart</button>
+                                {{else}}
+                                    <a href="/api/v1/login" class="cart-btn border-0 "><span class="icon_bag_alt"></span> Login</a>
+                                {{/if}}
                             {{/if}}
                             <ul class="ps-0">
                                 {{#if product.isWishlisted}}
                                 <li id="wishlist" class="wishlist" data-id="{{product._id}}" ><a href="#" style="background-color: red"><span style="color:white" class="icon_heart_alt" ></span></a></li>
                                 {{else}}
-                                 <li id="wishlist" class="wishlist" data-id="{{product._id}}" ><a href="#" ><span class="icon_heart_alt"></span></a></li>
+                                    {{#if user}}
+                                        <li id="wishlist" class="wishlist" data-id="{{product._id}}" ><a href="#" ><span class="icon_heart_alt"></span></a></li>
+                                    {{else}}
+                                        <li class="wishlist" ><a href="/api/v1/login" ><span class="icon_heart_alt"></span></a></li>
+                                    {{/if}}
                                 {{/if}}
-                                {{!-- <li><a href="#"><span class="icon_adjust-horiz"></span></a></li> --}}
                             </ul>
                             {{/if}}
                             
@@ -155,23 +140,11 @@
                                             <span style="background-color: {{this.color.color}}; border: 1px solid black; " class="checkmark {{this.color.color}}-bg"></span></a>
                                         </label>
                                         {{/each}}
-                                        {{!-- <label for="black">
-                                            <input type="radio" name="color__radio" id="black">
-                                            <span class="checkmark black-bg"></span>
-                                        </label>
-                                        <label for="grey">
-                                            <input type="radio" name="color__radio" id="grey">
-                                            <span class="checkmark grey-bg"></span>
-                                        </label> --}}
                                     </div>
                                 </li>
                                 <li>
                                     <span>Available size:</span>
                                     <div class="size__btn">
-                                        {{!-- <label for="xs-btn" class="active">
-                                            <input type="radio" id="xs-btn">
-                                            xs
-                                        </label> --}}
                                         <label for="s-btn">
                                             <input type="radio" id="s-btn">
                                             s
@@ -210,42 +183,16 @@
                         <div class="tab-content">
                             <div class="tab-pane active" id="tabs-1" role="tabpanel">
                                 <h6>Description</h6>
-                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
-                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
-                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
-                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
-                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
-                                consequat massa quis enim.</p>
-                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
-                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
-                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
-                                quis, sem.</p>
+                                <p>Discover a diverse range of clothing products that blend comfort, quality, and style seamlessly. From timeless classics to the latest trends, our collection offers something for every occasion and personal style. Explore a curated selection of tops, bottoms, dresses, outerwear, and accessories crafted from premium materials and designed to elevate your wardrobe effortlessly. Whether you're dressing for work, leisure, or special events, find the perfect pieces to express your individuality and make a statement with every outfit.</p>
+                                <p></p>
                             </div>
                             <div class="tab-pane" id="tabs-2" role="tabpanel">
                                 <h6>Specification</h6>
-                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
-                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
-                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
-                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
-                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
-                                consequat massa quis enim.</p>
-                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
-                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
-                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
-                                quis, sem.</p>
+                                <p>Explore our wide selection of clothing products featuring various sizes, colors, and styles to suit every preference and occasion. Our products are meticulously crafted from high-quality materials, ensuring durability, comfort, and style. From casual essentials to formal attire, our collection caters to diverse tastes and needs. Browse through our range of tops, bottoms, dresses, outerwear, and accessories, each designed with attention to detail and fashion-forward aesthetics. Elevate your wardrobe with our versatile and trendy clothing options that promise to enhance your everyday style.</p>
                             </div>
                             <div class="tab-pane" id="tabs-3" role="tabpanel">
                                 <h6>Reviews ( 2 )</h6>
-                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
-                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
-                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
-                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
-                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
-                                consequat massa quis enim.</p>
-                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
-                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
-                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
-                                quis, sem.</p>
+                                <p>Overall, our collection offers an extensive range of products designed to meet various style preferences and occasions. With a focus on quality craftsmanship and attention to detail, each item in our selection promises durability and style. From everyday essentials to statement pieces, our range of tops, bottoms, dresses, outerwear, and accessories caters to diverse needs and tastes. Customers can expect versatility, comfort, and on-trend designs that elevate their wardrobe effortlessly. With a commitment to providing quality products that stand the test of time, we aim to offer a seamless shopping experience for all our customers.</p>
                             </div>
                         </div>
                     </div>
@@ -263,7 +210,8 @@
                 <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product__item">
                         <div class="product__item__pic set-bg" data-setbg="/img/product/related/rp-1.jpg">
-                            <div class="label new">New</div>
+                            <div class="label new">New</div>\
+                            <div class="label stockout">out of stock</div>
                             <ul class="product__hover">
                                 <li><a href="img/product/related/rp-1.jpg" class="image-popup"><span class="arrow_expand"></span></a></li>
                                 <li><a href="#"><span class="icon_heart_alt"></span></a></li>
@@ -279,13 +227,14 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">₹ 59.0</div>
+                            <div class="product__price">₹ 599.0</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product__item">
                         <div class="product__item__pic set-bg" data-setbg="/img/product/related/rp-2.jpg">
+                        <div class="label stockout">out of stock</div>
                             <ul class="product__hover">
                                 <li><a href="img/product/related/rp-2.jpg" class="image-popup"><span class="arrow_expand"></span></a></li>
                                 <li><a href="#"><span class="icon_heart_alt"></span></a></li>
@@ -301,7 +250,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">₹ 49.0</div>
+                            <div class="product__price">₹ 499.0</div>
                         </div>
                     </div>
                 </div>
@@ -324,13 +273,14 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">₹ 59.0</div>
+                            <div class="product__price">₹ 599.0</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product__item">
                         <div class="product__item__pic set-bg" data-setbg="/img/product/related/rp-4.jpg">
+                        <div class="label stockout">out of stock</div>
                             <ul class="product__hover">
                                 <li><a href="img/product/related/rp-4.jpg" class="image-popup"><span class="arrow_expand"></span></a></li>
                                 <li><a href="#"><span class="icon_heart_alt"></span></a></li>
@@ -346,7 +296,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">₹ 59.0</div>
+                            <div class="product__price">₹ 599.0</div>
                         </div>
                     </div>
                 </div>
@@ -355,10 +305,6 @@
         </div>
     </section>
     <!-- Product Details Section End -->
-
-
-    
-
     <!-- Search Begin -->
     <div class="search-model">
         <div class="h-100 d-flex align-items-center justify-content-center">
@@ -419,6 +365,7 @@
     wishlistButton.addEventListener("click", function addWishlist(event){
         event.preventDefault();
         event.stopPropagation();
+        console.log("Thisis wishlist")
         
         const productId = wishlistButton.getAttribute("data-id");
         console.log("this is productid",productId);

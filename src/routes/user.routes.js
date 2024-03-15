@@ -15,21 +15,14 @@ const auth = require("../middlewares/auth.middleware.js");
 const insertUser = require("../middlewares/insertUser.middleware.js");
 const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 
+
 //routes starts
-
-router.get("/test", auth.verifyUserJWT, productController.bestSellerProducts)
-
-
 
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
 router.post("/verify-otp", userController.verifyOtp, userController.verifiedUserLogin);
 router.post("/resendotp", otpGenerator, userController.resendotpsender);
-//router.post("/signup", userController.loginUser);
-//router.get("/product-list", userController.allproductlist)
 router.post("/forgotpassword", userController.getUserId, otpGenerator, userController.forgotPassOtpSender);
 router.post("/changepassword", userController.changePassFromOtp);
-
-
 router.get("/home", auth.verifyUserJWT, userController.homePageRender);
 
 //coupons
@@ -53,7 +46,6 @@ router.patch("/userdetails", auth.verifyUserJWT, userController.updateUserDetail
 router.patch("/password", auth.verifyUserJWT, userController.changeCurrentPassword);
 router.get('/getuser', auth.verifyUserJWT, userController.getCurrentUser);
 
-
 //user profile
 router.get("/profile", auth.verifyUserJWT, userController.renderProfilePage);
 router.get("/delete-user/:id", auth.verifyUserJWT, userController.deleteUser);
@@ -74,7 +66,6 @@ router.patch("/orders", auth.verifyUserJWT, userController.updateWallet, orderCo
 router.patch("/returnorders", auth.verifyUserJWT,  orderController.returnOrder);
 router.get("/orders/:id", auth.verifyUserJWT,  orderController.renderUserOrderDetailsPage);
 
-
 //checkout
 router.post("/deliverycharge", auth.verifyUserJWT, orderController.calcDelCharge)
 router.post("/checkout", auth.verifyUserJWT, orderController.checkOutPage);
@@ -83,13 +74,11 @@ router.post("/orderplaced", auth.verifyUserJWT, orderController.createOrder);
 router.get("/ordersuccess/:id", auth.verifyUserJWT, orderController.orderSuccessPage);
 router.post("/verifyPayment", auth.verifyUserJWT, orderController.verifyPayment);
 
-
 //pay later
 router.post("/paylater", auth.verifyUserJWT, orderController.payLater);
 
 //invoice
 router.get("/invoice/:id", auth.verifyUserJWT, orderController.renderInvoice);
-
 
 //wallet
 router.get("/wallet", auth.verifyUserJWT, userController.renderWalletPage);
@@ -103,8 +92,5 @@ router.get("/offers", auth.verifyUserJWT, offerController.renderUserOffersPage);
 //filters
 router.get("/filter/price/:min/:max", auth.verifyUserJWT , productController.filterByPrice);
 router.get("/filter/color/:color", auth.verifyUserJWT, productController.filterByColor);
-// router.post("/filter/brand", userController.filterByBrand);
-// router.post("/filter/category", userController.filterByCategory);
-
 
 module.exports = router;

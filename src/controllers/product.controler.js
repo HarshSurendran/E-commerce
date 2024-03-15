@@ -669,19 +669,14 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     const prodDetails = prod[0];
    
 
-    const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: prodDetails._id });
-    
+    const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: prodDetails._id });    
     if (isWishlisted) {
         prodDetails.isWishlisted = true;
     } else {
         prodDetails.isWishlisted = false;
-    }
-
+    }   
     
-    
-    
-    const mainProdId = prodDetails.name._id;
-    
+    const mainProdId = prodDetails.name._id;    
     if (prodDetails.stock < 1) {
         prodDetails.isOutOfStock = true;
     }
@@ -757,9 +752,7 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
         prodDetails.originalprice = prodDetails.price;
         prodDetails.price = applyOffer(prodDetails.price, offer.discount);
         prodDetails.offerApplied = true;
-    }   
-    
-    //add size logic here
+    }  
     
     res
     .status(200)
@@ -799,14 +792,14 @@ const categoryListPage = asyncHandler( async(req,res)=>{
     //data for layout
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
-    let wishlistlayout = await Wishlist.find({userId: req.user._id})
+    let wishlistlayout = await Wishlist.find({userId: req?.user?._id})
     wishlistlayout = wishlistlayout[0];
     if (wishlistlayout?.productsId.length) {
         wishlistlayout.productsId.forEach(element => {
             wishlistCountlayout++;
         });        
     }
-    const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
+    const cartCountlayout = await Cart.find({user_id: req?.user?._id}).countDocuments();
 
     const categoryProductList = await ProductVarient.aggregate(
         [   
@@ -892,7 +885,7 @@ const categoryListPage = asyncHandler( async(req,res)=>{
         if (element.stock < 1) {
             element.isOutofStock = true;            
         }
-        const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
+        const isWishlisted = await Wishlist.findOne({ userId: req?.user?._id, productsId: element._id });
         console.log("isWishlisted", isWishlisted);
         if (isWishlisted) {
             element.isWishlisted = true;
@@ -916,7 +909,6 @@ const categoryListPage = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    //.json( new ApiResponse(200, {mensProducts}, "fetched"))
     .render("users/categoryproductlist",{title:"Urbane Wardrobe", user: req.user, products: rearrangedProducts , categorylayout, wishlistCountlayout, cartCountlayout});
 });
 
@@ -1041,7 +1033,7 @@ const uploadImage = asyncHandler( async(req,res)=>{
 
 
         if(prodUpdate){
-            res.status(200).json(uploadedToCloudinary.url);
+            return res.status(200).json(uploadedToCloudinary.url);
         }
 
         res.status(500).json("Something went wrong");
@@ -1398,16 +1390,6 @@ const filterByColor = asyncHandler(async (req, res) => {
 });
 
 const bestSellerProducts = asyncHandler(async (req, res) => {
-    // const categorylayout = await Category.find({});
-    // let wishlistCountlayout = 0;
-    // let wishlistlayout = await Wishlist.find({userId: req.user._id})
-    // wishlistlayout = wishlistlayout[0];
-    // if (wishlistlayout?.productsId.length) {
-    //     wishlistlayout.productsId.forEach(element => {
-    //         wishlistCountlayout++;
-    //     });        
-    // }
-    // const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
 
     const product = await ProductVarient.aggregate(
         [   
@@ -1484,32 +1466,31 @@ const bestSellerProducts = asyncHandler(async (req, res) => {
         ]
         );          
             
-        const productList = await Promise.all(product.map(async (element) => {
-            if (element.stock < 1) {
-                element.isOutofStock = true;            
-            }
-            const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
-            if (isWishlisted) {
-                element.isWishlisted = true;
-            } else {
-                element.isWishlisted = false;
-            }
-            const offer = await checkOffer(element.name?.category?.category);
-            if (offer) {
-                element.originalprice = element.price;
-                element.price = applyOffer(element.price, offer.discount);
-                element.offerApplied = true;
-            }
-            return element; 
-        }));
+    const productList = await Promise.all(product.map(async (element) => {
+        if (element.stock < 1) {
+            element.isOutofStock = true;            
+        }
+        const isWishlisted = await Wishlist.findOne({ userId: req.user._id, productsId: element._id });
+        if (isWishlisted) {
+            element.isWishlisted = true;
+        } else {
+            element.isWishlisted = false;
+        }
+        const offer = await checkOffer(element.name?.category?.category);
+        if (offer) {
+            element.originalprice = element.price;
+            element.price = applyOffer(element.price, offer.discount);
+            element.offerApplied = true;
+        }
+        return element; 
+    }));
 
     console.log("products after filter", productList);
     
     return res
     .status(200)
     .json(new ApiResponse(200, {productList}, "fetched product data"))
-})
-
+});
 
 
 module.exports = {
@@ -1523,10 +1504,7 @@ module.exports = {
     deleteProduct,
     addProductVarientPage,
     productDetailsPage,
-    listUnlistProduct,
-    // menslistPage,
-    // womenslistPage,
-    // kidslistPage,
+    listUnlistProduct,    
     categoryListPage,
     productVarientDetailsPage,
     editProductVarientPage,

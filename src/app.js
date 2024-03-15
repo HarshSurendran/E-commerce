@@ -5,13 +5,11 @@ const path = require("path");
 const hbs = require("hbs");
 const nocache = require("nocache");
 const moment = require("moment");
-//const errorHandlingMiddleware = require("./middlewares/errorHandling.middleware.js")
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
 app.use(cookieParser());
-//app.use(errorHandlingMiddleware());
 
 //setup view-engine
 app.set('views', path.join(__dirname, 'views'));
@@ -84,7 +82,7 @@ hbs.registerHelper('formatDate', function(isoDate) {
       const month = ('0' + (date.getMonth() + 1)).slice(-2);
       const year = date.getFullYear();
       return `${day}/${month}/${year}`;
-    });
+});
 hbs.registerHelper('add', function(value1, value2) {
   value1 = parseInt(value1);
   value2 = parseInt(value2);
@@ -95,10 +93,8 @@ hbs.registerHelper('checkPending', function (paymentStatus){
     return "d-block";
   }
   return "d-none";
-})
-
+});
 app.use(nocache());
-
 
 //Require routes
 const userRouter = require("./routes/user.routes.js");
@@ -112,7 +108,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/products", productRouter);
 
-
+//page not found error
 app.use((req,res,next)=>{
   res
   .status(404)

@@ -1,16 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/product.controler.js");
+const commonController = require("../controllers/common.controller.js");
 const auth = require("../middlewares/auth.middleware.js");
 
-
 router.get("/:category", auth.verifyUserJWT, productController.categoryListPage);
-
-// router.get("/Mens", productController.menslistPage);
-
-// router.get("/Womens", productController.womenslistPage);
-
-// router.get("/Kids", productController.kidslistPage);
 
 router.get("/list/all", auth.verifyUserJWT,  productController.listProducts);
 

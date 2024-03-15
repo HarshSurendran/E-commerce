@@ -7,7 +7,6 @@ const User = require("../models/user.models.js");
 const mongoose = require("mongoose");
 
 const renderHomePage = asyncHandler( async(req,res)=>{
-
     const productList = await ProductVarient.aggregate(
         [   
             {
@@ -92,10 +91,8 @@ const renderRegisterPage = asyncHandler( async(req,res)=>{
 });
 
 const productDetailsPage = asyncHandler( async(req,res)=>{
-
     const prodId = req.params.id;
-    console.log("This is the product id to productdetails",prodId);
-   
+    console.log("This is the product id to productdetails",prodId);   
 
     const prod = await ProductVarient.aggregate([
         {
@@ -164,13 +161,8 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
     if(!prod){
         throw new ApiError(400,"Bad request prod id is not valid");
     }
-
-    const prodDetails = prod[0];
-    console.log(prodDetails);
-
-    const mainProdId = prodDetails.name._id;
-
-    console.log("Thisis mainprod id",mainProdId);
+    const prodDetails = prod[0];    
+    const mainProdId = prodDetails.name._id;    
     
     const prodVarients = await ProductVarient.aggregate([
         {
@@ -235,8 +227,6 @@ const productDetailsPage = asyncHandler( async(req,res)=>{
             }
         }
     ]);
-    //lookupthe color and size etc
-    console.log("Thisi s the prodvarients",prodVarients);
 
     res
     .status(200)
@@ -312,7 +302,7 @@ const listProducts = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    .render("common/guestlistproducts",{common:true, products: productList});
+    .render("common/guestlistproducts",{common:true, products: productList, title:"Urbane Wardrobe"});
 });
 
 const checkEmail = asyncHandler( async(req,res)=>{
@@ -321,8 +311,7 @@ const checkEmail = asyncHandler( async(req,res)=>{
 
     const emailExist = await User.findOne({email}).select("-password -refreshtoken -createdAt -updatedAt");
 
-    if(emailExist){
-        // throw new ApiError(400,"Email already exists");
+    if(emailExist){        
         return res
         .status(400)
         .json( new ApiError(400,"Email already exist"));
@@ -339,8 +328,7 @@ const checkPhone = asyncHandler( async(req,res)=>{
 
     const phoneExist = await User.findOne({phone}).select("-password -refreshtoken -createdAt -updatedAt");
 
-    if(phoneExist){
-        // throw new ApiError(400,"Email already exists");
+    if(phoneExist){        
         return res
         .status(400)
         .json( new ApiError(400,"Phone already exist"));
@@ -352,10 +340,97 @@ const checkPhone = asyncHandler( async(req,res)=>{
 });
 
 const changePasswordPage = asyncHandler( async(req,res)=>{
-    userId = req.user;
+    let userId = req.user;
     console.log("this is change pass page",userId);
     res.render("changepassword",{common:true, title:"Urbane Wardrobe", userId});
-})
+});
+
+const guestCatListPage = asyncHandler(async (req,res)=>{
+    const category = req.query.cat   
+    const categoryProductList = await ProductVarient.aggregate(
+        [   
+            {
+                $lookup: {
+                    from: "products",
+                    localField : "product_id",
+                    foreignField : "_id",
+                    as: "name",
+                    pipeline: [
+                        {
+                            $match: {
+                                islisted : true,
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "categories",
+                                localField: "category",
+                                foreignField: "_id",
+                                as: "category",
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            category: category
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            $addFields: {
+                                category: { $first: "$category" }
+                            }
+                        }
+                    ]
+                }        
+            },
+            {
+                $lookup: {
+                    from: "colors",
+                    localField : "color_id",
+                    foreignField : "_id",
+                    as: "color"
+                } 
+            },
+            {
+                $lookup: {
+                    from: "sizes",
+                    localField : "size_id",
+                    foreignField : "_id",
+                    as: "size"
+                } 
+            },
+            {            
+                $addFields : {
+                    name : { $first: "$name" },
+                    color : { $first: "$color"},
+                    size : { $first: "$size" },
+                }                       
+            },
+            {
+                $project : {
+                    name:1,
+                    color:1,
+                    size:1,
+                    images:1,
+                    stock:1,
+                    price:1
+                }
+            }
+        ]
+        );
+        
+    const products = categoryProductList.filter((element)=>{
+        if(element.name?.category){
+            return true
+        }
+        return false
+    });
+
+    res
+    .status(200)
+    .render("common/guestlistproducts",{common:true, products, title:"Urbane Wardrobe"});
+});
 
 module.exports= {
     renderHomePage,
@@ -365,5 +440,6 @@ module.exports= {
     listProducts,
     checkEmail,
     checkPhone,
-    changePasswordPage
+    changePasswordPage,
+    guestCatListPage
 }

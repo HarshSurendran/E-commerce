@@ -160,9 +160,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-                {{!-- <div>
-                Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
-                </div> --}}
+               
                 <div class="dropdown mt-3">
                     <button class="btn btn-secondary dropdown-toggle w-100 " type="button" data-bs-toggle="dropdown">
                         Prize Range
@@ -237,7 +235,6 @@
         });
     });
 
-
     //redirecting to prodetails page
     const prodDetailDiv = document.querySelectorAll(".prodDetailsDiv");
     prodDetailDiv.forEach((element)=>{
@@ -284,38 +281,4 @@
             })
         })
     })
-
-    //Filtering
-    /*const colorDropdownMenu = document.getElementById('colorDropdown');
-    colorDropdownMenu.addEventListener('click', (event) => {
-        console.log("entered dropdown", event.target);
-    if (event.target.tagName === 'LI' || event.target.tagName === 'A') {
-
-        const min = event.target.getAttribute('data-min');
-        const max = event.target.getAttribute('data-max');
-        const color = event.target.getAttribute('data-color');
-        
-        if(color){
-            console.log(`Color: ₹{color}`);
-            /*fetch(`/api/v1/products/filter/color`,{
-                method : "POST",
-                headers : {
-                    "content-type" : "application/json"
-                },
-                body : JSON.stringify({
-                    color
-                })
-            })
-            .then( res=> res.json())
-            .then((data)=>{
-                
-            })
-            fetch(`/api/v1/users/filter/color/₹{color}`)
-        }
-        console.log(`Min: ₹{min}, Max: ₹{max}`);
-        
-        // You can perform further actions based on the min and max values
-    }
-});*/
-
 </script>

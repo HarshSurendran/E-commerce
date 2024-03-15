@@ -49,8 +49,7 @@ const addToCart = asyncHandler( async(req, res)=>{
 });
 
 const renderCartPage = asyncHandler( async(req,res)=>{
-    const user = req.user;
-    
+    const user = req.user;    
     //layout data
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
@@ -62,8 +61,7 @@ const renderCartPage = asyncHandler( async(req,res)=>{
         });        
     }
     const cartCountlayout = await Cart.find({user_id: req.user._id}).countDocuments();
-    //layout data end
-    
+    //layout data end    
 
     const cart = await Cart.aggregate([
             {
@@ -132,9 +130,7 @@ const renderCartPage = asyncHandler( async(req,res)=>{
                     productVarient_id: { $first: "$productVarient_id" },
                 }
             }
-        ])
-
-    
+        ])    
 
     let total = 0;
     for (const element of cart) {
@@ -177,8 +173,6 @@ const addQuantity = asyncHandler( async(req,res)=>{
         .status(500)
         .json( new ApiResponse(500,"Stock exceeded. Try with lesser quantity"));
     }
-
-    //cart.productVarient_id.stock = cart.productVarient_id.stock - quantity
 
     const updateCart = await Cart.updateOne(
         {

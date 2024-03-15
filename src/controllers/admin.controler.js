@@ -93,7 +93,6 @@ const task = cron.schedule('30 11 * * *', () =>
 );
 task.start();
 
-
 const generateAccessAndRefreshToken = async (adminid)=>{
     try{
         const admin = await Admin.findOne({_id:adminid});    
@@ -437,130 +436,9 @@ const graphData = asyncHandler( async (req,res)=>{
         "revenueData": [],
         "productsData": []
     }
-    const { filter, time } = req.body
-    console.log("this is filter and time", filter, time);
+    const { filter, time } = req.body    
 
-    // if (filter === "weekly") {
-    //     salesData.labels = ["week1", "week2", "week3", "week4", "week5"];
-    //     const sales = await Order.aggregate([
-    //         {
-    //             $match: {
-    //                 $month: time
-    //             }
-    //         },
-    //         {
-    //             $group: {
-    //                 _id: {
-    //                         $month: "$createdAt"
-    //                 },
-    //                 revenueData: {
-    //                     $sum: "$orderAmount"
-    //                 },
-    //                 salesData: {
-    //                     $sum: 1
-    //                 }
-    //             }
-    //         }
-    //     ])
-    //     console.log(sales);
-
-    if (filter === "weekly") {      
-        
-        let month = getMonthNumber(time);
-        console.log("This is montyht  mnumber",month)
-        
-
-        const startOfMonth = new Date(2024, month, 1);
-        startOfMonth.setHours(0, 0, 0, 0);
-        const endOfMonth = new Date(2024, month + 1, 0);
-        endOfMonth.setHours(23, 59, 59, 999);
-        console.log("This is the start of month and end", startOfMonth, endOfMonth)
-
-        const differenceInMilliseconds = endOfMonth.getTime() - startOfMonth.getTime();
-        // Define the number of milliseconds in a week
-        const millisecondsInWeek = 7 * 24 * 60 * 60 * 1000;
-        // Calculate the number of weeks
-        const numberOfWeeks = Math.ceil(differenceInMilliseconds / millisecondsInWeek);
-        console.log("Number of weeks:", numberOfWeeks);
-    
-        for (let i = 1; i <= numberOfWeeks; i++) {
-            salesData.labels.push(`week${i}`);
-        }
-        
-      
-    
-        const sales = await Order.aggregate([
-            {
-                $match: {
-                    createdAt: { $gte: startOfMonth, $lte: endOfMonth }
-                }
-            },
-            {
-                $group: {
-                    _id: { $week: "$createdAt" },
-                    revenueData: { $sum: "$orderAmount" },
-                    salesData: { $sum: 1 }
-                }
-            },
-            {
-                $sort: { "_id": 1 } 
-            }
-        ]);
-
-        const products = await Product.aggregate([
-            {
-                $match: {
-                    createdAt: { $gte: startOfMonth, $lte: endOfMonth }
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        $year: "$createdAt"
-                    },
-                    productsData: {
-                        $sum: 1
-                    }
-                }
-            },
-            {
-                $sort: {
-                    "_id": 1 
-                }
-            }
-        ])
-    
-        // Populate the salesData object
-        // sales.forEach(item => {
-        //     // Store the data in the salesDataById object
-        //     salesData = {
-        //         revenueData: item.revenueData,
-        //         salesData: item.salesData,
-        //         labels: `week${item._id}`
-        //     };
-            
-           
-        // });
-        // sales.forEach((item) => {            
-        //     salesData.labels.forEach((salesData) => {
-        //         console.log("sales data",key)
-        //         if (`week${item._id}` == salesData ) {
-        //             console.log("Entered if condidtion",item._id)
-        //             salesData.salesData = item.salesData;
-        //             salesData.revenueDate = item.revenueData;
-        //         }else{
-        //             salesData = 0
-        //         }
-        //     })
-        // });
-        salesData.salesData = sales.map((item) => item.salesData);
-        salesData.revenueData = sales.map((item) => item.revenueData/1000);
-        salesData.productsData = products.map((item) => item.productsData);
-    
-        console.log("This is the data of sales ",sales, salesData);   
-        res.json(salesData) 
-
-    }else if(filter === "monthly"){
+    if(filter === "monthly"){
         salesData.labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const contraints = {
             $gte: new Date(`${time}-01-01T00:00:00.000Z`),
@@ -698,8 +576,10 @@ const graphData = asyncHandler( async (req,res)=>{
         }
 
     }
-    
-    res.json(salesData)
+
+    res
+    .status(200)
+    .json(salesData)
 });
 
 const renderSalesReportPage = asyncHandler(async (req, res) => {
@@ -775,8 +655,6 @@ const salesReportFilter = asyncHandler(async (req, res) => {
         }
     }
 
-
-
     const weeklyPaidOrders = await Order.aggregate([
         {
             $match: {
@@ -805,19 +683,18 @@ const categoryPage = asyncHandler( async(req,res)=>{
         throw new ApiError(500, "Couldnt fetch category data");
     }
 
-    const updatedCategory = category.map((element) => {
-        // Provided date string
+    const updatedCategory = category.map((element) => {       
         console.log(element)
         const dateString = element.createdAt;
         const dateObject = new Date(dateString);
         const day = dateObject.getDate();
-        const month = dateObject.getMonth() + 1; // Months are zero-indexed, so we add 1
+        const month = dateObject.getMonth() + 1; 
         const year = dateObject.getFullYear();
         const formattedDate = `${day}/${month}/${year}`;
         console.log(formattedDate);
         
         return {
-            ...element.toObject(), // Convert Mongoose model to plain JavaScript object
+            ...element.toObject(), 
             date: formattedDate,
         }
 
@@ -825,7 +702,7 @@ const categoryPage = asyncHandler( async(req,res)=>{
 
     const bestSellingCategories = await Order.aggregate([
         {
-          $unwind: "$orderedItems" // Deconstruct the orderedItems array
+          $unwind: "$orderedItems" 
         },
         {
           $lookup: {
@@ -869,12 +746,8 @@ const categoryPage = asyncHandler( async(req,res)=>{
         {
           $sort: { totalSoldQuantity: -1 }
         }
-      ]);
+      ]);      
       
-      console.log("Best selling categories:", bestSellingCategories);
-
-
-      //console.log(updatedCategory);
     res
     .status(200)
     .render("admin/category",{ admin:true, title:"Urbane Wardrobe", category:updatedCategory, bestSellingCategories});
@@ -883,8 +756,7 @@ const categoryPage = asyncHandler( async(req,res)=>{
 const addCategory = asyncHandler( async(req,res)=>{
     const {category} = req.body;
 
-    //const categoryExist = await Category.findOne({category});
-    const categoryExist = await Category.findOne({ category: { $regex: `^${category}$`, $options: 'i' } }); //checking without case sensitivity
+    const categoryExist = await Category.findOne({ category: { $regex: `^${category}$`, $options: 'i' } }); 
 
     if(categoryExist){
         throw new ApiError(400,"Category already exist");

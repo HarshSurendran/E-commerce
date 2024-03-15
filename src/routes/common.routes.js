@@ -21,7 +21,8 @@ router.post("/checkemail", commonController.checkEmail);
 
 router.post("/checkphone", commonController.checkPhone);
 
-router.post("/verifyotp", userController.verifyOtp, commonController.changePasswordPage)
+router.post("/verifyotp", userController.verifyOtp, commonController.changePasswordPage);
 
+router.get("/category", commonController.guestCatListPage);
 
 module.exports = router

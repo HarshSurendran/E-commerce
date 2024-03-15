@@ -97,11 +97,8 @@
                             </div>                        
                         </div>
                         <div class="col-lg-4">
-                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                            <p class="card-text">Our orders are processed meticulously for efficient and timely delivery.</p>
                         </div>
-                        {{!-- <div class="col-lg-2 d-flex d-column justify-content-center align-items-center">
-                        <a class="btn btn-danger cancelButton">Cancel</a>
-                        </div> --}}
                     </div>
                 </div>
                 {{/each}}
@@ -166,8 +163,7 @@
     
         const returnButton = document.querySelectorAll(".returnButton");
         returnButton.forEach((element) => {
-            element.addEventListener("click", (event) => {
-               //const conform = confirm("Are you sure you want to return this order?");
+            element.addEventListener("click", (event) => {               
                 Swal.fire({
                     title: "Are you sure?",
                     text: "You won't be able to revert this!",
@@ -175,7 +171,7 @@
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, delete"
+                    confirmButtonText: "Yes, Return"
                 }).then((result) => {
                     if (result.isConfirmed) { 
                         console.log("Entered fetch for retirn", event.target.dataset.id)
@@ -198,37 +194,9 @@
                                 return
                             }                       
                             showNotification("Return request failed");
-                        })    
-                        /*Swal.fire({
-                        title: "Deleted!",
-                        text: "Your file has been deleted.",
-                        icon: "success"                
-                        });*/                            
+                        })                 
                     }   
                 });
-               /*if(conform){
-                   console.log("Entered fetch for retirn", event.target.dataset.id)
-                   const orderId = event.target.dataset.id;
-                   fetch("/api/v1/users/returnorders", {
-                       method: "PATCH",
-                       headers: {
-                           "content-type": "application/json"
-                       },
-                       body: JSON.stringify({
-                           orderId
-                       })
-                   })
-                   .then(response => response.json())
-                   .then((data) => {
-                       console.log("this is response after return",data);
-                       if (data.success) {
-                           event.target.remove();
-                           showNotification("Return request initiated");
-                           return
-                       }                       
-                       showNotification("Return request failed");
-                   })
-               }*/
             })
         })
     </script>

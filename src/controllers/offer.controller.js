@@ -86,7 +86,6 @@ function applyOffer(price, discount){
     discountedAmount = Math.ceil(discountedAmount);
     return discountedAmount   
 }
-
 async function checkOffer(category){
     const categoryId = await Category.findOne({category});
     if (!categoryId) {

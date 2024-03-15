@@ -102,8 +102,7 @@ const editCouponPage = asyncHandler( async(req,res)=>{
 })
 
 const editCoupon = asyncHandler( async(req,res)=>{
-    const {_id, name, code, description, userlimit, expiryDate, discount, minamount} = req.body;   
-    
+    const {_id, name, code, description, userlimit, expiryDate, discount, minamount} = req.body; 
 
     const coupon = await Coupon.findOne({_id: _id});
     if(!coupon){
@@ -197,7 +196,6 @@ const editCoupon = asyncHandler( async(req,res)=>{
     .status(200)
     .redirect("/api/v1/admin/coupons");
 })
-
 
 module.exports = {
     renderCouponPage,

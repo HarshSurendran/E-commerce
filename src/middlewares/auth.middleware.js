@@ -7,8 +7,7 @@ const ProductVarient = require("../models/productvarient.models.js")
 
 const verifyUserJWT = asyncHandler( async(req,res,next)=>{
     let blocked;
-    try {
-        
+    try {        
         //getting token from request
         const token = req.cookies?.userAccessToken || req.header("Authorization")?.replace("Bearer ", "");
 
@@ -16,7 +15,6 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
             blocked = null
             throw new ApiError(401,"Unauthorised request");
         }
-
         // decoding the token and verifying it with user
         const decodedtoken = jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET);
 
@@ -36,8 +34,7 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
         req.user = user;
         next();       
         
-    } catch (error) {
-        // throw new ApiError(401,"Verification of JWT unsuccessful.",error)        
+    } catch (error) {                
         const options ={
             httpOnly:true,
             secure: true
@@ -112,11 +109,10 @@ const verifyUserJWT = asyncHandler( async(req,res,next)=>{
         res
         .status(400)
         .clearCookie("userAccessToken", options)
-        .clearCookie("RefreshToken", options)
-        //.redirect("/api/v1/");
+        .clearCookie("RefreshToken", options)        
         .render("landingPage", {common:true , title: "Urbane Wardrobe" , products: productList, blocked });
     }
-})
+});
 
 const verifyAdminJWT = asyncHandler( async(req,res,next)=>{
     try {
@@ -140,8 +136,7 @@ const verifyAdminJWT = asyncHandler( async(req,res,next)=>{
         req.admin = admin;
         next();       
         
-    } catch (error) {
-        // throw new ApiError(401,"Verification of JWT unsuccessful.",error)
+    } catch (error) {        
         const options ={
             httpOnly:true,
             secure: true
@@ -153,7 +148,7 @@ const verifyAdminJWT = asyncHandler( async(req,res,next)=>{
         .clearCookie("RefreshToken", options)
         .redirect("/api/v1/admin");
     }
-})
+});
 
 const checkUserJWT = asyncHandler( async(req,res,next)=>{
     try {

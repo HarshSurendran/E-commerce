@@ -16,12 +16,9 @@ const Otp = require("../models/otp.models.js");
 //controllers
 const { checkOffer, applyOffer } = require("./offer.controller");
 
-
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { default: mongoose } = require("mongoose");
-
-
 
 //Functions for use inside this file
 const generateAccessAndRefreshToken = async (userid)=>{
@@ -39,7 +36,6 @@ const generateAccessAndRefreshToken = async (userid)=>{
         throw new ApiError(200,"Something went wrong while creating Tokens")
     }
 }
-
 //declaration of nodemailer
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -48,73 +44,6 @@ const transporter = nodemailer.createTransport({
       pass: process.env.GOOGLEPASSWORD,
     },
 });
-
-// const registerUser = asyncHandler(async(req,res)=>{   
-//     console.log(req.body);
-//     const {fullname,phone,email,password} = req.body;
-//     console.log(fullname);
-
-//     //validation
-//     if(fullname.trim() === ""){
-//         throw new ApiError(400, "fullname is required")
-//     }else if(email.trim() === ""){
-//         throw new ApiError(400, "email is required")
-//     }else if(password.trim() === ""){
-//         throw new ApiError(400, "password is required")
-//     }
-//     let nameRegex = /^[A-Z]/
-//     if(!fullname.match(nameRegex)){
-//         throw new ApiError(400, "First name has to start with a capital letter")     
-//     }
-//     let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/       
-//     if(!email.match(emailRegex)){
-//         throw new ApiError(400, "Email is not valid")
-//     }
-
-//     const emailExist = await User.findOne({email})
-    
-//     if(emailExist){
-//         console.log("Details of existing email id", emailExist);
-//         throw new ApiError(409,"Email already exists");
-//     }
-    
-//     //file handling
-//     console.log(req.file);
-
-//     if(!req.file){
-//         throw new ApiError(500,"Image path is null");
-//     }
-
-//     const imageLocalPath = req.file?.path;
-    
-
-//     const imageUploaded = await uploadOnCloudinary(imageLocalPath);
-
-//     console.log("\n the response after image uploaded", imageUploaded);
-
-//     const user = await User.create({
-//         fullname,
-//         phone,
-//         email,
-//         password,
-//         image: imageUploaded?.url || ""
-//     });
-
-//     const createdUser = await User.findOne({_id: user._id}).select("-password -refreshtoken");
-
-//     if(!createdUser){
-//         throw new ApiError(500,"Error while registering a user");
-//     }
-
-//     return res
-//     .status(201)
-//     .json(new ApiResponse(
-//         200,
-//         createdUser,
-//         "User registered Successfully"
-//         )
-//     )
-// })
 
 const verifiedUserLogin = asyncHandler( async (req,res)=>{
 
@@ -142,20 +71,11 @@ const verifiedUserLogin = asyncHandler( async (req,res)=>{
         secure: true 
     }
 
-    // sending the tokens to browser through cookie
-
     return res.status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    // .json( new ApiResponse(
-    //     200,
-    //     {
-    //     user: userLoggedIn,accessToken,refreshToken
-    //     },
-    //     "User succesfully logged in"
-    // ));
+    .cookie("userAccessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)    
     .redirect("/api/v1/users/home");
-})
+});
 
 const loginUser = asyncHandler( async (req,res)=>{
     // steps needed:-
@@ -234,7 +154,7 @@ const loginUser = asyncHandler( async (req,res)=>{
         console.log("This is error",error.message);
         res.render("userlogin", {common:true , title: "Urbane Wardrobe", message: error.message});
     }
-})
+});
 
 const homePageRender = asyncHandler( async(req,res)=>{
     const categorylayout = await Category.find({});
@@ -366,7 +286,7 @@ const logoutUser = asyncHandler( async (req,res)=>{
     .clearCookie("RefreshToken", options)
     //.json(new ApiResponse(200,{},"User successfully logged out"));
     .render("landingPage", {common:true, title: "Urbane Wardrobe"});
-})
+});
 
 const refreshAccessToken = asyncHandler( async (req,res)=>{
     const incomingRefreshToken = req.cookies.refreshToken;
@@ -405,7 +325,7 @@ const refreshAccessToken = asyncHandler( async (req,res)=>{
         },
         "Access Token refreshed succesfully"
         ));
-})
+});
 
 const changeCurrentPassword = asyncHandler( async(req,res)=>{
     const {oldPassword, newPassword, confirmPassword} = req.body;
@@ -429,13 +349,13 @@ const changeCurrentPassword = asyncHandler( async(req,res)=>{
     .status(200)
     .json( new ApiResponse(200,{},"Password updated successfully"))   
     
-})
+});
 
 const getCurrentUser = asyncHandler( async(req,res)=>{    
     return res
     .status(200)
     .json( new ApiResponse(200,req.user,"User data retrival successfull"))
-})
+});
 
 const updateUserDetails = asyncHandler( async(req,res)=>{
 
@@ -463,7 +383,7 @@ const updateUserDetails = asyncHandler( async(req,res)=>{
         user,
         "User data updated successfully"
     ));
-})
+});
 
 const otpPageLoader = asyncHandler( async(req,res)=>{
     
@@ -493,7 +413,7 @@ const otpPageLoader = asyncHandler( async(req,res)=>{
     //     {},
     //     "Otp sent to email"
     // ))
-})
+});
 
 const allproductlist = asyncHandler( async(req,res)=>{
     const allProducts = await ProductVarient.aggregate({
@@ -513,7 +433,7 @@ const allproductlist = asyncHandler( async(req,res)=>{
     res.render("users/allproductlist", {product: allProducts})
 
 
-})
+});
 
 const addProfilepicture = asyncHandler( async(req,res)=>{
     const userId = req.user._id;
@@ -540,7 +460,7 @@ const addProfilepicture = asyncHandler( async(req,res)=>{
 
     res.redirect("/api/v1/users/test");
     
-})
+});
 
 const resendotpsender = asyncHandler( async(req,res)=>{
     const generatedOtp = req.otp.otp;
@@ -571,7 +491,7 @@ const resendotpsender = asyncHandler( async(req,res)=>{
     //     .status(500)
     //     .render("users/otpvalidation", {common:true, title:"Urbane Wardrobe", message: error.message})
     // }
-})
+});
 
 const forgotPassOtpSender = asyncHandler( async(req,res)=>{
     const generatedOtp = req.otp.otp;
@@ -595,7 +515,7 @@ const forgotPassOtpSender = asyncHandler( async(req,res)=>{
     //.json( new ApiResponse(200,{},"otp is sent to email"));
     .render("forgotpassotppage", {userId : req.user._id, title:"Urbane Wardrobe", common:true});
 
-})
+});
 
 const changePassFromOtp = asyncHandler( async(req,res)=>{
    
@@ -656,7 +576,7 @@ const changePassFromOtp = asyncHandler( async(req,res)=>{
     //     "User succesfully logged in"
     // ));
     .redirect("/api/v1/users/home");
-})
+});
 
 const deleteUser = asyncHandler( async(req,res)=>{
 
@@ -682,7 +602,7 @@ const deleteUser = asyncHandler( async(req,res)=>{
     .clearCookie("RefreshToken", options)
     //.json(new ApiResponse(200,{},"User successfully logged out"));
     .redirect("/api/v1");
-})
+});
 
 const addToWishlist = asyncHandler( async(req,res)=>{
     const {productId} = req.body;
@@ -725,7 +645,7 @@ const addToWishlist = asyncHandler( async(req,res)=>{
         console.log("Error while adding product to wishlist", error);
         res.json( new ApiError(500, "Error while adding product to wishlist", error.message));
     }
-})
+});
 
 const renderWishlist = asyncHandler( async(req,res)=>{
     //const wishlist = await Wishlist.findOne({userId: req.user._id})
@@ -857,7 +777,6 @@ const availableCoupons = asyncHandler( async(req,res)=>{
     .json( new ApiResponse(200,{coupons}));
 });
 
-
 const renderWalletPage = asyncHandler(async (req, res) => {
     const user = req.user;
     const categorylayout = await Category.find({});
@@ -960,12 +879,10 @@ const verifyOtp = asyncHandler( async(req,res,next)=>{
     let forgotPassword = req.body?.forgotpassword;
 try{
     const userOtp = await Otp.findOne({userid:userId});
-    const user = await User.findOne({_id: userId});
-    //check whether the user is present
+    const user = await User.findOne({_id: userId});    
     if(!user){
         throw new ApiError(400, "Registration timed out. Re-register again");
-    }
-    //check whether the otp document exists
+    }    
     if(!userOtp){
         throw new ApiError(400,"Invalid");
     }
