@@ -294,7 +294,7 @@ const addProductVarientPage = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    .render("admin/addproductVarient",{admin:true, title:"Urbane Wardrobe", color, size});
+    .render("admin/addproductvarient",{admin:true, title:"Urbane Wardrobe", color, size});
 });
 
 const addProductVarientPagewithId = asyncHandler( async(req,res)=>{
