@@ -594,7 +594,7 @@ const renderSalesReportPage = asyncHandler(async (req, res) => {
     
    
     console.log("this is orders", orders);
-    res.render("admin/salesReport",{admin:true, orders});
+    res.render("admin/salesreport",{admin:true, orders});
 });
 
 const getSalesReport = asyncHandler(async (req, res) => {
