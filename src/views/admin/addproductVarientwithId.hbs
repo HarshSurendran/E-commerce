@@ -199,7 +199,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", ()=>{    
+    
     //validation
     function validateForm() {
         const alertPrice = document.getElementById("alertPrice");
@@ -237,10 +237,7 @@
 
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-
-            reader.onload = function (e) {
-                //preview.src = e.target.result;
-                                
+            reader.onload = function (e) {  
                 $(document).ready(function(){
                     $(`#imageModal${number}`).modal('show');
                 });     
@@ -250,27 +247,17 @@
                 img.src = e.target.result;
                 
                 imageElement.appendChild(img);
-
                 //crop image
                 cropper = new Cropper(img, {
-                aspectRatio: 1,
+                aspectRatio: 1/1,
                 viewMode: 1,
                 dragMode: "move",
-               /* minContainerWidth: 450,
-                    minContainerHeight: 500,
-                    minCropBoxWidth: 400,
-                    minCropBoxHeight: 400,
-                    minCanvasHeight: 500,
-                    minCanvasWidth: 500,   */              
-                    /*crop(event) {
-                        console.log(event.detail.x);
-                        console.log(event.detail.y);
-                        console.log(event.detail.width);
-                        console.log(event.detail.height);
-                        console.log(event.detail.rotate);
-                        console.log(event.detail.scaleX);
-                        console.log(event.detail.scaleY);
-                    },*/
+                minContainerWidth: 450,
+                minContainerHeight: 500,
+                minCropBoxWidth: 400,
+                minCropBoxHeight: 400,
+                minCanvasHeight: 500,
+                minCanvasWidth: 500,
                 });
 
             };
@@ -292,5 +279,5 @@
             bootstrapModal.hide();
         });
     }
-    })
+   
  </script>
