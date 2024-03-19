@@ -1,73 +1,4 @@
 <link rel='stylesheet' href='/stylesheets/userlogin.css' />
-{{!-- 
-<div class="container ">
-  <div class="d-flex flex-column justify-content-center  align-content-center">
-<form class="row g-3 needs-validation" novalidate>
-  <div class="col-md-4">
-    <label for="validationCustom01" class="form-label">Full name</label>
-    <input type="text" class="form-control" id="validationCustom01" value="Mark" required>
-    <div class="valid-feedback">
-      Looks good!
-    </div>
-  </div>
-  <div class="col-md-4">
-    <label for="validationCustom02" class="form-label">Last name</label>
-    <input type="text" class="form-control" id="validationCustom02" value="Otto" required>
-    <div class="valid-feedback">
-      Looks good!
-    </div>
-  </div>
-  <div class="col-md-4">
-    <label for="validationCustomUsername" class="form-label">Username</label>
-    <div class="input-group has-validation">
-      <span class="input-group-text" id="inputGroupPrepend">@</span>
-      <input type="text" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
-      <div class="invalid-feedback">
-        Please choose a username.
-      </div>
-    </div>
-  </div>
-  <div class="col-md-6">
-    <label for="validationCustom03" class="form-label">City</label>
-    <input type="text" class="form-control" id="validationCustom03" required>
-    <div class="invalid-feedback">
-      Please provide a valid city.
-    </div>
-  </div>
-  <div class="col-md-3">
-    <label for="validationCustom04" class="form-label">State</label>
-    <select class="form-select" id="validationCustom04" required>
-      <option selected disabled value="">Choose...</option>
-      <option>...</option>
-    </select>
-    <div class="invalid-feedback">
-      Please select a valid state.
-    </div>
-  </div>
-  <div class="col-md-3">
-    <label for="validationCustom05" class="form-label">Zip</label>
-    <input type="text" class="form-control" id="validationCustom05" required>
-    <div class="invalid-feedback">
-      Please provide a valid zip.
-    </div>
-  </div>
-  <div class="col-12">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
-      <label class="form-check-label" for="invalidCheck">
-        Agree to terms and conditions
-      </label>
-      <div class="invalid-feedback">
-        You must agree before submitting.
-      </div>
-    </div>
-  </div>
-  <div class="col-12">
-    <button class="btn btn-primary" type="submit">Submit form</button>
-  </div>
-</form>
-</div>
-</div> --}}
 
 <div class="container mt-5">
     <div class="row ">
@@ -156,8 +87,7 @@
     passwordAlert.innerText="";
     cpasswordAlert.innerText="";
 
-    if(fullname.trim() === ""){
-        console.log("This is inside fillnamecheck")
+    if(fullname.trim() === ""){       
         nameAlert.innerText = "Name can't be empty";
         return false;
     }else if(email.trim() === ""){
@@ -191,17 +121,18 @@
     }
     const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if(!password.match(strongPasswordRegex)){
-        passwordAlert.innerText = "Phone number is not valid."
+        passwordAlert.innerText = "Password is not valid."
+        return false
+    }
+    if(confirmPassword !== password){
+        cpasswordAlert.innerText = "Passwords don't match."
         return false
     }
   }
   
   //checking password matches strong password
   password.addEventListener("input", ()=>{
-
-    let value = document.getElementById("Password1").value;
-    console.log("This  is keydiwn listener :", value)
-
+    let value = document.getElementById("Password1").value;    
     const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
     if(strongPasswordRegex.test(value)){
@@ -214,15 +145,9 @@
   });
 
   //checking whether confirm password matched password
-  confirmPassword.addEventListener("input", ()=>{
-
-    console.log("This  is keydiwn listener for cpass")
-
+  confirmPassword.addEventListener("input", ()=>{  
     let value = document.getElementById("Password1").value;
     let cvalue = document.getElementById("Password2").value;
-
-    console.log("pass :", value, "cpass :", cvalue)
-
     if(value === cvalue){
       cpasswordAlert.classList.replace("text-danger","text-success");
       cpasswordAlert.innerText = "Password is matching"
@@ -233,15 +158,11 @@
   });
 
   //checking whether phone exists
-  phone.addEventListener("input", ()=>{
-
-    console.log("This  is keydiwn listener for phone")
-
+  phone.addEventListener("input", ()=>{  
     let value = document.getElementById("Phone").value;  
     const phoneRegex = /^\d{10}$/;
 
     if(value.match(phoneRegex)){ 
-
       fetch("/api/v1/checkphone",{
           method : "POST",
           headers : {
