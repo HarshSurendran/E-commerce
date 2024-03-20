@@ -42,6 +42,7 @@ async function calculateDistance(sourceAddress, destinationAddress) {
         destinationLocation = destinationLocation.filter((element)=>{
             return element.countryCode === "IN"
         })
+        
         const sourceCoords = [sourceLocation[0].latitude, sourceLocation[0].longitude];
         const destinationCoords = [destinationLocation[0].latitude, destinationLocation[0].longitude];
         const distance = getDistance(sourceCoords, destinationCoords);        
@@ -357,20 +358,15 @@ const createOrder = asyncHandler( async(req,res)=>{
             const productVarient = await ProductVarient.findOne({ _id: element.productVarient_id });
             if (!productVarient) {
                 throw new ApiError(404, "Product variant not found");
-            }
-            // if (productVarient.stock < (element.quantity + 1)) {
-            //     throw new ApiError(410, "Insufficient stock");
+            }            
             if ((productVarient.stock - element.quantity) < 0) {
                 throw new ApiError(410, "Insufficient stock");
-            }
-            // Update the stock
-            // const productVarientUpdate = await ProductVarient.updateOne({ _id: element.productVarient_id }, { $inc: { stock: -element.quantity } });
+            }            
 
             orderedItems.push({ productVarientId: element.productVarient_id, quantity: element.quantity });
 
             const offer = await checkOffer(element.product.name.category?.category);
-            if (offer) {
-                // productVarient.originalprice = productVarient.price;
+            if (offer) {                
                 element.product.price = applyOffer(element.product.price, offer.discount);
                 element.offerApplied = true;
                 console.log("this is price after applying offer", productVarient.price);
@@ -409,7 +405,11 @@ const createOrder = asyncHandler( async(req,res)=>{
         pincode = pincode.toString();        
         let distance = await calculateDistance("673639", pincode); 
         deliveryCharge = calculateDeliveryCharge(distance);
-        total = total + deliveryCharge;
+        if(deliveryCharge){
+            total = total + deliveryCharge;
+        }else{
+            deliveryCharge = 0;
+        }
 
         if(paymentMethod === "Wallet"){
             const wallet = await Wallet.findOne({ userId: user._id });
@@ -804,12 +804,13 @@ const changeOrderStatus = asyncHandler( async(req,res)=>{
             },
             {
                 $set: {
-                    returnPeriod : true
+                    returnPeriod : true,
+                    paymentStatus: "Paid"
                 }
             }
         );    
         
-        console.log("updated o;rder", order)
+        console.log("updated order", order)
     }
     const updatedOrder = await Order.findOne({_id: orderId})
     console.log("this is updated order",updatedOrder)

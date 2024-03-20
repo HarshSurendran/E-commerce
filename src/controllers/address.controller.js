@@ -76,9 +76,7 @@ const addAddressPage = asyncHandler( async(req,res)=>{
 
 const addAddress = asyncHandler( async(req,res)=>{
     const user = req.user    
-    const {fullName, phone, type, street, locality, district, state, pinCode} = req.body;
-    console.log(req.body);
-    console.log(user._id)
+    const {fullName, phone, type, street, locality, district, state, pinCode} = req.body;    
 
     const address =  await Address.create({
         userid: user._id,
@@ -100,7 +98,7 @@ const addAddress = asyncHandler( async(req,res)=>{
 
     res
     .status(200)
-    .redirect("/api/v1/users/profile");
+    .redirect("/api/v1/users/address");
 });
 
 const editAddressPage = asyncHandler(async(req,res)=>{
