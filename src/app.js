@@ -94,6 +94,21 @@ hbs.registerHelper('checkPending', function (paymentStatus){
   }
   return "d-none";
 });
+hbs.registerHelper('gt', function(a, b) {
+  return a > b;
+});
+hbs.registerHelper('lt', function(a, b) {
+  return a < b;
+});
+hbs.registerHelper('eq', function(a, b) {
+  return a === b;
+});
+hbs.registerHelper('sub', function(a, b) {
+  return a - b;
+});
+hbs.registerHelper('sum', function(a, b) {
+  return a + b;
+});
 app.use(nocache());
 
 //Require routes

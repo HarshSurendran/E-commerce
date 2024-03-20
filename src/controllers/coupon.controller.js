@@ -7,8 +7,14 @@ const Coupon = require("../models/coupon.models.js");
 
 
 const renderCouponPage = asyncHandler( async(req,res)=>{
-    const coupons1 = await Coupon.find({});
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;   
     
+    const totalCount = await Coupon.countDocuments();
+    const totalPages = Math.ceil(totalCount / limit);
+
+    const coupons1 = await Coupon.find({}).skip(skip).limit(limit);    
     const coupons = coupons1.map((element) => {
         const dateString = element.expiryDate;
         const dateObject = new Date(dateString);
@@ -20,12 +26,15 @@ const renderCouponPage = asyncHandler( async(req,res)=>{
             ...element.toObject(),
             expiryDate: formattedDate,
         }
-
     });
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+    }
     
     res
     .status(200)
-    .render("admin/coupon", {admin:true, title:"Urbane Wardrobe", coupons})
+    .render("admin/coupon", {admin:true, title:"Urbane Wardrobe", coupons, totalCount, totalPages, currentPage: page, pages})
 });
 
 const addCoupon = asyncHandler( async(req,res)=>{

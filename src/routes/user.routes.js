@@ -17,7 +17,6 @@ const otpGenerator = require("../middlewares/otpGenerator.middleware.js");
 
 
 //routes starts
-
 router.post("/register", upload.single('image'), insertUser, otpGenerator, userController.otpPageLoader);
 router.post("/verify-otp", userController.verifyOtp, userController.verifiedUserLogin);
 router.post("/resendotp", otpGenerator, userController.resendotpsender);

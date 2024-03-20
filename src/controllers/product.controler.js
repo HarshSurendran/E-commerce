@@ -71,8 +71,15 @@ const addProduct = asyncHandler( async (req,res)=>{
     )
 });
 
-const onlyProductsList = asyncHandler( async (req,res)=>{
-    //const products = await Product.find({}).select(" -updatedAt");
+const onlyProductsList = asyncHandler( async (req,res)=>{   
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    console.log("skip,page:",skip,page)
+    
+    const totalCount = await Product.countDocuments();
+    const totalPages = Math.ceil(totalCount / limit);
+
     const products = await Product.aggregate([
         {
             $lookup: {
@@ -86,6 +93,12 @@ const onlyProductsList = asyncHandler( async (req,res)=>{
             $addFields: {
                 category: { $first : "$category" }
             }
+        },
+        {
+            $skip: skip
+        },
+        {
+            $limit: limit
         },
         {
             $project: {
@@ -113,6 +126,12 @@ const onlyProductsList = asyncHandler( async (req,res)=>{
     if(!category){
         throw new ApiError(500, "Something went wrong while fetching category details");
     }
+
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+    }
+    
 
     //const bestSellers = await ProductVarient.find({}).sort({sold_count: -1}).limit(10)
     const bestSellers = await ProductVarient.aggregate([
@@ -176,7 +195,7 @@ const onlyProductsList = asyncHandler( async (req,res)=>{
     ])
     console.log("this is the bestseller", bestSellers)
 
-    res.render("admin/onlyProductList", {admin: true, title: "Urbane Wardrobe", products, category, bestSellers});
+    res.render("admin/onlyProductList", {admin: true, title: "Urbane Wardrobe", products, category, bestSellers, totalCount, totalPages, currentPage: page, pages});
 });
 
 const editProductPage = asyncHandler ( async (req,res)=>{

@@ -80,7 +80,35 @@
                 <!-- card-body end// -->
             </div>
             <!-- card end// -->
-            
+            <div class="d-flex justify-content-center">
+                <div class="pagination-area mt-15 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">  
+                            {{#if (gt currentPage 1)}}
+                            <li class="page-item">
+                                <a class="page-link d-flex justify-content-center align-items-center" href="/api/v1/admin/orders?page={{sub currentPage 1}}">
+                                <i class="material-icons md-chevron_left"></i>
+                                </a>
+                            </li>
+                            {{/if}}
+
+                            {{#each pages}}
+                            <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
+                                <a class="page-link" href="/api/v1/admin/orders?page={{this}}">{{this}}</a>
+                            </li>
+                            {{/each}}
+
+                            {{#if (lt currentPage totalPages)}}
+                            <li class="page-item">
+                                <a class="page-link d-flex justify-content-center align-items-center" href="/api/v1/admin/orders?page={{sum currentPage 1}}">
+                                <i class="material-icons md-chevron_right"></i>
+                                </a>
+                            </li>
+                            {{/if}}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </section>
         <!-- content-main end// -->
         

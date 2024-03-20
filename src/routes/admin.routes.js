@@ -17,17 +17,20 @@ const  mongoose  = require("mongoose");
 const ApiResponse = require("../utils/ApiResponse");
 
 //offer
+
 router.get("/offers", auth.verifyAdminJWT, offerController.renderOffersPage);
 router.get("/offers/add-offer", auth.verifyAdminJWT, offerController.addOffersPage);
 router.post("/offers", auth.verifyAdminJWT, upload.single("images"), offerController.addOffers);
 router.get("/offers/delete-offer/:id", auth.verifyAdminJWT, offerController.deleteOffer);
 
 //sales Report
+
 router.get("/salesreport", auth.verifyAdminJWT, adminController.renderSalesReportPage);
 router.post("/salesreport", auth.verifyAdminJWT, adminController.getSalesReport);
 router.post("/filtersalesreport", adminController.salesReportFilter);
 
 //coupons
+
 router.get("/coupons", auth.verifyAdminJWT, couponController.renderCouponPage);
 router.post("/coupons", auth.verifyAdminJWT, couponController.addCoupon);
 router.get("/delete-coupon/:id", auth.verifyAdminJWT, couponController.deleteCoupon);
@@ -35,20 +38,24 @@ router.get("/edit-coupon/:id", auth.verifyAdminJWT, couponController.editCouponP
 router.post("/editcoupon", auth.verifyAdminJWT, couponController.editCoupon)
 
 //graph
+
 router.post("/graphData", auth.verifyAdminJWT, adminController.graphData);
 
 //order
+
 router.get("/orders/orderdetails/:id", orderController.renderOrderDetailsPage);
 router.get("/orders", orderController.renderOrdersPage);
 router.post("/updateorderstatus", orderController.changeOrderStatus);
 
 //login
+
 router.get("/", auth.checkAdminJWT , adminController.renderLoginPage);
 router.post("/", adminController.adminlogin);
 router.post("/verify", adminController.verifyEmailPassword);
 router.get("/dashboard", auth.verifyAdminJWT, adminController.renderDashboard);
 
 //product handling 
+
 router.get("/Products", auth.verifyAdminJWT, productController.onlyProductsList);
 router.get("/products/addproduct", auth.verifyAdminJWT, productController.addProductPage);
 router.post("/addproduct", auth.verifyAdminJWT, productController.addProduct);
@@ -65,6 +72,7 @@ router.post("/products/editproductvarient", auth.verifyAdminJWT, productControll
 router.get("/products/productvarientdetails/:id", auth.verifyAdminJWT, productController.productVarientDetailsPage);
 
 //user handling
+
 router.patch("/blockunblock/:userId", auth.verifyAdminJWT, adminController.blockUnblockUser)
 router.get("/users", auth.verifyAdminJWT, adminController.userList);
 //router.get("/delete-user/:id", auth.verifyAdminJWT, adminController.deleteUser); Delete User is not necessary
@@ -74,23 +82,28 @@ router.get("/users/details/:id",auth.verifyAdminJWT, adminController.userDetails
 router.patch("/editdetails", auth.verifyAdminJWT, adminController.editUserDetails);
 
 //category handling
+
 router.get("/category", auth.verifyAdminJWT, adminController.categoryPage);
 router.post("/category", auth.verifyAdminJWT, adminController.addCategory);
 router.get("/delete-category/:id", auth.verifyAdminJWT, adminController.deleteCategory);
 router.patch("/category", auth.verifyAdminJWT, adminController.editCategory);
 
 //Color
+
 router.post("/color", auth.verifyAdminJWT, productController.addColor);
 router.get("/color/:id", auth.verifyAdminJWT, productController.deleteColor);
 
 //Size
+
 router.post("/size", auth.verifyAdminJWT, productController.addSize);
 router.get("/size/:id", auth.verifyAdminJWT, productController.deleteSize);
 
-// Secured routes
+//Secured routes
+
 router.get("/logout", auth.verifyAdminJWT, adminController.logout);
 
-// invoice
+//invoice
+
 router.get("/invoice/:id", auth.verifyAdminJWT, orderController.renderInvoiceAdmin);
 
 module.exports = router;

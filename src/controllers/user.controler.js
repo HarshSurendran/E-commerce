@@ -77,13 +77,7 @@ const verifiedUserLogin = asyncHandler( async (req,res)=>{
     .redirect("/api/v1/users/home");
 });
 
-const loginUser = asyncHandler( async (req,res)=>{
-    // steps needed:-
-    // Validate empty input -Done
-    // Find the input value type(email or password) and then find the user in database -Done
-    // check wether the password is correct -Done
-    // generate refresh and accesstoken -Done
-    // respond with access and refresh token in cookie -Done
+const loginUser = asyncHandler( async (req,res)=>{    
     try{
     const {value, password} = req.body;
 

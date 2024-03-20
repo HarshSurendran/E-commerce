@@ -584,6 +584,14 @@ const orderSuccessPage = asyncHandler( async(req,res)=>{
 });
 
 const renderOrdersPage = asyncHandler( async(req,res)=>{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    console.log("skip,page:",skip,page)
+    
+    const totalCount = await Order.countDocuments();
+    const totalPages = Math.ceil(totalCount / limit);
+
     const orders = await Order.aggregate(
         [
             {
@@ -605,20 +613,31 @@ const renderOrdersPage = asyncHandler( async(req,res)=>{
                 $sort: {
                     createdAt: -1
                 }
+            },
+            {
+                $skip: skip 
+            },
+            {
+                $limit: limit
             }
         ]
-        )
+    )
 
     orders.forEach((order)=>{
         const formattedCreatedAt = order.createdAt.toISOString().split('T')[0];
         order.createdAt = formattedCreatedAt;        
     });
+    console.log("This is orders", orders);
 
-    console.log("this is orders", orders);
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+    }
+    
 
     res
     .status(200)
-    .render("admin/orderlist",{admin:true, title:"Urbane Wardrobe", orders});
+    .render("admin/orderlist",{admin:true, title:"Urbane Wardrobe", orders, totalCount, totalPages, currentPage: page, pages});
 });
 
 const renderOrderDetailsPage = asyncHandler( async(req,res)=>{

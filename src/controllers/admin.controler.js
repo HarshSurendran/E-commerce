@@ -283,14 +283,24 @@ const logout = asyncHandler( async(req,res)=>{
 });
 
 const userList = asyncHandler( async(req, res)=>{
-    const userList = await User.find({}).select("-refreshToken");
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;   
+    
+    const totalCount = await User.countDocuments();
+    const totalPages = Math.ceil(totalCount / limit);    
+    const userList = await User.find({}).select("-refreshToken").skip(skip).limit(limit);
     if(!userList){
         throw new ApiError(500,"Problem fetching user data");
+    }
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
     }
 
     res
     .status(200)
-    .render("admin/userlist",{ admin:true, title:"Urbane Wardrobw", userDetails: userList});
+    .render("admin/userlist",{ admin:true, title:"Urbane Wardrobw", userDetails: userList, totalCount, totalPages, currentPage: page, pages});
 });
 
 const createUserPage = asyncHandler( async(req,res)=>{
@@ -583,18 +593,25 @@ const graphData = asyncHandler( async (req,res)=>{
 });
 
 const renderSalesReportPage = asyncHandler(async (req, res) => {
-    let orders = await Order.find({paymentStatus:"Paid"}).populate("userId").sort({createdAt: -1});
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;   
     
+    const totalCount = await Order.find({paymentStatus:"Paid"}).countDocuments();    
+    const totalPages = Math.ceil(totalCount / limit);
 
+    let orders = await Order.find({paymentStatus:"Paid"}).populate("userId").sort({createdAt: -1}).skip(skip).limit(limit);
     if (!orders) {
         res
         .status(400)
         .json( new ApiError(400, null, "Could not find orders"))
     }
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+    }
     
-   
-    console.log("this is orders", orders);
-    res.render("admin/salesreport",{admin:true, orders});
+    res.render("admin/salesreport",{admin:true, orders, totalCount, totalPages, currentPage: page, pages});
 });
 
 const getSalesReport = asyncHandler(async (req, res) => {
@@ -677,8 +694,14 @@ const salesReportFilter = asyncHandler(async (req, res) => {
 }); 
 
 const categoryPage = asyncHandler( async(req,res)=>{
-    let category = await Category.find({}).select(" -updatedAt");
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;   
+    
+    const totalCount = await Category.countDocuments();
+    const totalPages = Math.ceil(totalCount / limit);
 
+    let category = await Category.find({}).select(" -updatedAt").skip(skip).limit(limit);
     if(!category){
         throw new ApiError(500, "Couldnt fetch category data");
     }
@@ -697,8 +720,11 @@ const categoryPage = asyncHandler( async(req,res)=>{
             ...element.toObject(), 
             date: formattedDate,
         }
-
-      });
+    });
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+    }
 
     const bestSellingCategories = await Order.aggregate([
         {
@@ -746,11 +772,11 @@ const categoryPage = asyncHandler( async(req,res)=>{
         {
           $sort: { totalSoldQuantity: -1 }
         }
-      ]);      
+    ]);      
       
     res
     .status(200)
-    .render("admin/category",{ admin:true, title:"Urbane Wardrobe", category:updatedCategory, bestSellingCategories});
+    .render("admin/category",{ admin:true, title:"Urbane Wardrobe", category:updatedCategory, bestSellingCategories, totalCount, totalPages, currentPage: page, pages});
 })
 
 const addCategory = asyncHandler( async(req,res)=>{
