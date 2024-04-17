@@ -7,18 +7,15 @@ const User = require("../models/user.models");
 const speakeasy = require("speakeasy");
 
 const generateOtp = ()=>{
-
     const secret = speakeasy.generateSecret({ length: 20 });
-
-    console.log("\n you have entered otp generator function and this is the secret :",secret);
-
-    const otp = speakeasy.totp({
-        secret: secret.base32,
-        encoding: "base32",
-    })
-
-    console.log(otp);
-
+    let otp
+    do{
+         otp = speakeasy.totp({
+            secret: secret.base32,
+            encoding: "base32",
+        })
+    } while (otp.startsWith('0'));    
+    console.log(otp)
     return otp
 }
 

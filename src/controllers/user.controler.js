@@ -46,13 +46,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const verifiedUserLogin = asyncHandler( async (req,res)=>{
-
-    console.log(req.user);
-
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(req.user);
-
-    console.log(accessToken);
-
     const userUpdated =  await User.updateOne(
         {
            _id: req.user
@@ -80,8 +74,6 @@ const verifiedUserLogin = asyncHandler( async (req,res)=>{
 const loginUser = asyncHandler( async (req,res)=>{    
     try{
     const {value, password} = req.body;
-
-    console.log(value,"and",password);
 
     //validation of value and password
     if(value.trim()==""){
@@ -153,8 +145,7 @@ const loginUser = asyncHandler( async (req,res)=>{
 const homePageRender = asyncHandler( async(req,res)=>{
     const categorylayout = await Category.find({});
     let wishlistCountlayout = 0;
-    let wishlistlayout = await Wishlist.find({userId: req.user._id});
-    console.log("This is wishlist",wishlistlayout);
+    let wishlistlayout = await Wishlist.find({userId: req.user._id});    
     wishlistlayout = wishlistlayout[0];
     if (wishlistlayout?.productsId.length) {
         wishlistlayout.productsId.forEach(element => {

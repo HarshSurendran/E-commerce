@@ -9,7 +9,7 @@ const Coupon = require("../models/coupon.models.js");
 const renderCouponPage = asyncHandler( async(req,res)=>{
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
-    const skip = (page - 1) * limit;   
+    const skip = (page - 1) * limit;
     
     const totalCount = await Coupon.countDocuments();
     const totalPages = Math.ceil(totalCount / limit);

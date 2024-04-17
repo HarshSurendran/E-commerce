@@ -1094,7 +1094,7 @@ const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
         [
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId(orderid) // orderid
+                    _id: new mongoose.Types.ObjectId(orderid) 
                 }
             },
             {
@@ -1236,23 +1236,22 @@ const renderUserOrderDetailsPage = asyncHandler( async(req,res)=>{
         subTotal += order.productVarient.price * order.orderedItems.quantity;
         console.log("This is subtotal", subTotal)
     }
-    const coupon = await Coupon.findOne({code: order.couponCode});
-
-    let total = parseInt(subTotal);    
-    if (coupon) {
-        total = parseInt(subTotal) - parseInt(coupon.discount); 
-    }
-    total = total + parseInt(order.deliveryCharge);
+    
+    // let total = parseInt(subTotal);    
+    // if (coupon) {
+    //     total = parseInt(subTotal) - parseInt(coupon.discount); 
+    // }
+    // total = total + parseInt(order.deliveryCharge);
 
     if (order.status === "Delivered") {
         order.delivered = true;
     }
-    console.log("this is total", total);
+   
     console.log("Thisis order", order);
     
     res
     .status(200)
-    .render("users/orderdetails",{user:req.user, title:"Urbane Wardrobe", order, orderVarients, subTotal, total, coupon, layout: "userprofilelayout", wishlistCountlayout, cartCountlayout, categorylayout});
+    .render("users/orderdetails",{user:req.user, title:"Urbane Wardrobe", order, orderVarients, subTotal,  layout: "userprofilelayout", wishlistCountlayout, cartCountlayout, categorylayout});
 });
 
 const verifyPayment = asyncHandler( async(req,res)=>{

@@ -123,7 +123,7 @@
                                                 </dl>
                                                 <dl class="dlist">
                                                     <dt>Grand total:</dt>
-                                                    <dd><b class="h5">₹{{total}}</b></dd>
+                                                    <dd><b class="h5">₹{{order.orderAmount}}</b></dd>
                                                 </dl>
                                                 <dl class="dlist">
                                                     {{!-- <dt class="text-muted">Status:</dt>
@@ -156,10 +156,10 @@
                         <div class="box shadow-sm bg-light">
                             <h6 class="mb-15">Discount info</h6>
                             <p>
-                                COUPON CODE : <b>{{coupon.code}}</b>
+                                COUPON CODE : <b>{{order.couponCode}}</b>
                             </p>
                             <p>
-                                DISCOUNT : ₹ <b>{{coupon.discount}}</b>
+                                DISCOUNT : ₹ <b>{{order.couponDiscount}}</b>
                             </p>
                         </div>
                         
